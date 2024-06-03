@@ -1,0 +1,12 @@
+asgiref
+Django
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+gunicorn
+dj-database-url
+psycopg2-binary
+python-dotenv
+pytz
+sqlparse
+dotenv
