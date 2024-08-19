@@ -6,7 +6,8 @@ const SelectedPlayers = ({ selectedPlayers, players }) => {
       <div>
         <h2>Selected Players:</h2>
         <ul>
-          {selectedPlayers.map((playerId) => {
+          {Object.keys(selectedPlayers).map((position) => {
+            const playerId = selectedPlayers[position];
             const player = players.find((p) => p.id === playerId);
             return (
               <li key={player.id}>

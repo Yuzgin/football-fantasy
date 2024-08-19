@@ -1,0 +1,27 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+    border: 1px solid #ddd; /* Add border to the table */
+  }
+  
+  th, td {
+    padding: 12px;
+    border: 1px solid #ddd; /* Add border to table headers and data cells */
+  }
+  
+  thead {
+    background-color: rgba(255, 255, 0, 0.1); /* Light yellow with 60% opacity */
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  th {
+    background-color: rgba(238, 238, 62, 0.421); /* Ensure header background color is light yellow with 60% opacity */
+    color: black; /* Change header text color to black for better contrast */
+  }
+  

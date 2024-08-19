@@ -126,3 +126,10 @@ class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PlayerGameStats.objects.all()
     serializer_class = PlayerGameStatsSerializer
     permission_classes = [IsAuthenticated]
+
+class TeamListView(generics.ListCreateAPIView):
+    serializer_class = TeamSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Team.objects.all()

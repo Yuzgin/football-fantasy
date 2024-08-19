@@ -5,13 +5,25 @@ import TeamForm from '../components/TeamForm';
 import SelectedPlayers from '../components/SelectedPlayers';
 import HomeButton from '../components/HomeButton';
 import LogoutButton from '../components/LogoutButton';
+import PlayerModal from '../components/PlayerModal';
+
+const formations = {
+  "4-4-2": ["Goalkeeper", "Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
+  "4-3-3": ["Goalkeeper", "Defender", "Defender", "Defender", "Defender", "Midfielder", "Midfielder", "Midfielder", "Attacker", "Attacker", "Attacker"],
+  "3-5-2": ["Goalkeeper", "Defender", "Defender", "Defender", "Midfielder", "Midfielder", "Midfielder", "Midfielder", "Midfielder", "Attacker", "Attacker"],
+  // Add more formations if needed
+};
 
 const CreateTeam = () => {
   const [players, setPlayers] = useState([]);
   const [name, setName] = useState('');
-  const [selectedPlayers, setSelectedPlayers] = useState([]);
+  const [selectedPlayers, setSelectedPlayers] = useState({});
   const [hasTeam, setHasTeam] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [budget, setBudget] = useState(100);
+  const [selectedFormation, setSelectedFormation] = useState("4-4-2");
+  const [currentPosition, setCurrentPosition] = useState(null);
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
 
   useEffect(() => {
     fetchPlayers();
@@ -47,8 +59,8 @@ const CreateTeam = () => {
   const handleCreateTeam = async (event) => {
     event.preventDefault();
     try {
-      const teamData = { name, players: selectedPlayers };
-      const response = await api.post('/api/team/', teamData);
+      const teamData = { name, players: Object.values(selectedPlayers) };
+      await api.post('/api/team/', teamData);
       // Redirect to the team page
       window.location.href = '/team';
     } catch (error) {
@@ -57,18 +69,35 @@ const CreateTeam = () => {
   };
 
   const handlePlayerSelect = (playerId) => {
-    if (selectedPlayers.length < 11) {
-      setSelectedPlayers((prevSelectedPlayers) => [...prevSelectedPlayers, playerId]);
+    const player = players.find((p) => p.id === playerId);
+    if (budget - player.price >= 0) {
+      setSelectedPlayers((prevSelectedPlayers) => ({
+        ...prevSelectedPlayers,
+        [currentPosition]: playerId,
+      }));
+      setBudget((prevBudget) => prevBudget - player.price);
+      setShowPlayerModal(false);
+      setCurrentPosition(null);
     }
   };
 
-  const handlePlayerDeselect = (playerId) => {
-    setSelectedPlayers((prevSelectedPlayers) =>
-      prevSelectedPlayers.filter((id) => id !== playerId)
-    );
+  const handlePlayerDeselect = (position) => {
+    const playerId = selectedPlayers[position];
+    const player = players.find((p) => p.id === playerId);
+    setSelectedPlayers((prevSelectedPlayers) => {
+      const updatedPlayers = { ...prevSelectedPlayers };
+      delete updatedPlayers[position];
+      return updatedPlayers;
+    });
+    setBudget((prevBudget) => prevBudget + player.price);
   };
 
-  const isPlayerSelected = (playerId) => selectedPlayers.includes(playerId);
+  const isPlayerSelected = (playerId) => Object.values(selectedPlayers).includes(playerId);
+
+  const openPlayerModal = (position) => {
+    setCurrentPosition(position);
+    setShowPlayerModal(true);
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -90,10 +119,25 @@ const CreateTeam = () => {
         handlePlayerSelect={handlePlayerSelect}
         handlePlayerDeselect={handlePlayerDeselect}
         handleCreateTeam={handleCreateTeam}
+        formations={formations}
+        selectedFormation={selectedFormation}
+        setSelectedFormation={setSelectedFormation}
+        budget={budget}
+        openPlayerModal={openPlayerModal}
       />
       <SelectedPlayers selectedPlayers={selectedPlayers} players={players} />
       <HomeButton />
       <LogoutButton />
+
+      {showPlayerModal && (
+        <PlayerModal
+          players={players}
+          isPlayerSelected={isPlayerSelected}
+          handlePlayerSelect={handlePlayerSelect}
+          closeModal={() => setShowPlayerModal(false)}
+          position={currentPosition}
+        />
+      )}
     </div>
   );
 };

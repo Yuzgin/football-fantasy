@@ -19,7 +19,7 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ["id", "name", "position", "points"]
+        fields = ["id", "name", "position", "points", "price", "team", "goals", "assists", "yellow_cards", "red_cards", "clean_sheets", "games_played"]
 
     def get_points(self, player):
         team_creation_date = self.context.get('team_creation_date')
