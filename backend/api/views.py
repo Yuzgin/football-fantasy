@@ -9,8 +9,6 @@ from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework import viewsets
-from django.db.models import Q
 
 
 # Create your views here.
@@ -77,6 +75,32 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
 
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            team = Team.objects.get(user=user)
+        except Team.DoesNotExist:
+            return Response({'error': 'You do not have a team to update.'}, status=status.HTTP_404_NOT_FOUND)
+
+        name = request.data.get('name', team.name)  # Use the current name if not provided
+        player_ids = request.data.get('players', [])
+
+        if not player_ids or len(player_ids) != 11:
+            return Response({'error': 'You must select exactly 11 players.'}, status=400)
+
+        players = Player.objects.filter(id__in=player_ids)
+
+        if players.count() != 11:
+            return Response({'error': 'Invalid player selection.'}, status=400)
+
+        # Update team details
+        team.name = name
+        team.players.set(players)
+        team.save()
+
+        serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class TeamDeleteView(generics.DestroyAPIView):

@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { Navigate } from 'react-router-dom';
-import TeamForm from '../components/TeamForm';
-import SelectedPlayers from '../components/SelectedPlayers';
+import TeamPlayer from '../components/TeamForm';
 import HomeButton from '../components/HomeButton';
 import LogoutButton from '../components/LogoutButton';
 import PlayerModal from '../components/PlayerModal';
 
 const formations = {
-  "4-4-2": ["Goalkeeper", "Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
-  "4-3-3": ["Goalkeeper", "Defender", "Defender", "Defender", "Defender", "Midfielder", "Midfielder", "Midfielder", "Attacker", "Attacker", "Attacker"],
-  "3-5-2": ["Goalkeeper", "Defender", "Defender", "Defender", "Midfielder", "Midfielder", "Midfielder", "Midfielder", "Midfielder", "Attacker", "Attacker"],
-  // Add more formations if needed
+  "4-4-2": ["Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
 };
 
 const CreateTeam = () => {
@@ -61,7 +57,6 @@ const CreateTeam = () => {
     try {
       const teamData = { name, players: Object.values(selectedPlayers) };
       await api.post('/api/team/', teamData);
-      // Redirect to the team page
       window.location.href = '/team';
     } catch (error) {
       console.error('Error creating team:', error);
@@ -99,6 +94,51 @@ const CreateTeam = () => {
     setShowPlayerModal(true);
   };
 
+  // Updated getSelectedPlayerCount to exclude the goalkeeper
+  const getSelectedPlayerCount = () => 
+    Object.keys(selectedPlayers).filter(position => position !== "Goalkeeper").length;
+
+  const getPositionCount = (positionType) =>
+    Object.keys(selectedPlayers).filter((pos) => pos.startsWith(positionType)).length;
+
+  // Logic to ensure only one additional defender or midfielder is allowed
+  const additionalDefenderAllowed =
+    getPositionCount('Defender') === 4 &&
+    getPositionCount('Midfielder') < 5 &&
+    getSelectedPlayerCount() <= 9;
+
+  const additionalMidfielderAllowed =
+    getPositionCount('Midfielder') === 4 &&
+    getPositionCount('Defender') < 5 &&
+    getSelectedPlayerCount() <= 9;
+
+  const additionalAttackerAllowed =
+    getPositionCount('Attacker') === 2 && getSelectedPlayerCount() <= 9;
+
+  // Logic to determine if only one attacker should be rendered
+  const onlyOneAttackerAllowed =
+    (getPositionCount('Defender') === 4 && getPositionCount('Midfielder') === 5) ||
+    (getPositionCount('Defender') === 5 && getPositionCount('Midfielder') === 4);
+
+  const renderTeamPlayer = (position) => {
+    const totalSelectedPlayers = getSelectedPlayerCount();
+    const playerAssigned = selectedPlayers[position];
+
+    // Only show the component if the position has an assigned player or the total selected players is less than 10
+    if (totalSelectedPlayers < 10 || playerAssigned) {
+      return (
+        <TeamPlayer
+          key={position}
+          position={position}
+          selectedPlayer={players.find((p) => p.id === playerAssigned)}
+          openPlayerModal={openPlayerModal}
+          handlePlayerDeselect={handlePlayerDeselect}
+        />
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -110,22 +150,75 @@ const CreateTeam = () => {
   return (
     <div>
       <p>You do not have a team. Please create one.</p>
-      <TeamForm
-        name={name}
-        setName={setName}
-        selectedPlayers={selectedPlayers}
-        players={players}
-        isPlayerSelected={isPlayerSelected}
-        handlePlayerSelect={handlePlayerSelect}
-        handlePlayerDeselect={handlePlayerDeselect}
-        handleCreateTeam={handleCreateTeam}
-        formations={formations}
-        selectedFormation={selectedFormation}
-        setSelectedFormation={setSelectedFormation}
-        budget={budget}
-        openPlayerModal={openPlayerModal}
-      />
-      <SelectedPlayers selectedPlayers={selectedPlayers} players={players} />
+      <form onSubmit={handleCreateTeam}>
+        <label htmlFor="name">Team Name:</label>
+        <input
+          type="text"
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+
+        <label htmlFor="formation">Formation:</label>
+        <select
+          id="formation"
+          value={selectedFormation}
+          onChange={(e) => setSelectedFormation(e.target.value)}
+        >
+          {Object.keys(formations).map((formation) => (
+            <option key={formation} value={formation}>
+              {formation}
+            </option>
+          ))}
+        </select>
+
+        <div>
+          {/* Render Goalkeeper separately */}
+          <TeamPlayer
+            position="Goalkeeper"
+            selectedPlayer={players.find((p) => p.id === selectedPlayers["Goalkeeper"])}
+            openPlayerModal={openPlayerModal}
+            handlePlayerDeselect={handlePlayerDeselect}
+          />
+
+          {/* Render Defenders */}
+          {formations[selectedFormation]
+            .filter(position => position.startsWith("Defender"))
+            .map(position => renderTeamPlayer(position))}
+          
+          {/* Conditionally render the 5th Defender */}
+          {(additionalDefenderAllowed || selectedPlayers["Defender-5"]) && renderTeamPlayer("Defender-5")}
+
+          {/* Render Midfielders */}
+          {formations[selectedFormation]
+            .filter(position => position.startsWith("Midfielder"))
+            .map(position => renderTeamPlayer(position))}
+
+          {/* Conditionally render the 5th Midfielder */}
+          {(additionalMidfielderAllowed || selectedPlayers["Midfielder-5"]) && renderTeamPlayer("Midfielder-5")}
+
+          {/* Render Attackers */}
+          {formations[selectedFormation]
+            .filter(position => position.startsWith("Attacker"))
+            .map(position => {
+              if (position === "Attacker-2" && onlyOneAttackerAllowed && !selectedPlayers["Attacker-2"]) {
+                return null; // Do not render Attacker-2 if only one attacker is allowed and it hasn't been selected yet
+              }
+              return renderTeamPlayer(position);
+            })}
+
+          {/* Conditionally render the 3rd Attacker */}
+          {(additionalAttackerAllowed || selectedPlayers["Attacker-3"]) && renderTeamPlayer("Attacker-3")}
+        </div>
+
+        <div>Budget: £{budget.toFixed(1)}m</div>
+
+        <button type="submit" disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}>
+          Create Team
+        </button>
+      </form>
+
       <HomeButton />
       <LogoutButton />
 

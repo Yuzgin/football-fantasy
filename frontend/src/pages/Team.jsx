@@ -5,10 +5,12 @@ import TeamInfo from '../components/TeamInfo';
 import PlayerTable from '../components/PlayerTable';
 import HomeButton from '../components/HomeButton';
 import LogoutButton from '../components/LogoutButton';
+import TransfersButton from '../components/TransfersButtton'
 
 const TeamPage = () => {
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [teamValue, setTeamValue] = useState(0);
 
   useEffect(() => {
     fetchTeam();
@@ -19,6 +21,10 @@ const TeamPage = () => {
       const response = await api.get('/api/team/');
       console.log('Fetched team:', response.data);
       setTeam(response.data);
+      const totalValue = response.data.players.reduce((total, player) => {
+        return total + player.price;
+      }, 0);
+      setTeamValue(totalValue);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setTeam(null);
@@ -49,9 +55,10 @@ const TeamPage = () => {
 
   return (
     <div>
-      <TeamInfo team={team} handleDeleteTeam={handleDeleteTeam} />
+      <TeamInfo team={team} handleDeleteTeam={handleDeleteTeam} value={teamValue} />
       <PlayerTable players={team.players} />
       <HomeButton />
+      <TransfersButton />
       <LogoutButton />
     </div>
   );

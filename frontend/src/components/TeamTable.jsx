@@ -1,12 +1,9 @@
 import React from 'react';
 import '../styles/TeamTable.css';
 
-const TeamTable =({
-    teams
-}) => {
-
+const TeamTable = ({ teams }) => {
     return (
-        <table>
+        <table className="team-table">
             <thead>
                 <tr>
                     <th>Team</th>
@@ -14,7 +11,7 @@ const TeamTable =({
                 </tr>
             </thead>
             <tbody>
-                {teams.map((team) =>(
+                {teams.map((team) => (
                     <tr key={team.id}>
                         <td>{team.name}</td>
                         <td>{team.total_points}</td>
@@ -25,4 +22,4 @@ const TeamTable =({
     );
 };
 
-export default TeamTable
+export default TeamTable;

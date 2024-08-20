@@ -9,7 +9,7 @@ import Team from './pages/Team'
 import Players from './pages/Players'
 import Match from './pages/Match'
 import CreateTeam from './pages/CreateTeam'
-
+import TeamTransfers from './pages/TeamTransfers'
 
 function Logout() {
   localStorage.clear()
@@ -31,6 +31,7 @@ function App() {
         <Route path="/CreateTeam" element={<ProtectedRoute><CreateTeam /></ProtectedRoute>}/>
         <Route path="/Team" element={<ProtectedRoute><Team /></ProtectedRoute>}/>
         <Route path="/Match" element={<ProtectedRoute><Match /></ProtectedRoute>}/>
+        <Route path="/TeamTransfers" element={<ProtectedRoute><TeamTransfers /></ProtectedRoute>}/>
         <Route path="/Players" element={<Players />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
