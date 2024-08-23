@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer, PlayerGameStatsSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -8,7 +6,8 @@ import sys
 from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import action
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
 
 
 # Create your views here.
@@ -30,7 +29,6 @@ class PlayerDelete(generics.DestroyAPIView):
         return Player.objects.all()
 
 
-
 class CreateUserView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
@@ -42,6 +40,7 @@ class CreateUserView(generics.CreateAPIView):
         # Print username and password to terminal
         print(f"New user registration request - Email: {email}, Password: {password}", file=sys.stdout)
         return super().post(request, *args, **kwargs)
+
 
 class TeamDetailOrCreateView(generics.GenericAPIView):
     serializer_class = TeamSerializer
@@ -157,3 +156,14 @@ class TeamListView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Team.objects.all()
+
+class TeamDetailView(generics.RetrieveAPIView):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
+    permission_classes = [AllowAny]  # Or any other permission class you deem appropriate
+
+    def get(self, request, *args, **kwargs):
+        team_id = kwargs.get('pk')
+        team = get_object_or_404(Team, id=team_id)
+        serializer = TeamSerializer(team)
+        return Response(serializer.data)

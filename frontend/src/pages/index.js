@@ -1,0 +1,10 @@
+export { default as Login } from './Login';
+export { default as Home } from './Home';
+export { default as NotFound } from './NotFound';
+export { default as Register } from './Register';
+export { default as Team } from './Team';
+export { default as Players } from './Players';
+export { default as Match } from './Match';
+export { default as CreateTeam } from './CreateTeam';
+export { default as TeamTransfers } from './TeamTransfers';
+export { default as OtherTeam } from './OtherTeam';

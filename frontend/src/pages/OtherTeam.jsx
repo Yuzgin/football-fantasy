@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { useParams, Navigate } from 'react-router-dom';
 import api from '../api';
-import { Navigate } from 'react-router-dom';
-import TeamInfo from '../components/TeamInfo';
 import PlayerTable from '../components/PlayerTable';
 import Header from '../components/Header';
-import TransfersButton from '../components/TransfersButtton'
 
-const TeamPage = () => {
+const OtherTeam = () => {
+  const { teamId } = useParams(); // Extract the teamId from the URL parameters
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [teamValue, setTeamValue] = useState(0);
 
   useEffect(() => {
     fetchTeam();
-  }, []);
+  }, [teamId]);
 
   const fetchTeam = async () => {
     try {
-      const response = await api.get('/api/team/');
+      const response = await api.get(`/api/team/${teamId}/`);
       console.log('Fetched team:', response.data);
       setTeam(response.data);
       const totalValue = response.data.players.reduce((total, player) => {
@@ -35,31 +34,21 @@ const TeamPage = () => {
     }
   };
 
-  const handleDeleteTeam = async () => {
-    try {
-      await api.delete('/api/team/delete/');
-      setTeam(null);
-    } catch (error) {
-      console.error('Error deleting team:', error);
-    }
-  };
-
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (team === null) {
-    return <Navigate to="/createteam" replace />;
+    return <div>Team not found or does not exist.</div>;
   }
 
   return (
     <div>
       <Header />
-      <TeamInfo team={team} handleDeleteTeam={handleDeleteTeam} value={teamValue} />
+      <h1>{team.name}</h1>
       <PlayerTable players={team.players} />
-      <TransfersButton />
     </div>
   );
 };
 
-export default TeamPage;
+export default OtherTeam;

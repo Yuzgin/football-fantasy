@@ -1,15 +1,6 @@
-import react from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/Login'
-import Home from './pages/Home'
-import NotFound from './pages/NotFound'
-import Register from './pages/Register'
-import ProtectedRoute from './components/ProtectedRoute'
-import Team from './pages/Team'
-import Players from './pages/Players'
-import Match from './pages/Match'
-import CreateTeam from './pages/CreateTeam'
-import TeamTransfers from './pages/TeamTransfers'
+import * as Pages from './pages';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function Logout() {
   localStorage.clear()
@@ -27,16 +18,17 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>}/>
-        <Route path="/CreateTeam" element={<ProtectedRoute><CreateTeam /></ProtectedRoute>}/>
-        <Route path="/Team" element={<ProtectedRoute><Team /></ProtectedRoute>}/>
-        <Route path="/Match" element={<ProtectedRoute><Match /></ProtectedRoute>}/>
-        <Route path="/TeamTransfers" element={<ProtectedRoute><TeamTransfers /></ProtectedRoute>}/>
-        <Route path="/Players" element={<Players />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Pages.Home />} />
+        <Route path="/CreateTeam" element={<ProtectedRoute><Pages.CreateTeam /></ProtectedRoute>}/>
+        <Route path="/Team" element={<ProtectedRoute><Pages.Team /></ProtectedRoute>}/>
+        <Route path="/Match" element={<ProtectedRoute><Pages.Match /></ProtectedRoute>}/>
+        <Route path="/TeamTransfers" element={<ProtectedRoute><Pages.TeamTransfers /></ProtectedRoute>}/>
+        <Route path="/team/:teamId" element={<Pages.OtherTeam />} />
+        <Route path="/Players" element={<Pages.Players />} />
+        <Route path="/login" element={<Pages.Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />}/>
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<Pages.NotFound />} />
       </Routes>
     </BrowserRouter>
     </>

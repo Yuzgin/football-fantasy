@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import TeamButton from '../components/TeamButton';
-import LogoutButton from '../components/LogoutButton';
+import Header from '../components/Header';
 import TeamTable from '../components/TeamTable';
 
 const Home = () => {
@@ -24,11 +23,10 @@ const Home = () => {
 
   return (
     <div>
+      <Header />
       <TeamTable
         teams={teams}
       />
-      <TeamButton />
-      <LogoutButton />
     </div>
   );
 };

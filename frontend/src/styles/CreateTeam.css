@@ -1,0 +1,115 @@
+/* Container for the football field background and player positions */
+.team-container {
+    position: relative;
+    width: 500px; /* Fixed width for the container */
+    height: 600px; /* Fixed height for the container */
+    margin: 40px auto 0 auto; /* Center the container horizontally and add top margin for separation */
+    padding: 20px; /* Padding inside the container */
+    background-image: url('../assets/FootballField.png');
+    background-size: 100% 100%; /* Stretch the image to fit the container exactly */
+    background-position: center;
+    background-repeat: no-repeat; /* Prevents the background from repeating */
+    overflow: hidden; /* Prevents content overflow */
+    border-radius: 20px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border: 2px solid transparent; /* Invisible border */
+}
+
+/* Flexbox layout for centering and spacing player positions */
+.team-formation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center content vertically within the container */
+    height: 100%; /* Ensure it fills the entire height of the container */
+    gap: 60px; /* Space between rows */
+}
+
+/* Layout for each position group (e.g., defenders, midfielders) */
+.position-group {
+    display: flex;
+    justify-content: center; /* Center players within each group */
+    gap: 60px; /* Space between players */
+}
+
+/* Layout for the team container and controls side by side */
+.team-and-controls {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align items to the top */
+    gap: 20px; /* Space between the team container and the controls */
+}
+
+/* Styling for the controls container (team name form, budget, submit button) */
+.controls-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align content to the left */
+    padding: 10px;
+    background-color: #2b2b28; /* Light background for contrast */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: 2px solid transparent; /* Invisible border */
+    margin-top: 40px; /* Add margin to separate from the header */
+}
+
+.controls-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between form elements */
+}
+
+/* Styling for the form labels */
+form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Styling for the input fields */
+form input[type="text"] {
+    padding: 8px;
+    width: 250px; /* Set a consistent width for the input field */
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Styling for the budget display */
+.budget-display {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Styling for the submit button */
+form button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 5px; /* Add space above the submit button */
+}
+
+form button[type="submit"]:disabled {
+    background-color: #ccc; /* Grey background when disabled */
+    cursor: not-allowed; /* Show not-allowed cursor when disabled */
+}
+
+/* Set the background color of the entire page to yellow */
+body {
+    background-color: #e0b507;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* Optional: Set a consistent font for the page */
+}
+
+/* Wrapper around all content except the header */
+.content-wrapper {
+    border: 2px solid transparent; /* Invisible border */
+    padding: 20px; /* Space inside the wrapper */
+    max-width: 100%; /* Ensure wrapper doesn't exceed screen width */
+    max-height: calc(100vh - 60px); /* Limit wrapper height to viewport height minus some space */
+    overflow-y: auto; /* Make content scrollable vertically if it exceeds height */
+    box-sizing: border-box; /* Ensure padding is included in height calculation */
+}

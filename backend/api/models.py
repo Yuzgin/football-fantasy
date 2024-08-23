@@ -1,24 +1,28 @@
-from datetime import datetime
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from api.managers import CustomUserManager
 
-# Create your models here.
-
-class CustomUser(AbstractUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
+
     groups = models.ManyToManyField(Group, related_name='customuser_set')
     user_permissions = models.ManyToManyField(
         'auth.Permission',
         verbose_name='user permissions',
         blank=True,
-        related_name='custom_user_permissions_set',  # Unique related_name
+        related_name='custom_user_permissions_set',
         related_query_name='user',
     )
+    
+    def __str__(self):
+        return self.email
 
 
 class Player(models.Model):
