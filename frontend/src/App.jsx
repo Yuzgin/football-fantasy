@@ -18,7 +18,7 @@ function App() {
     <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Pages.Home />} />
+        <Route path="/" element={<ProtectedRoute><Pages.Home /></ProtectedRoute>} />
         <Route path="/CreateTeam" element={<ProtectedRoute><Pages.CreateTeam /></ProtectedRoute>}/>
         <Route path="/Team" element={<ProtectedRoute><Pages.Team /></ProtectedRoute>}/>
         <Route path="/Match" element={<ProtectedRoute><Pages.Match /></ProtectedRoute>}/>

@@ -92,6 +92,12 @@ const Header = () => {
             <button style={buttonStyle}>Login</button>
           </Link>
         )}
+        <Link to="/mens" style={linkStyle}>
+          <button style={buttonStyle}>Men's</button>
+        </Link>
+        <Link to="/womens" style={linkStyle}>
+          <button style={buttonStyle}>Women's</button>
+        </Link>
       </nav>
     </header>
   );

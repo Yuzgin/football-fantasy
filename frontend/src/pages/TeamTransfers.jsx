@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import TeamPlayer from '../components/TeamForm';
-import HomeButton from '../components/HomeButton';
-import LogoutButton from '../components/LogoutButton';
 import PlayerModal from '../components/PlayerModal';
 import '../styles/CreateTeam.css'; // Reuse the CSS file from CreateTeam
 import Header from '../components/Header';
