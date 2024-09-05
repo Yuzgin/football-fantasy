@@ -53,7 +53,7 @@ class Match(models.Model):
     date = models.DateTimeField()
     team1 = models.CharField(max_length=255)
     team2 = models.CharField(max_length=255)
-    
+
 
 class PlayerGameStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_stats')
@@ -67,3 +67,23 @@ class PlayerGameStats(models.Model):
 
     def __str__(self):
         return f"{self.player.name} - {self.match}"
+
+
+class GameWeek(models.Model):
+    week = models.IntegerField(default = 0)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return f"Game Week {self.start_date} - {self.end_date}"
+
+
+class TeamSnapshot(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='snapshots')
+    players = models.ManyToManyField(Player, related_name='snapshot_players')
+    game_week = models.ForeignKey(GameWeek, on_delete=models.CASCADE, related_name='team_snapshots')
+    snapshot_date = models.DateField(auto_now_add=True)
+    weekly_points = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.team.name} - {self.game_week.start_date} to {self.game_week.end_date}"

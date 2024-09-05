@@ -9,7 +9,7 @@ function Logout() {
 
 function RegisterAndLogout() {
   localStorage.clear()
-  return <Register />
+  return <Pages.Register />
 }
 
 function App() {

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { Navigate } from 'react-router-dom';
 import TeamInfo from '../components/TeamInfo';
-import PlayerTable from '../components/PlayerTable';
 import TransfersButton from '../components/TransfersButtton';
 import Header from '../components/Header';
 import PlayerView from '../components/PlayerView';
@@ -16,13 +15,14 @@ const TeamPage = () => {
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState({});
   const [budget, setBudget] = useState(100);
-  const [selectedFormation, setSelectedFormation] = useState("4-4-2");
   const [currentPosition, setCurrentPosition] = useState(null);
   const [teamValue, setTeamValue] = useState(100);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const[team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+  const selectedFormation = "4-4-2";
 
   useEffect(() => {
       fetchTeamAndPlayers();
@@ -156,12 +156,12 @@ const TeamPage = () => {
       return null;
   };
 
-  if (team === null) {
-    return <Navigate to='/createteam' replace />
-  }
-
   if (loading) {
       return <div>Loading...</div>;
+  }
+
+  if (team === null) {
+    return <Navigate to='/createteam' replace />
   }
 
   return (

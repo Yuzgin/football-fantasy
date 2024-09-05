@@ -1,10 +1,9 @@
 .modal {
   position: fixed; /* Use fixed to position relative to the viewport */
+  flex-direction: column;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); /* Center the modal */
-  width: 15%;
-  height: 35%;
   background: rgba(0, 0, 0, 1);
   display: flex;
   justify-content: center;
@@ -12,6 +11,7 @@
   z-index: 1000;
   text-align: center;
   border-radius: 20px;
+  padding: 1%;
 }
   
   .player-list {

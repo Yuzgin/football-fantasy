@@ -1,13 +1,14 @@
-from rest_framework import generics
-from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer, PlayerGameStatsSerializer
+from rest_framework import generics, viewsets
+from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer, PlayerGameStatsSerializer, TeamSnapshotSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Player, Team, Match, PlayerGameStats
+from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek
 import sys
 from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 
 
 # Create your views here.
@@ -167,3 +168,47 @@ class TeamDetailView(generics.RetrieveAPIView):
         team = get_object_or_404(Team, id=team_id)
         serializer = TeamSerializer(team)
         return Response(serializer.data)
+
+class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = TeamSnapshotSerializer
+    queryset = TeamSnapshot.objects.all()
+
+    def get_queryset(self):
+        team_id = self.request.query_params.get('team_id')
+        game_week_id = self.request.query_params.get('game_week_id')
+
+        queryset = TeamSnapshot.objects.all()
+
+        if team_id:
+            queryset = queryset.filter(team_id=team_id)
+
+        if game_week_id:
+            queryset = queryset.filter(game_week_id=game_week_id)
+
+        return queryset
+
+    def retrieve(self, request, pk=None):
+        team_id = request.query_params.get('team_id')
+        game_week_id = request.query_params.get('game_week_id')
+        snapshot = get_object_or_404(TeamSnapshot, team_id=team_id, game_week_id=game_week_id)
+        serializer = self.get_serializer(snapshot)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def most_recent(self, request):
+        team_id = request.query_params.get('team_id')
+        if not team_id:
+            return Response({"detail": "team_id query parameter is required."}, status=400)
+        
+        # Get the latest GameWeek based on end_date
+        latest_gameweek = GameWeek.objects.order_by('-end_date').first()
+        if not latest_gameweek:
+            return Response({"detail": "No GameWeeks available."}, status=404)
+        
+        # Retrieve the TeamSnapshot for the team and latest GameWeek
+        snapshot = TeamSnapshot.objects.filter(team_id=team_id, game_week=latest_gameweek).first()
+        if not snapshot:
+            return Response({"detail": "TeamSnapshot not found for the latest GameWeek."}, status=404)
+        
+        serializer = self.get_serializer(snapshot)
+        return Response(serializer.data, status=200)

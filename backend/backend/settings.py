@@ -92,6 +92,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',  # Set to DEBUG for more detailed logs
+#         },
+#     },
+# }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

@@ -1,11 +1,14 @@
 from django.contrib import admin
-from .models import Player, CustomUser, Team, Match, PlayerGameStats
+from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot
 
 # Register your models here.
 admin.site.register(Player)
 admin.site.register(CustomUser)
 admin.site.register(Match)
-admin.site.register(PlayerGameStats) 
+admin.site.register(PlayerGameStats)
+admin.site.register(GameWeek)
+admin.site.register(TeamSnapshot)
+
 
 class TeamAdmin(admin.ModelAdmin):
     list_display = ('name', 'user', 'created_at', 'total_points')

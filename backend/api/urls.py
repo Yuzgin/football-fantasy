@@ -1,6 +1,9 @@
-# urls.py
-from django.urls import path
+from django.urls import path, include
 from . import views
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'team-snapshots', views.TeamSnapshotViewSet, basename='team-snapshots')
 
 urlpatterns = [
     path('players/', views.PlayerListView.as_view(), name='players'),
@@ -13,4 +16,5 @@ urlpatterns = [
     path('player-game-stats/', views.PlayerGameStatsListCreateView.as_view(), name='player_game_stats'),
     path('player-game-stats/<int:pk>/', views.PlayerGameStatsDetailView.as_view(), name='player_game_stats_detail'),
     path('team/<int:pk>/', views.TeamDetailView.as_view(), name='team-detail'),
+    path('', include(router.urls)),  # Include the router for team snapshots
 ]
