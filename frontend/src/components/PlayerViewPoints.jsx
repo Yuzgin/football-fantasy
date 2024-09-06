@@ -5,21 +5,21 @@ import '../styles/TeamPlayer.css'; // Import the CSS file
 const PlayerViewPoints = ({
   selectedPlayer,
   openPlayerStats,
-  gameWeekStartDate,
-  gameWeekEndDate,
+  gameWeekId, // We now pass the gameWeekId instead of start and end dates
 }) => {
   const handleClick = () => {
     openPlayerStats(selectedPlayer)
   };
 
   const calculateGameWeekPoints = (player) => {
+
     return player.game_stats.filter((stat) => {
-        console.log(stat.match.date);
-        const matchDate = new Date(stat.match.date);
-        // Include points only for matches strictly between the start and end dates
-        return matchDate >= new Date(gameWeekStartDate) && matchDate < new Date(gameWeekEndDate);
-      })
-      .reduce((total, stat) => total + stat.points, 0);
+      // Filter stats for matches that belong to the same game week as the snapshot
+      const isSameGameWeek = stat.match.game_week === gameWeekId;
+      return isSameGameWeek;
+    }).reduce((total, stat) => {
+      return total + stat.points;
+    }, 0);
   };
 
   return (

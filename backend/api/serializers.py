@@ -20,7 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ['id', 'date', 'team1', 'team2']
+        fields = ['id', 'date', 'team1', 'team2', 'game_week']
+
 
 class PlayerGameStatsSerializer(serializers.ModelSerializer):
     match = serializers.PrimaryKeyRelatedField(queryset=Match.objects.all())
@@ -57,10 +58,8 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'players', 'total_points', 'created_at']
 
     def get_total_points(self, team):
-        total_points = 0
-        for player in team.players.all():
-            stats = PlayerGameStats.objects.filter(player=player)
-            total_points += sum(stat.points for stat in stats)
+        # Sum the weekly points from all snapshots related to this team
+        total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
         return total_points
 
 
@@ -83,3 +82,14 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
             "start_date": obj.game_week.start_date,
             "end_date": obj.game_week.end_date,
         }
+
+    def update(self, instance, validated_data):
+        instance.weekly_points = sum(stat.points for stat in instance.players.all())
+        instance.save()
+
+        # Update total team points
+        team = instance.team
+        team.total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
+        team.save()
+
+        return instance

@@ -47,12 +47,22 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+    
 
+class GameWeek(models.Model):
+    week = models.IntegerField(default = 0)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def __str__(self):
+        return f"Game Week {self.start_date} - {self.end_date}"
+    
 
 class Match(models.Model):
     date = models.DateTimeField()
     team1 = models.CharField(max_length=255)
     team2 = models.CharField(max_length=255)
+    game_week = models.ForeignKey(GameWeek, on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class PlayerGameStats(models.Model):
@@ -67,15 +77,6 @@ class PlayerGameStats(models.Model):
 
     def __str__(self):
         return f"{self.player.name} - {self.match}"
-
-
-class GameWeek(models.Model):
-    week = models.IntegerField(default = 0)
-    start_date = models.DateField()
-    end_date = models.DateField()
-
-    def __str__(self):
-        return f"Game Week {self.start_date} - {self.end_date}"
 
 
 class TeamSnapshot(models.Model):

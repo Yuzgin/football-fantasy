@@ -124,7 +124,15 @@ class MatchListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         match_serializer = self.get_serializer(data=request.data)
         match_serializer.is_valid(raise_exception=True)
-        match = match_serializer.save()
+
+        match_date = match_serializer.validated_data['date']
+        
+        # Find the correct GameWeek based on match date
+        game_week = GameWeek.objects.filter(start_date__lte=match_date, end_date__gte=match_date).first()
+        if not game_week:
+            return Response({'error': 'No GameWeek found for the given match date.'}, status=400)
+
+        match = match_serializer.save(game_week=game_week)
 
         players_stats = request.data.get('players_stats', [])
         for player_stat in players_stats:
@@ -133,13 +141,67 @@ class MatchListCreateView(generics.ListCreateAPIView):
             stat_serializer.is_valid(raise_exception=True)
             stat_serializer.save()
 
+            # Update TeamSnapshot points for each player in the stat
+            self.update_team_snapshot_points(stat_serializer.instance.player, match.game_week, stat_serializer.instance.points)
+
         headers = self.get_success_headers(match_serializer.data)
         return Response(match_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update_team_snapshot_points(self, player, game_week, points):
+        # Find all snapshots in the game week that include this player
+        team_snapshots = TeamSnapshot.objects.filter(players=player, game_week=game_week)
+
+        for snapshot in team_snapshots:
+            # Add the player's points to this snapshot's weekly points
+            snapshot.weekly_points += points
+            snapshot.save()
+
+            # Recalculate and update the team's total points based on all snapshots
+            team = snapshot.team
+            team.total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
+            team.save()
+
 
 class MatchDeleteView(generics.DestroyAPIView):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
     permission_classes = [IsAuthenticated]
+
+    def delete(self, request, *args, **kwargs):
+        match = self.get_object()
+        game_week = match.game_week
+
+        # Get all player stats related to this match
+        player_stats = PlayerGameStats.objects.filter(match=match)
+
+        # Subtract points from the relevant team snapshots
+        for stat in player_stats:
+            self.update_team_snapshot_points_on_delete(stat.player, game_week, stat.points)
+
+        # Delete player stats for this match
+        player_stats.delete()
+
+        # Now, delete the match
+        match.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def update_team_snapshot_points_on_delete(self, player, game_week, points):
+        # Find all snapshots in the game week that include this player
+        team_snapshots = TeamSnapshot.objects.filter(players=player, game_week=game_week)
+
+        for snapshot in team_snapshots:
+            # Subtract the player's points from this snapshot's weekly points
+            snapshot.weekly_points -= points
+            if snapshot.weekly_points < 0:
+                snapshot.weekly_points = 0  # Ensure points don't go negative
+            snapshot.save()
+
+            # Recalculate and update the team's total points based on all snapshots
+            team = snapshot.team
+            team.total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
+            team.save()
+
 
 class PlayerGameStatsListCreateView(generics.ListCreateAPIView):
     queryset = PlayerGameStats.objects.all()
@@ -172,6 +234,7 @@ class TeamDetailView(generics.RetrieveAPIView):
 class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TeamSnapshotSerializer
     queryset = TeamSnapshot.objects.all()
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         team_id = self.request.query_params.get('team_id')
