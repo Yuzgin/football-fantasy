@@ -24,11 +24,76 @@ class MatchSerializer(serializers.ModelSerializer):
 
 
 class PlayerGameStatsSerializer(serializers.ModelSerializer):
-    match = serializers.PrimaryKeyRelatedField(queryset=Match.objects.all())
+    game_week = serializers.SerializerMethodField()
+    match = serializers.PrimaryKeyRelatedField(queryset=Match.objects.all())  # Default for PUT/POST
 
     class Meta:
         model = PlayerGameStats
-        fields = ['id', 'player', 'match', 'goals', 'assists', 'yellow_cards', 'red_cards', 'clean_sheets', 'points']
+        fields = ['id', 'player', 'match', 'goals', 'assists', 'yellow_cards', 'red_cards', 'clean_sheets', 'points', 'game_week']
+
+    def get_game_week(self, obj):
+        return obj.match.game_week.id if obj.match and obj.match.game_week else None
+
+    def calculate_points(self, player, goals, assists, yellow_cards, red_cards, clean_sheets):
+        # Start with 2 base points for everyone
+        points = 2
+
+        # Points logic based on the player's position
+        if player.position == "Attacker":
+            points += goals * 4
+            points += assists * 3
+        elif player.position == "Midfielder":
+            points += goals * 5
+            points += assists * 3
+            points += clean_sheets * 1
+        elif player.position == "Defender":
+            points += goals * 6
+            points += assists * 4
+            points += clean_sheets * 3
+        elif player.position == "Goalkeeper":
+            points += goals * 8
+            points += assists * 7
+            points += clean_sheets * 5
+
+        # Subtract points for cards
+        points -= red_cards * 3
+        points -= yellow_cards * 1
+
+        return points
+
+    def create(self, validated_data):
+        # Calculate points before saving the player stats
+        player = validated_data['player']
+        goals = validated_data['goals']
+        assists = validated_data['assists']
+        yellow_cards = validated_data['yellow_cards']
+        red_cards = validated_data['red_cards']
+        clean_sheets = validated_data['clean_sheets']
+
+        # Call the points calculation method
+        validated_data['points'] = self.calculate_points(player, goals, assists, yellow_cards, red_cards, clean_sheets)
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        In PUT requests, keep the match unchanged.
+        """
+        validated_data.pop('match', None)  # Remove match if present
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        """
+        Customize the GET and POST response to return full match details.
+        """
+        representation = super().to_representation(instance)
+        request = self.context.get('request')  # Safely get the request object
+        if request and request.method in ['GET', 'POST']:
+            # Replace match field with full match details
+            match_serializer = MatchSerializer(instance.match)
+            representation['match'] = match_serializer.data
+        return representation
+
 
 class PlayerSerializer(serializers.ModelSerializer):
     points = serializers.SerializerMethodField()
@@ -36,7 +101,10 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ["id", "name", "position", "points", "price", "team", "game_stats"]
+        fields = [
+            "id", "name", "position", "points", "price", "team",
+            "game_stats", "goals", "assists", "clean_sheets", "games_played",
+        ]
 
     def get_points(self, player):
         game_week = self.context.get('game_week')
@@ -63,6 +131,12 @@ class TeamSerializer(serializers.ModelSerializer):
         return total_points
 
 
+class GameWeekSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameWeek
+        fields = ['id', 'week', 'start_date', 'end_date']
+
+
 class TeamSnapshotSerializer(serializers.ModelSerializer):
     players = serializers.SerializerMethodField()
     game_week = serializers.SerializerMethodField()
@@ -78,6 +152,7 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
 
     def get_game_week(self, obj):
         return {
+            "id": obj.game_week.id,
             "week": obj.game_week.week,
             "start_date": obj.game_week.start_date,
             "end_date": obj.game_week.end_date,

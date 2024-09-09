@@ -1,0 +1,48 @@
+/* PlayerStatForm.css */
+
+.player-stat-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #e0b507;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .player-stat-form label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    color: black;
+  }
+  
+  .player-stat-form select, 
+  .player-stat-form input {
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #fff;
+    color: black;
+  }
+  
+  .player-stat-form select {
+    background-color: #e0b507;
+  }
+  
+  .player-stat-form input::placeholder {
+    color: #888;
+  }
+  
+  .player-stat-form input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  .player-stat-form input[type="number"]::-webkit-outer-spin-button,
+  .player-stat-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  

@@ -1,0 +1,30 @@
+/* Match.css */
+
+.match-page {
+    padding: 20px;
+    background-color: #fff;
+    color: black;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  h2 {
+    color: black;
+  }
+  
+  button {
+    background-color: #e0b507;
+    color: black;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #d1a605;
+  }
+  
+  button:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+  }
+  

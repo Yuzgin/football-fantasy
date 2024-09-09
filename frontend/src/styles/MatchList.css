@@ -1,0 +1,57 @@
+/* MatchList.css */
+
+.match-list-container {
+    margin: 20px 0;
+  }
+  
+  .match-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .match-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #e0b507;
+    border-radius: 8px;
+    color: black;
+    transition: background-color 0.3s ease;
+  }
+  
+  .match-item:hover {
+    background-color: #d1a605;
+  }
+  
+  .match-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .teams {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+  
+  .match-date {
+    font-size: 0.9em;
+    color: #333;
+  }
+  
+  .delete-button {
+    background-color: black;
+    color: #e0b507;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .delete-button:hover {
+    background-color: white;
+    color: black;
+  }
+  

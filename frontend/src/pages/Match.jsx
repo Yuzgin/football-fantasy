@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import MatchList from '../components/MatchList';
 import CreateMatchForm from '../components/CreateMatchForm';
+import '../styles/Match.css';
 
 const MatchPage = () => {
   const [matches, setMatches] = useState([]);
@@ -42,6 +43,7 @@ const MatchPage = () => {
 
   const createMatch = (e) => {
     e.preventDefault();
+  
     const matchData = { team1, team2, date };
     const formattedPlayerStats = playersStats.map(stat => ({
       ...stat,
@@ -53,13 +55,21 @@ const MatchPage = () => {
       points: parseInt(stat.points),
       player: parseInt(stat.player)
     }));
+  
+    // Log the data before sending the request
+    console.log('Match data being sent:', { ...matchData, players_stats: formattedPlayerStats });
+  
     api.post('/api/matches/', { ...matchData, players_stats: formattedPlayerStats })
       .then(() => {
         alert('Match and player stats created!');
         getMatches();
       })
-      .catch((err) => alert(`Error creating match or player stats: ${err.message}`));
+      .catch((err) => {
+        alert(`Error creating match or player stats: ${err.message}`);
+        console.error('Error response:', err.response);  // Log the full error response for more details
+      });
   };
+  
 
   const deleteMatch = (id) => {
     api.delete(`/api/matches/delete/${id}/`)

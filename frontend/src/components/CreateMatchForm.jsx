@@ -1,5 +1,6 @@
 import React from 'react';
 import PlayerStatForm from './PlayerStatForm';
+import '../styles/CreateMatchForm.css';
 
 const CreateMatchForm = ({
   team1,

@@ -1,5 +1,6 @@
 from rest_framework import generics, viewsets
-from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer, PlayerGameStatsSerializer, TeamSnapshotSerializer
+from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
+from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek
 import sys
@@ -9,13 +10,14 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.decorators import action
+import logging
 
 
 # Create your views here.
 
 class PlayerListView(generics.ListCreateAPIView):
     serializer_class = PlayerSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return Player.objects.all()
@@ -114,7 +116,7 @@ class TeamDeleteView(generics.DestroyAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Team.DoesNotExist:
             return Response({'error': 'Team does not exist.'}, status=status.HTTP_404_NOT_FOUND)
-        
+    
 
 class MatchListCreateView(generics.ListCreateAPIView):
     queryset = Match.objects.all()
@@ -122,27 +124,44 @@ class MatchListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)  # Initialize the logger
+
+        logger.info("Incoming request data: %s", request.data)  # Log the incoming request data
+
         match_serializer = self.get_serializer(data=request.data)
         match_serializer.is_valid(raise_exception=True)
-
+        
         match_date = match_serializer.validated_data['date']
+        logger.info("Match date: %s", match_date)  # Log the match date
         
         # Find the correct GameWeek based on match date
         game_week = GameWeek.objects.filter(start_date__lte=match_date, end_date__gte=match_date).first()
         if not game_week:
+            logger.error("No GameWeek found for the given match date: %s", match_date)
             return Response({'error': 'No GameWeek found for the given match date.'}, status=400)
 
+        logger.info("GameWeek found: %s", game_week)  # Log the found game_week
+
         match = match_serializer.save(game_week=game_week)
+        logger.info("Match created: %s", match)  # Log the created match
 
         players_stats = request.data.get('players_stats', [])
         for player_stat in players_stats:
+            logger.info("Player stat before saving: %s", player_stat)  # Log each player stat before saving
             player_stat['match'] = match.id
+
+            # Create player stats and automatically calculate points
             stat_serializer = PlayerGameStatsSerializer(data=player_stat)
             stat_serializer.is_valid(raise_exception=True)
-            stat_serializer.save()
+            stat_instance = stat_serializer.save()
+
+            logger.info("Player stat saved: %s", stat_instance)  # Log the saved player stat
 
             # Update TeamSnapshot points for each player in the stat
-            self.update_team_snapshot_points(stat_serializer.instance.player, match.game_week, stat_serializer.instance.points)
+            self.update_team_snapshot_points(stat_instance.player, match.game_week, stat_instance.points)
+
+            # Update the Player model's fields
+            self.update_player_totals(stat_instance)
 
         headers = self.get_success_headers(match_serializer.data)
         return Response(match_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -160,6 +179,19 @@ class MatchListCreateView(generics.ListCreateAPIView):
             team = snapshot.team
             team.total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
             team.save()
+
+    def update_player_totals(self, stat_instance):
+        """
+        Update the Player model's total fields (goals, assists, games played, etc.).
+        """
+        player = stat_instance.player
+        player.goals += stat_instance.goals
+        player.assists += stat_instance.assists
+        player.yellow_cards += stat_instance.yellow_cards
+        player.red_cards += stat_instance.red_cards
+        player.clean_sheets += stat_instance.clean_sheets
+        player.games_played += 1  # Increment games played
+        player.save()
 
 
 class MatchDeleteView(generics.DestroyAPIView):
@@ -208,10 +240,28 @@ class PlayerGameStatsListCreateView(generics.ListCreateAPIView):
     serializer_class = PlayerGameStatsSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_serializer_context(self):
+        # Pass the request object to the serializer's context
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request
+        })
+        return context
+
+
 class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PlayerGameStats.objects.all()
     serializer_class = PlayerGameStatsSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        # Pass the request object to the serializer's context
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request
+        })
+        return context
+
 
 class TeamListView(generics.ListCreateAPIView):
     serializer_class = TeamSerializer
@@ -230,6 +280,16 @@ class TeamDetailView(generics.RetrieveAPIView):
         team = get_object_or_404(Team, id=team_id)
         serializer = TeamSerializer(team)
         return Response(serializer.data)
+
+class GameWeekListView(generics.ListAPIView):
+    serializer_class = GameWeekSerializer
+
+    def get_queryset(self):
+        week = self.request.query_params.get('week')
+        if week:
+            return GameWeek.objects.filter(week=week)
+        return GameWeek.objects.all()
+    
 
 class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TeamSnapshotSerializer
