@@ -6,7 +6,6 @@ django-cors-headers==4.0.0  # To handle CORS (cross-origin requests)
 # Database dependencies
 psycopg2-binary==2.9.6  # PostgreSQL adapter (if using PostgreSQL)
 mysqlclient==2.2.0  # MySQL adapter (if using MySQL)
-sqlite3==3.39.4  # Optional: For local development
 
 # Authentication and user management
 djangorestframework-simplejwt==5.3.0  # For JSON Web Token authentication
