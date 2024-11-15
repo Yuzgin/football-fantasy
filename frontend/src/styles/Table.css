@@ -1,15 +1,9 @@
-/* TeamTable.css */
 .team-table {
-  position: fixed; /* Position relative to the viewport */
-  top: 50%; /* Position the top of the table in the middle of the viewport */
-  left: 50%; /* Position the left side of the table in the middle of the viewport */
-  width: 20%;
+  width: 300px; /* Adjust as needed */
   border-collapse: collapse;
-  margin: 0; /* Remove margin since it's centered */
   font-size: 18px;
   text-align: left;
   border: 1px solid #ddd;
-  transform: translate(-50%, -50%); /* Offset by half of the table's width and height to center it */
 }
 
 .team-table th, .team-table td {
@@ -22,7 +16,6 @@
 }
 
 .team-table th {
-  background-color: #fff959; /* Bright yellow header */
   color: black;
 }
 
@@ -34,7 +27,6 @@
   background-color: #404040; /* Slightly darker grey */
 }
 
-/* Center the Points column */
 .team-table td:nth-child(2), .team-table th:nth-child(2) {
-  text-align: center;
+  text-align: center; /* Center the Points column */
 }

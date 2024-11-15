@@ -1,6 +1,6 @@
 from datetime import timedelta
 from rest_framework import serializers
-from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot
+from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot, Fixture
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,52 +35,60 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
         return obj.match.game_week.id if obj.match and obj.match.game_week else None
 
     def calculate_points(self, player, goals, assists, yellow_cards, red_cards, clean_sheets):
-        # Start with 2 base points for everyone
-        points = 2
-
-        # Points logic based on the player's position
+        # Custom points calculation logic
+        points = 2  # Base points for all players
         if player.position == "Attacker":
-            points += goals * 4
-            points += assists * 3
+            points += goals * 4 + assists * 3
         elif player.position == "Midfielder":
-            points += goals * 5
-            points += assists * 3
-            points += clean_sheets * 1
+            points += goals * 5 + assists * 3 + clean_sheets * 1
         elif player.position == "Defender":
-            points += goals * 6
-            points += assists * 4
-            points += clean_sheets * 3
+            points += goals * 6 + assists * 4 + clean_sheets * 3
         elif player.position == "Goalkeeper":
-            points += goals * 8
-            points += assists * 7
-            points += clean_sheets * 5
-
-        # Subtract points for cards
-        points -= red_cards * 3
-        points -= yellow_cards * 1
-
+            points += goals * 8 + assists * 7 + clean_sheets * 5
+        points -= yellow_cards * 1 + red_cards * 3
         return points
+
+    def update_player_total_points(self, player, points, action='add'):
+        if action == 'add':
+            player.points += points
+        elif action == 'subtract':
+            player.points -= points
+        player.save()
 
     def create(self, validated_data):
         # Calculate points before saving the player stats
         player = validated_data['player']
-        goals = validated_data['goals']
-        assists = validated_data['assists']
-        yellow_cards = validated_data['yellow_cards']
-        red_cards = validated_data['red_cards']
-        clean_sheets = validated_data['clean_sheets']
-
-        # Call the points calculation method
-        validated_data['points'] = self.calculate_points(player, goals, assists, yellow_cards, red_cards, clean_sheets)
-
+        points = self.calculate_points(
+            player,
+            validated_data['goals'],
+            validated_data['assists'],
+            validated_data['yellow_cards'],
+            validated_data['red_cards'],
+            validated_data['clean_sheets']
+        )
+        validated_data['points'] = points
+        self.update_player_total_points(player, points, action='add')  # Add points to player total_points
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        """
-        In PUT requests, keep the match unchanged.
-        """
-        validated_data.pop('match', None)  # Remove match if present
-        return super().update(instance, validated_data)
+        # Subtract old points from player’s total before updating
+        self.update_player_total_points(instance.player, instance.points, action='subtract')
+
+        # Recalculate and set new points
+        new_points = self.calculate_points(
+            instance.player,
+            validated_data.get('goals', instance.goals),
+            validated_data.get('assists', instance.assists),
+            validated_data.get('yellow_cards', instance.yellow_cards),
+            validated_data.get('red_cards', instance.red_cards),
+            validated_data.get('clean_sheets', instance.clean_sheets)
+        )
+        validated_data['points'] = new_points
+        updated_instance = super().update(instance, validated_data)
+
+        # Add the updated points back to player’s total
+        self.update_player_total_points(updated_instance.player, new_points, action='add')
+        return updated_instance
 
     def to_representation(self, instance):
         """
@@ -104,6 +112,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "position", "points", "price", "team",
             "game_stats", "goals", "assists", "clean_sheets", "games_played",
+            "points", "yellow_cards", "red_cards"
         ]
 
     def get_points(self, player):
@@ -168,3 +177,9 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
         team.save()
 
         return instance
+
+
+class FixtureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fixture
+        fields = ['id', 'team1', 'team2', 'location', 'date', 'time']

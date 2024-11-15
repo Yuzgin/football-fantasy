@@ -98,6 +98,9 @@ const Header = () => {
         <Link to="/womens" style={linkStyle}>
           <button style={buttonStyle}>Women's</button>
         </Link>
+        <Link to="/LMS" style={linkStyle}>
+          <button style={buttonStyle}>LMS</button>
+        </Link>
       </nav>
     </header>
   );

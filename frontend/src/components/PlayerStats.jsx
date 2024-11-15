@@ -13,7 +13,7 @@ const PlayerStats = ({selectedPlayer, closeStats}) => {
                 <div>Assists: {selectedPlayer.assists}</div>
                 <div>Clean sheets: {selectedPlayer.clean_sheets}</div>
                 <div>Price: £{selectedPlayer.price}m</div>
-                <button onClick={closeStats}>Close</button>
+                <button className="close" onClick={closeStats}>Close</button>
             </div>
         </div>
     )

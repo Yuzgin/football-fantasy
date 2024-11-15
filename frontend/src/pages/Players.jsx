@@ -79,24 +79,28 @@ const Players = () => {
   };
 
   return (
-    <div>
-      <ViewPlayerList
-        players={players}
-        playerGameStats={playerGameStats}
-        getTotalStats={getTotalStats}
-        deletePlayer={deletePlayer}
-      />
-      <CreatePlayerForm
-        name={name}
-        setName={setName}
-        position={position}
-        setPosition={setPosition}
-        team={team}
-        setTeam={setTeam}
-        price={price}
-        setPrice={setPrice}
-        createPlayer={createPlayer}
-      />
+    <div style={{ display: 'flex', gap: '20px', height: '100vh', overflow: 'hidden' }}>
+      <div style={{ flex: 2, overflowY: 'auto' }}>
+        <ViewPlayerList
+          players={players}
+          playerGameStats={playerGameStats}
+          getTotalStats={getTotalStats}
+          deletePlayer={deletePlayer}
+        />
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
+        <CreatePlayerForm
+          name={name}
+          setName={setName}
+          position={position}
+          setPosition={setPosition}
+          team={team}
+          setTeam={setTeam}
+          price={price}
+          setPrice={setPrice}
+          createPlayer={createPlayer}
+        />
+      </div>
     </div>
   );
 };

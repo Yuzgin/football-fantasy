@@ -12,20 +12,30 @@
   text-align: center;
   border-radius: 20px;
   padding: 1%;
+  font-weight: bold;
 }
   
-  .player-list {
-    max-height: 400px;
-    overflow-y: auto;
-  }
-  
-  .player-item {
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .player-item.faded {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  
+.player-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.player-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.player-item.faded {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.close {
+  background : white;
+  color: black;
+}
+
+.close:disabled {
+  background : #2b2b28;
+  color : #2b2b28;
+}

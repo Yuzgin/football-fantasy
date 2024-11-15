@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from api.managers import CustomUserManager
@@ -36,6 +37,7 @@ class Player(models.Model):
     clean_sheets = models.IntegerField(default=0, null=True, blank=True)
     games_played = models.IntegerField(default=0, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
+    points = models.IntegerField(default=0, null=True, blank=True)
 
 
 class Team(models.Model):
@@ -53,6 +55,12 @@ class GameWeek(models.Model):
     week = models.IntegerField(default = 0)
     start_date = models.DateField()
     end_date = models.DateField()
+
+    @classmethod
+    def get_current_game_week(cls):
+        today = timezone.now().date()
+        return cls.objects.filter(start_date__lte=today, end_date__gte=today).first()
+
 
     def __str__(self):
         return f"Game Week {self.start_date} - {self.end_date}"
@@ -88,3 +96,17 @@ class TeamSnapshot(models.Model):
 
     def __str__(self):
         return f"{self.team.name} - {self.game_week.start_date} to {self.game_week.end_date}"
+
+
+class Fixture(models.Model):
+    team1 = models.CharField(max_length=100)
+    team2 = models.CharField(max_length=100)
+    location = models.CharField(max_length=200)
+    date = models.DateField()
+    time = models.TimeField()
+
+    class Meta:
+        unique_together = ('team1', 'team2')
+
+    def __str__(self):
+        return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"

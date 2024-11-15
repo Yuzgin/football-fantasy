@@ -4,6 +4,8 @@ import api from '../api';
 import Header from '../components/Header';
 import PlayerViewPoints from '../components/PlayerViewPoints';
 import PlayerStats from '../components/PlayerStats';
+import '../styles/Modal.css';
+import '../styles/OtherTeam.css';
 
 const OtherTeam = () => {
   const [players, setPlayers] = useState([]);
@@ -180,13 +182,13 @@ const OtherTeam = () => {
         </div>
 
         <div className="controls-container">
-          <h2>{teamSnapshot.team.name} - Gameweek {teamSnapshot.game_week.week}</h2>
-          <p>Gameweek: {teamSnapshot.game_week.start_date} to {teamSnapshot.game_week.end_date}</p>
-          <p>Total Weekly Points: {teamSnapshot.weekly_points}</p>
-          <p>Total Team Value: £{teamValue}m</p>
+          <h2>{teamSnapshot.team.name}: Gameweek {teamSnapshot.game_week.week}</h2>
+          <p>Points: {teamSnapshot.weekly_points}</p>
+          <p>Team Value: £{teamValue}m</p>
 
           {/* Navigation buttons */}
           <button
+            className="close"
             onClick={handlePrevWeek}
             disabled={currentWeek === 1}
           >
@@ -194,6 +196,7 @@ const OtherTeam = () => {
           </button>
 
           <button
+            className="close"
             onClick={handleNextWeek}
             disabled={currentWeek === maxWeek}
           >

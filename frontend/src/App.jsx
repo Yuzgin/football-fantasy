@@ -28,6 +28,8 @@ function App() {
         <Route path="/login" element={<Pages.Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />}/>
+        <Route path="/mens" element={<Pages.Mens />} />
+        <Route path="/LMS" element={<Pages.LMS />} />
         <Route path="*" element={<Pages.NotFound />} />
       </Routes>
     </BrowserRouter>

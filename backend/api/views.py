@@ -1,16 +1,20 @@
 from rest_framework import generics, viewsets
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
 from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
+from .serializers import FixtureSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek
+from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek, Fixture
 import sys
 from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 from rest_framework.decorators import action
 import logging
+from django.utils import timezone
+from django.db.models import Q
+from django.utils.timezone import now
+
 
 
 # Create your views here.
@@ -59,6 +63,7 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
             return Response({'message': 'You do not have a team. Please create one.'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
+        # PREVIOUS CODE
         user = request.user
         name = request.data.get('name')
         player_ids = request.data.get('players', [])
@@ -75,16 +80,35 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         team.players.set(players)
         team.save()
 
+        # NEW TEMPORARY CODE: Create a snapshot in the current game week
+        current_game_week = GameWeek.objects.filter(
+            start_date__lte=timezone.now().date(),
+            end_date__gte=timezone.now().date()
+        ).first()
+
+        if current_game_week:
+            # Create a snapshot for the team
+            snapshot = TeamSnapshot.objects.create(
+                team=team,
+                game_week=current_game_week,
+                weekly_points=0  # Initialize weekly points to 0
+            )
+            snapshot.players.set(players)  # Add players to the snapshot
+            snapshot.save()
+
+        # PREVIOUS CODE CONTINUES
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):
+        # OLD CODE: Fetch the user's team
         user = request.user
         try:
             team = Team.objects.get(user=user)
         except Team.DoesNotExist:
             return Response({'error': 'You do not have a team to update.'}, status=status.HTTP_404_NOT_FOUND)
 
+        # OLD CODE: Validate and update the team details
         name = request.data.get('name', team.name)  # Use the current name if not provided
         player_ids = request.data.get('players', [])
 
@@ -96,11 +120,37 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if players.count() != 11:
             return Response({'error': 'Invalid player selection.'}, status=400)
 
-        # Update team details
+        # OLD CODE: Update the team in the database
         team.name = name
         team.players.set(players)
         team.save()
 
+        # NEW CODE: Handle snapshot creation or update
+        current_game_week = GameWeek.objects.filter(
+            start_date__lte=timezone.now().date(),
+            end_date__gte=timezone.now().date()
+        ).first()
+
+        if current_game_week:
+            # Check if a snapshot for the current game week already exists
+            snapshot = TeamSnapshot.objects.filter(team=team, game_week=current_game_week).first()
+
+            if snapshot:
+                # Update the existing snapshot
+                snapshot.players.set(players)
+                snapshot.weekly_points = 0  # Reset weekly points if necessary
+                snapshot.save()
+            else:
+                # Create a new snapshot
+                snapshot = TeamSnapshot.objects.create(
+                    team=team,
+                    game_week=current_game_week,
+                    weekly_points=0  # Initialize weekly points to 0
+                )
+                snapshot.players.set(players)
+                snapshot.save()
+
+        # OLD CODE: Return the updated team data
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
@@ -323,15 +373,38 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
         if not team_id:
             return Response({"detail": "team_id query parameter is required."}, status=400)
         
-        # Get the latest GameWeek based on end_date
-        latest_gameweek = GameWeek.objects.order_by('-end_date').first()
-        if not latest_gameweek:
-            return Response({"detail": "No GameWeeks available."}, status=404)
+        # Fetch the current date
+        today = timezone.now().date()
         
-        # Retrieve the TeamSnapshot for the team and latest GameWeek
-        snapshot = TeamSnapshot.objects.filter(team_id=team_id, game_week=latest_gameweek).first()
+        # Get the GameWeek that includes today's date
+        current_gameweek = GameWeek.objects.filter(
+            Q(start_date=today) | (Q(start_date__lte=today) & Q(end_date__gte=today))
+            ).order_by('-start_date').first()
+
+        if not current_gameweek:
+            return Response({"detail": "No current GameWeek found."}, status=404)
+        
+        # Retrieve the TeamSnapshot for the team and current GameWeek
+        snapshot = TeamSnapshot.objects.filter(team_id=team_id, game_week=current_gameweek).first()
         if not snapshot:
-            return Response({"detail": "TeamSnapshot not found for the latest GameWeek."}, status=404)
+            return Response({"detail": "TeamSnapshot not found for the current GameWeek."}, status=404)
         
         serializer = self.get_serializer(snapshot)
         return Response(serializer.data, status=200)
+
+
+class FixtureListView(generics.ListAPIView):
+    """
+    Handle GET requests for listing fixtures.
+    Supports filtering for upcoming fixtures.
+    """
+    serializer_class = FixtureSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        upcoming_only = self.request.query_params.get('upcoming', None)
+        today = now().date()
+
+        if upcoming_only:
+            return Fixture.objects.filter(date__gte=today).order_by('date')[:8]
+        return Fixture.objects.all()

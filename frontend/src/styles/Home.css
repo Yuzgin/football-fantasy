@@ -1,0 +1,30 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw; /* Ensures it spans the entire viewport width */
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligns items at the top */
+  gap: 20px;
+  width: 100%;
+}
+
+.table-tall {
+  height: auto; /* Allows it to grow as needed */
+}
+
+.table-short {
+  height: 300px; /* Set a fixed height for other tables */
+}

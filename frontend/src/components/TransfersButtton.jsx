@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/Modal.css';
 
 const TransfersButton = () => {
   const buttonStyle = {
     padding: '10px 20px',
     margin: '10px',
-    backgroundColor: '#007BFF',
-    color: '#FFF',
     border: 'none',
     borderRadius: '5px',
     cursor: 'pointer',
@@ -14,7 +13,7 @@ const TransfersButton = () => {
 
   return (
     <Link to="/teamtransfers">
-      <button style={buttonStyle}>Transfers</button>
+      <button className='close' style={buttonStyle}>Transfers</button>
     </Link>
   );
 };
