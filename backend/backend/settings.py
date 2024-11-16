@@ -30,7 +30,9 @@ SECRET_KEY = "django-insecure-p%%)pvvu6h#ynb63ch&jvgplt=4xv(+-7e*$&7g-h4u(g9-9s)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['langwithfootball.com', 'www.langwithfootball.com', 'your-ec2-public-ip']
+
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
