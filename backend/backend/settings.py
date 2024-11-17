@@ -31,7 +31,13 @@ SECRET_KEY = "django-insecure-p%%)pvvu6h#ynb63ch&jvgplt=4xv(+-7e*$&7g-h4u(g9-9s)
 DEBUG = False
 
 # ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = ['langwithfootball.com', 'www.langwithfootball.com', 'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'langwithfootball.com',
+    'www.langwithfootball.com',
+    'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com',
+    'd257m9yf5awtwy.cloudfront.net']
 
 
 REST_FRAMEWORK = {
