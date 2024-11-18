@@ -34,6 +34,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
+    '18.171.185.104',
     'langwithfootball.com',
     'www.langwithfootball.com',
     'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com',
@@ -177,3 +178,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://www.langwithfootball.com',
+    'https://d257m9yf5awtwy.cloudfront.net',
+]
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
