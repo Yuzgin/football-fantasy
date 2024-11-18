@@ -25,9 +25,11 @@ a:hover {
 body {
   margin: 0;
   display: flex;
-  place-items: center;
+  flex-direction: column; /* Stack content vertically */
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 h1 {
@@ -54,15 +56,138 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.main-content {
+  margin-top: 70px; /* Match header height */
+  padding: 10px;
+  width: 100%; /* Ensure full width */
+  box-sizing: border-box;
+}
+
+/* Header styles */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #FFF;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-sizing: border-box; /* Include padding in width/height calculations */
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    align-items: stretch; /* Allow content to take full width */
+    padding: 5px;
   }
-  a:hover {
-    color: #747bff;
+
+  h1 {
+    font-size: 2em;
   }
+
   button {
-    background-color: #f9f9f9;
+    padding: 0.4em 1em;
+    font-size: 0.9em;
+  }
+
+  header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+  }
+
+  nav {
+    display: none; /* Hide the navigation bar by default */
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background-color: #444;
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 1001;
+  }
+
+  nav.active {
+    display: block; /* Show the dropdown menu when active */
+  }
+
+  nav a, nav button {
+    display: block;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    background-color: #444; /* Dropdown background color */
+    border-radius: 4px;
+    margin: 5px 0;
+  }
+
+  nav a:hover, nav button:hover {
+    background-color: #555; /* Highlight on hover */
+  }
+}
+
+/* Form styles */
+.form_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90%; /* Adjust for smaller screens */
+  max-width: 400px; /* Maintain a maximum width */
+  margin: 40px auto 20px; /* Add more gap from the top with 40px */
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #e3e3e3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form_container h1 {
+  color: black; /* Set the "Login" text color to black */
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.register-button {
+  background-color: #008CBA;
+}
+
+.form-button:hover {
+  background-color: #45a049;
+}
+
+@media (max-width: 768px) {
+  .form_container {
+    width: 100%; /* Take full width on smaller screens */
+    padding: 15px;
+  }
+
+  .form-input, .form-button {
+    font-size: 0.9em; /* Adjust font size for smaller screens */
   }
 }

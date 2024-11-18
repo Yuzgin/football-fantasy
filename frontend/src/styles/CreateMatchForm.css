@@ -1,38 +1,41 @@
-/* CreateMatchForm.css */
-
 .create-match-form {
-    padding: 20px;
-    background-color: #e0b507;
-    border-radius: 10px;
-    max-width: 600px;
-    margin: 20px auto;
-    color: black;
-  }
-  
-  .create-match-form input {
-    display: block;
-    margin-bottom: 10px;
-    padding: 8px;
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid black;
-  }
-  
-  .create-match-form h3 {
-    color: black;
-  }
-  
-  button {
-    margin-top: 10px;
-    background-color: black;
-    color: #e0b507;
-    border: none;
+  padding: 20px;
+  background-color: #e0b507;
+  border-radius: 10px;
+  max-width: 90%; /* Adjust width for responsiveness */
+  margin: 20px auto;
+  color: black;
+}
+
+.create-match-form input {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px;
+  width: 100%; /* Use 100% width */
+  background-color: #fff;
+  border: 1px solid black;
+}
+
+.create-match-form h3 {
+  color: black;
+}
+
+button {
+  margin-top: 10px;
+  background-color: black;
+  color: #e0b507;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: white;
+  color: black;
+}
+
+@media (max-width: 768px) {
+  .create-match-form {
     padding: 10px;
-    cursor: pointer;
   }
-  
-  button:hover {
-    background-color: white;
-    color: black;
-  }
-  
+}

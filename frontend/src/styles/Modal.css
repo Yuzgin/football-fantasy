@@ -1,3 +1,5 @@
+/*Modal.css*/
+
 .modal {
   position: fixed; /* Use fixed to position relative to the viewport */
   flex-direction: column;
