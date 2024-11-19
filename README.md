@@ -37,7 +37,7 @@ python manage.py runserver
 
 And backend will be runnning at http://localhost:8000/
 
-[![My Tech Stack](https://github-readme-tech-stack.vercel.app/api/cards?lineCount=1&theme=github&line1=react%2Creact%2C263f7e%3BDjango%2Cdjango%2Cdccf16%3BAxios%2Caxios%2C13a11c%3BJavascript%2CJavascript%2Cc41ca7%3BAWS%2CAWS%2Cd47f13%3BPython%2CPython%2C1da2a7%3B)
+[![My Tech Stack](https://github-readme-tech-stack.vercel.app/api/cards?lineCount=2&line1=React%2CReact%2C1321e8%3BDjango%2CDjango%2Ce40d0d%3BAxios%2CAxios%2C8af937%3B&line2=Javascript%2CJavascript%2Cd69b20%3BPython%2CPython%2C43bce7%3B)
 
 # Improvements
 
