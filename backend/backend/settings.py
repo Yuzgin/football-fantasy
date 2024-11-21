@@ -37,6 +37,8 @@ ALLOWED_HOSTS = [
     '18.171.185.104',
     'langwithfootball.com',
     'www.langwithfootball.com',
+    '18.170.162.224',
+    'ec2-18-170-162-224.eu-west-2.compute.amazonaws.com',
     'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com',
     'd257m9yf5awtwy.cloudfront.net']
 
