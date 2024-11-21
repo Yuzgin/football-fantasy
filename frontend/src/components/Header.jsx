@@ -143,15 +143,6 @@ const Header = () => {
         <Link to="/team" style={linkStyle}>
           <button style={buttonStyle}>Team</button>
         </Link>
-        {isLoggedIn ? (
-          <button style={buttonStyle} onClick={handleLogout}>
-            Logout
-          </button>
-        ) : (
-          <Link to="/login" style={linkStyle}>
-            <button style={buttonStyle}>Login</button>
-          </Link>
-        )}
         <Link to="/mens" style={linkStyle}>
           <button style={buttonStyle}>Men's</button>
         </Link>
@@ -161,14 +152,20 @@ const Header = () => {
         <Link to="/LMS" style={linkStyle}>
           <button style={buttonStyle}>LMS</button>
         </Link>
+        {isLoggedIn ? (
+          <button style={buttonStyle} onClick={handleLogout}>
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" style={linkStyle}>
+            <button style={buttonStyle}>Login</button>
+          </Link>
+        )}
       </nav>
       {showDropdown && (
         <div style={dropdownMenuStyle}>
           <Link to="/" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Home</div>
-          </Link>
-          <Link to="/team" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Team</div>
           </Link>
           {isLoggedIn ? (
             <div style={dropdownItemStyle} onClick={handleLogout}>
@@ -179,6 +176,9 @@ const Header = () => {
               <div style={dropdownItemStyle}>Login</div>
             </Link>
           )}
+          <Link to="/team" style={linkStyle} onClick={closeDropdown}>
+            <div style={dropdownItemStyle}>Team</div>
+          </Link>
           <Link to="/mens" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Men's</div>
           </Link>

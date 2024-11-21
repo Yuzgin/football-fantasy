@@ -1,9 +1,9 @@
 from rest_framework import generics, viewsets
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
 from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
-from .serializers import FixtureSerializer
+from .serializers import FixtureSerializer, WomensFixtureSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek, Fixture
+from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek, Fixture, WomensFixture
 import sys
 from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
@@ -408,3 +408,20 @@ class FixtureListView(generics.ListAPIView):
         if upcoming_only:
             return Fixture.objects.filter(date__gte=today).order_by('date')[:8]
         return Fixture.objects.all()
+
+
+class WomensFixtureListView(generics.ListAPIView):
+    """
+    Handle GET requests for listing fixtures.
+    Supports filtering for upcoming fixtures.
+    """
+    serializer_class = WomensFixtureSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        upcoming_only = self.request.query_params.get('upcoming', None)
+        today = now().date()
+
+        if upcoming_only:
+            return WomensFixture.objects.filter(date__gte=today).order_by('date')[:8]
+        return WomensFixture.objects.all()

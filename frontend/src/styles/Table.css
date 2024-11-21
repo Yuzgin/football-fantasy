@@ -1,7 +1,7 @@
-/*Table.css*/
+/* Table.css */
 
 .team-table {
-  width: 300px; /* Adjust as needed */
+  width: auto; /* Allow the table width to adjust naturally */
   border-collapse: collapse;
   font-size: 18px;
   text-align: left;
@@ -31,4 +31,12 @@
 
 .team-table td:nth-child(2), .team-table th:nth-child(2) {
   text-align: center; /* Center the Points column */
+}
+
+.team-table tr {
+  height: auto; /* Allow rows to grow naturally based on content */
+}
+
+.team-table {
+  min-width: 300px; /* Ensure a reasonable width for responsiveness */
 }

@@ -110,3 +110,16 @@ class Fixture(models.Model):
 
     def __str__(self):
         return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"
+
+class WomensFixture(models.Model):
+    team1 = models.CharField(max_length=100)
+    team2 = models.CharField(max_length=100)
+    location = models.CharField(max_length=200)
+    date = models.DateField()
+    time = models.TimeField()
+
+    class Meta:
+        unique_together = ('team1', 'team2')
+    
+    def __str__(self):
+        return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"

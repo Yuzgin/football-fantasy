@@ -1,6 +1,6 @@
 from datetime import timedelta
 from rest_framework import serializers
-from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot, Fixture
+from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot, Fixture, WomensFixture
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -182,4 +182,9 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
 class FixtureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fixture
+        fields = ['id', 'team1', 'team2', 'location', 'date', 'time']
+
+class WomensFixtureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WomensFixture
         fields = ['id', 'team1', 'team2', 'location', 'date', 'time']

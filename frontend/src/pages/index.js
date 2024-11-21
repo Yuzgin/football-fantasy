@@ -10,3 +10,4 @@ export { default as TeamTransfers } from './TeamTransfers';
 export { default as OtherTeam } from './OtherTeam';
 export { default as LMS } from './LMS';
 export { default as Mens } from './Mens';
+export { default as Womens } from './Womens';

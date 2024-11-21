@@ -16,14 +16,21 @@ const TeamTable = ({ teams }) => {
         <table className="team-table">
             <thead>
                 <tr>
-                    <th>Fantasy League Table</th>
+                    <th style={{ width: '200px' }}>Fantasy League Table</th> {/* Adjust header cell width */}
                     <th>Points</th>
                 </tr>
             </thead>
             <tbody>
-                {sortedTeams.map((team) => (
-                    <tr key={team.id} onClick={() => handleRowClick(team.id)} style={{ cursor: 'pointer' }}>
-                        <td>{team.name}</td>
+                {sortedTeams.map((team, index) => (
+                    <tr
+                        key={team.id}
+                        onClick={() => handleRowClick(team.id)}
+                        style={{
+                            cursor: 'pointer',
+                            ...(index === 0 && { fontWeight: 'bold', fontSize: '18px' }), // Highlight the first row
+                        }}
+                    >
+                        <td style={index === 0 ? { width: '200px' } : {}}>{team.name}</td>
                         <td>{team.total_points}</td>
                     </tr>
                 ))}

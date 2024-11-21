@@ -32,20 +32,27 @@ const Home = () => {
     <div className="page-container">
       <Header />
       <div className="table-container">
-        <StatTable
-          players={players}
-          stat="Goals"
-          title="Top Scorers"
-        />
-        <TeamTable teams={teams} />
-        <StatTable
-          players={players}
-          stat="Points"
-          title="Top Points"
-        />
+        {/* Wrapping each table in a flex child container */}
+        <div className="table-wrapper">
+          <TeamTable teams={teams} />
+        </div>
+        <div className="table-wrapper">
+          <StatTable
+            players={players}
+            stat="Goals"
+            title="Top Scorers"
+          />
+        </div>
+        <div className="table-wrapper">
+          <StatTable
+            players={players}
+            stat="Points"
+            title="Top Points"
+          />
+        </div>
       </div>
     </div>
-);
+  );
 };
 
 export default Home;

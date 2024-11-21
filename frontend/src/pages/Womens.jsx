@@ -13,7 +13,7 @@ const Mens = () => {
 
   const fetchMatches = async () => {
     try {
-      const response = await api.get("/api/fixtures/", {
+      const response = await api.get("/api/womensfixtures/", {
         params: { upcoming: "true" },
       });
       console.log("API Response:", response.data); // Debugging API response
@@ -29,7 +29,7 @@ const Mens = () => {
     <div className="mens-page">
       <Header />
       <div className="content-container">
-        <h1>Upcoming mens fixtures</h1>
+        <h1>Upcoming womens fixtures</h1>
 
         {loading ? (
           <p>Loading matches...</p>

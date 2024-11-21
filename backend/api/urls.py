@@ -18,5 +18,6 @@ urlpatterns = [
     path('game-weeks/', views.GameWeekListView.as_view(), name='game-weeks'),
     path('team/<int:pk>/', views.TeamDetailView.as_view(), name='team-detail'),
     path('fixtures/', views.FixtureListView.as_view(), name='fixtures'),
+    path('womensfixtures/', views.WomensFixtureListView.as_view(), name='womens-fixtures'),
     path('', include(router.urls)),  # Include the router for team snapshots
 ]
