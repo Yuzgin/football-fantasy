@@ -37,7 +37,7 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Align items to the top */
-    gap: 20px; /* Space between the team container and the controls */
+    gap: 30px; /* Space between the team container and the controls */
 }
 
 /* Styling for the controls container (team name form, budget, submit button) */
@@ -50,7 +50,25 @@
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     border: 2px solid transparent; /* Invisible border */
-    margin-top: 40px; /* Add margin to separate from the header */
+    margin-top: 42px; /* Add margin to separate from the header */
+}
+
+.teamdetail-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center; /* Align content to the left */
+    padding: 10px;
+    background-color: #2b2b28; /* Light background for contrast */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border: 2px solid transparent; /* Invisible border */
+    margin-top: 42px; /* Add margin to separate from the header */
+    min-width: 250px;
+}
+
+.teamdetail-container h2 {
+    color: white; /* White text color */
 }
 
 .controls-container form {
@@ -92,7 +110,7 @@ form button[type="submit"] {
 }
 
 form button[type="submit"]:disabled {
-    background-color: #ccc; /* Grey background when disabled */
+    background-color: grey; /* Grey background when disabled */
     cursor: not-allowed; /* Show not-allowed cursor when disabled */
 }
 
@@ -106,6 +124,8 @@ body {
 
 /* Wrapper around all content except the header */
 .content-wrapper {
+    display: flex;
+    justify-content: center; /* Center content horizontally */
     border: 2px solid transparent; /* Invisible border */
     padding: 20px; /* Space inside the wrapper */
     max-width: 100%; /* Ensure wrapper doesn't exceed screen width */

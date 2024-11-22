@@ -27,7 +27,7 @@ function App() {
             <Route path="/Match" element={<ProtectedRoute><Pages.Match /></ProtectedRoute>} />
             <Route path="/TeamTransfers" element={<ProtectedRoute><Pages.TeamTransfers /></ProtectedRoute>} />
             <Route path="/team/:teamId" element={<Pages.OtherTeam />} />
-            <Route path="/Players" element={<Pages.Players />} />
+            <Route path="/Players" element={<ProtectedRoute><Pages.Players /></ProtectedRoute>} />
             <Route path="/login" element={<Pages.Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/register" element={<RegisterAndLogout />} />

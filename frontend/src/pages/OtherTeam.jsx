@@ -122,6 +122,7 @@ const OtherTeam = () => {
   return (
     <div>
       <Header />
+      <div className="content-wrapper">
       <div className="team-and-controls">
         <div className="team-container">
           <div className="team-formation">
@@ -181,7 +182,7 @@ const OtherTeam = () => {
           </div>
         </div>
 
-        <div className="controls-container">
+        <div className="teamdetail-container">
           <h2>{teamSnapshot.team.name}: Gameweek {teamSnapshot.game_week.week}</h2>
           <p>Points: {teamSnapshot.weekly_points}</p>
           <p>Team Value: £{teamValue}m</p>
@@ -211,6 +212,7 @@ const OtherTeam = () => {
           closeStats={() => setShowPlayerStats(false)}
         />
       )}
+    </div>
     </div>
   );
 };

@@ -3,6 +3,7 @@
 .modal {
   position: fixed; /* Use fixed to position relative to the viewport */
   flex-direction: column;
+  color: white;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); /* Center the modal */
@@ -15,6 +16,10 @@
   border-radius: 20px;
   padding: 1%;
   font-weight: bold;
+}
+
+.modal h2 {
+  color: white;
 }
   
 .player-list {

@@ -4,10 +4,6 @@ import '../styles/Modal.css';
 
 const TransfersButton = () => {
   const buttonStyle = {
-    padding: '10px 20px',
-    margin: '10px',
-    border: 'none',
-    borderRadius: '5px',
     cursor: 'pointer',
   };
 

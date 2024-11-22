@@ -201,6 +201,7 @@ const TeamTransfers = () => {
     return (
         <div>
             <Header />
+            <div className="content-wrapper">
             <div className="team-and-controls">
                 <div className="team-container">
                     <div className="team-formation">
@@ -265,6 +266,7 @@ const TeamTransfers = () => {
                     position={currentPosition}
                 />
             )}
+        </div>
         </div>
     );
 };

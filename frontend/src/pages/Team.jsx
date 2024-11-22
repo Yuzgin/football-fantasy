@@ -167,6 +167,7 @@ const TeamPage = () => {
   return (
       <div>
           <Header />
+          <div className="content-wrapper">
           <div className="team-and-controls">
               <div className="team-container">
                   <div className="team-formation">
@@ -205,7 +206,7 @@ const TeamPage = () => {
                   </div>
               </div>
 
-              <div className="controls-container">
+              <div className="teamdetail-container">
                 <TeamInfo team={team} handleDeleteTeam={handleDeleteTeam} value={teamValue} />
                 <TransfersButton />
               </div>
@@ -216,6 +217,7 @@ const TeamPage = () => {
                 closeStats={() => setShowPlayerStats(false)}
             />
             )}
+      </div>
       </div>
   );
 };
