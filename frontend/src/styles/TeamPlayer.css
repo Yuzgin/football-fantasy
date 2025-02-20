@@ -20,4 +20,15 @@
     overflow: hidden; /* Hide overflow text */
     text-overflow: ellipsis; /* Add ellipsis if text is too long */
   }
-  
+
+  /* Reduce player size for smaller screens */
+@media screen and (max-width: 600px) {
+  .team-player {
+      transform: scale(0.9); /* Scale down the whole player component */
+  }
+
+  .player-name-or-position {
+      font-size: 10px; /* Make the text slightly smaller */
+      padding: 1px 4px; /* Adjust padding */
+  }
+}

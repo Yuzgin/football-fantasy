@@ -133,3 +133,40 @@ body {
     overflow-y: auto; /* Make content scrollable vertically if it exceeds height */
     box-sizing: border-box; /* Ensure padding is included in height calculation */
 }
+
+
+/* Media query for smaller screens (e.g., iPhones) */
+@media screen and (max-width: 600px) {
+    .team-container {
+        width: 300px; /* Reduce pitch width */
+        height: 360px; /* Reduce pitch height */
+        padding: 10px; /* Adjust padding */
+    }
+
+    .team-formation {
+        gap: 5px; /* Reduce vertical spacing between rows */
+    }
+
+    .position-group {
+        gap: 15px; /* Reduce horizontal spacing between players */
+    }
+
+    .controls-container {
+        padding: 5px; /* Reduce padding for controls */
+        margin-top: 20px; /* Adjust spacing */
+    }
+
+    form input[type="text"] {
+        width: 180px; /* Make input fields smaller */
+    }
+
+    form button[type="submit"] {
+        padding: 8px 15px;
+        font-size: 14px; /* Reduce button size */
+    }
+
+    .budget-display {
+        font-size: 16px; /* Adjust budget text size */
+    }
+    
+}
