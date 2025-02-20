@@ -125,14 +125,16 @@ body {
 /* Wrapper around all content except the header */
 .content-wrapper {
     display: flex;
-    justify-content: center; /* Center content horizontally */
-    border: 2px solid transparent; /* Invisible border */
-    padding: 20px; /* Space inside the wrapper */
-    max-width: 100%; /* Ensure wrapper doesn't exceed screen width */
-    max-height: calc(100vh - 60px); /* Limit wrapper height to viewport height minus some space */
-    overflow-y: auto; /* Make content scrollable vertically if it exceeds height */
-    box-sizing: border-box; /* Ensure padding is included in height calculation */
+    justify-content: center;
+    border: 2px solid transparent;
+    padding: 20px;
+    max-width: 100%;
+    height: auto; /* Allow natural height */
+    max-height: none; /* Remove restriction */
+    overflow-y: visible; /* Allow full page scrolling */
+    box-sizing: border-box;
 }
+
 
 
 /* Media query for smaller screens (e.g., iPhones) */
@@ -196,7 +198,9 @@ body {
     }
 
     /* Ensure body allows scrolling */
-    body {
+    html, body {
         overflow-y: auto; /* Allow the whole page to scroll */
+        min-height: 150vh;
+        padding-top: 10vh;
     }
 }
