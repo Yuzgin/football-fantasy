@@ -168,5 +168,35 @@ body {
     .budget-display {
         font-size: 16px; /* Adjust budget text size */
     }
-    
+
+    .team-and-controls {
+        flex-direction: column; /* Stack elements vertically */
+        align-items: center; /* Center align content */
+        gap: 20px; /* Reduce space between them */
+    }
+
+    .controls-container {
+        order: -1; /* Moves controls to the top */
+        width: 90%; /* Make it take most of the screen width */
+        text-align: center; /* Center align text */
+    }
+
+    .team-container {
+        width: 300px; /* Reduce pitch width */
+        height: 360px; /* Reduce pitch height */
+        padding: 10px; /* Adjust padding */
+        flex-shrink: 0; /* Prevents shrinking */
+    }
+
+    /* This ensures the whole page, not just the container, scrolls */
+    .content-wrapper {
+        height: auto; /* Allow it to expand naturally */
+        max-height: none; /* Remove height restriction */
+        overflow-y: visible; /* Allow normal page scrolling */
+    }
+
+    /* Ensure body allows scrolling */
+    body {
+        overflow-y: auto; /* Allow the whole page to scroll */
+    }
 }
