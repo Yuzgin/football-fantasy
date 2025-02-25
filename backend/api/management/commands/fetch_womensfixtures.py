@@ -10,8 +10,8 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # List of URLs to fetch fixtures from
         urls = [
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cm16h5ymp008m4z8mib03b2gn/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cm16h5qfq008j4z8msvoj0sxb/fixtures'
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cm4gz9ups00in4psxotzlth3k/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cm4gzbp6d00iw4psxnll1ht9c/fixtures',
         ]
 
         # Get today's date

@@ -200,7 +200,7 @@ body {
     /* Ensure body allows scrolling */
     html, body {
         overflow-y: auto; /* Allow the whole page to scroll */
-        min-height: 150vh;
-        padding-top: 10vh;
+        min-height: 120vh;
+        padding-top: 5vh;
     }
 }
