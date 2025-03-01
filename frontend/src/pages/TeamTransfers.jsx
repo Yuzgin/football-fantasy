@@ -46,7 +46,7 @@ const TeamTransfers = () => {
                 if (positionMapping[player.position]) {
                     positionMapping[player.position].push(player.id);
                 }
-                teamValue += player.price;
+                teamValue += Number(player.price);
             });
 
             // Ensure a goalkeeper is assigned if available
@@ -102,12 +102,12 @@ const TeamTransfers = () => {
 
     const handlePlayerSelect = (playerId) => {
         const player = players.find((p) => p.id === playerId);
-        if (budget - player.price >= 0) {
+        if (budget - Number(player.price) >= 0) {
             setSelectedPlayers((prevSelectedPlayers) => ({
                 ...prevSelectedPlayers,
                 [currentPosition]: playerId,
             }));
-            setBudget((prevBudget) => prevBudget - player.price);
+            setBudget((prevBudget) => prevBudget - Number(player.price));
             setShowPlayerModal(false);
             setCurrentPosition(null);
         }
@@ -121,7 +121,7 @@ const TeamTransfers = () => {
             delete updatedPlayers[position];
             return updatedPlayers;
         });
-        setBudget((prevBudget) => prevBudget + player.price);
+        setBudget((prevBudget) => prevBudget + Number(player.price));
     };
 
     const isPlayerSelected = (playerId) => Object.values(selectedPlayers).includes(playerId);
@@ -181,7 +181,7 @@ const TeamTransfers = () => {
                     const player = players.find((p) => p.id === selectedPlayers[pos]);
                     return player ? (
                         <div key={pos}>
-                            {player.name} - £{player.price}m
+                            {player.name} - £{Number(player.price)}m
                         </div>
                     ) : null;
                 });

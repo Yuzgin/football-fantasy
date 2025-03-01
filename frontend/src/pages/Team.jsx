@@ -52,7 +52,7 @@ const TeamPage = () => {
           setTeam(teamData);
 
           const totalValue = teamData.players.reduce((total, player) => {
-            return total + player.price}, 0);
+            return total + Number(player.price)}, 0);
             setTeamValue(totalValue);
 
           let teamValue = 0;
@@ -67,7 +67,7 @@ const TeamPage = () => {
               if (positionMapping[player.position]) {
                   positionMapping[player.position].push(player.id);
               }
-              teamValue += player.price;
+              teamValue += Number(player.price);
           });
 
           // Ensure a goalkeeper is assigned if available

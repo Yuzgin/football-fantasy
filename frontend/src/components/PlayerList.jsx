@@ -41,7 +41,7 @@ const PlayerList = ({
                   }
                 />
                 <label htmlFor={`player-${player.id}`}>
-                {player.name} - {player.position} - £{Number(player.price).toFixed(1)}
+                {player.name} - {player.position} - £{Number(player.price).toFixed(1)}m
                 </label>
               </div>
             ))}
