@@ -65,27 +65,31 @@ const CreateTeam = () => {
 
   const handlePlayerSelect = (playerId) => {
     const player = players.find((p) => p.id === playerId);
-    if (budget - player.price >= 0) {
+    const playerPrice = Number(player.price); // Ensure it's a number
+  
+    if (budget - playerPrice >= 0) {
       setSelectedPlayers((prevSelectedPlayers) => ({
         ...prevSelectedPlayers,
         [currentPosition]: playerId,
       }));
-      setBudget((prevBudget) => prevBudget - player.price);
+      setBudget((prevBudget) => prevBudget - playerPrice);
       setShowPlayerModal(false);
       setCurrentPosition(null);
     }
   };
-
+  
   const handlePlayerDeselect = (position) => {
     const playerId = selectedPlayers[position];
     const player = players.find((p) => p.id === playerId);
+    const playerPrice = Number(player.price); // Ensure it's a number
+  
     setSelectedPlayers((prevSelectedPlayers) => {
       const updatedPlayers = { ...prevSelectedPlayers };
       delete updatedPlayers[position];
       return updatedPlayers;
     });
-    setBudget((prevBudget) => prevBudget + player.price);
-  };
+    setBudget((prevBudget) => prevBudget + playerPrice);
+  };  
 
   const isPlayerSelected = (playerId) => Object.values(selectedPlayers).includes(playerId);
 
@@ -220,7 +224,7 @@ const CreateTeam = () => {
                 required
               />
 
-              <div className="budget-display">Budget: £{budget.toFixed(1)}m</div>
+              <div className="budget-display">Budget: £{Number(budget).toFixed(1)}m</div>
 
               <div className="selected-players">
                 {renderSelectedPlayers()}

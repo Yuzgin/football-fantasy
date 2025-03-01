@@ -27,7 +27,7 @@ const PlayerModal = ({ players, isPlayerSelected, handlePlayerSelect, closeModal
                 className={`player-item ${isPlayerSelected(player.id) ? 'faded' : ''}`}
                 onClick={() => !isPlayerSelected(player.id) && handlePlayerSelect(player.id)}
               >
-                {player.name} - £{player.price.toFixed(1)}m
+                {player.name} - £{Number(player.price).toFixed(1)}m
               </div>
             ))
           ) : (
