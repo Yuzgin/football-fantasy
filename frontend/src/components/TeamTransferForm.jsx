@@ -53,7 +53,7 @@ const TeamTransferForm = ({
         })}
       </div>
 
-      <div>Budget: £{budget.toFixed(1)}m</div>
+      <div>Budget: £{Number(budget).toFixed(1)}m</div>
 
       <button type="submit" disabled={Object.keys(selectedPlayers).length !== 11}>
         Confirm Transfers

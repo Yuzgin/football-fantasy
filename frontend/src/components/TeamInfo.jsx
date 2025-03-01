@@ -12,7 +12,7 @@ const TeamInfo = ({ team, handleDeleteTeam, value }) => {
     <div className="team-info">
       <h1>{team.name}</h1>
       <p>Total Points: {team.total_points}</p>
-      <p>Team Value: £{value.toFixed(1)}m</p>
+      <p>Team Value: £{Number(value).toFixed(1)}m</p>
       <button className='close' onClick={confirmDelete}>Delete Team</button>
     </div>
   );

@@ -244,7 +244,7 @@ const TeamTransfers = () => {
 
                 <div className="controls-container">
                     <form onSubmit={handleUpdateTeam}>
-                        <div className="budget-display">Budget: £{budget.toFixed(1)}m</div>
+                    <div className="budget-display">Budget: £{Number(budget).toFixed(1)}m</div>
 
                         <div className="selected-players">
                             {renderSelectedPlayers()}
