@@ -36,7 +36,7 @@ class Player(models.Model):
     red_cards = models.IntegerField(default=0, null=True, blank=True)
     clean_sheets = models.IntegerField(default=0, null=True, blank=True)
     games_played = models.IntegerField(default=0, null=True, blank=True)
-    price = models.IntegerField(null=True, blank=True)
+    price = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
     points = models.IntegerField(default=0, null=True, blank=True)
 
 

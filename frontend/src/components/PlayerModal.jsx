@@ -15,6 +15,10 @@ const PlayerModal = ({ players, isPlayerSelected, handlePlayerSelect, closeModal
       <div className="modal-content">
         <h2>Select a {role}</h2>
         <button onClick={closeModal}>Close</button>
+        
+        {/* Divider line below the button */}
+        <div className="modal-divider"></div>
+
         <div className="player-list">
           {filteredPlayers.length > 0 ? (
             filteredPlayers.map((player) => (

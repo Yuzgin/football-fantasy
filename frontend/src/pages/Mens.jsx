@@ -51,7 +51,7 @@ const Mens = () => {
                     <td>{match.team1}</td>
                     <td>{match.team2}</td>
                     <td>{match.location}</td>
-                    <td>{new Date(match.date).toLocaleDateString()}</td>
+                    <td>{new Date(match.date).toLocaleDateString('en-GB')}</td>
                     <td>{match.time.slice(0, 5)}</td>
                   </tr>
                 ))}

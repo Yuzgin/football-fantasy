@@ -1,0 +1,37 @@
+.team-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-weight: bold;
+  }
+  
+  .team-info h1,
+  .team-info p {
+    margin: 10px 0;
+    border-bottom: 2px solid white; /* Adds a line between text elements */
+    padding-bottom: 5px;
+  }
+  
+  .team-info .close {
+    background: white;
+    color: black;
+    font-weight: bold;
+    margin-top: 10px;
+    padding: 8px 10px; /* Reduced size to 80% */
+    border: none;
+    cursor: pointer;
+    font-size: 0.9em; /* Scales the text */
+    transform: scale(0.9); /* Scales the button down */
+  }
+  
+  .team-info .close:hover {
+    background: #ddd;
+  }
+  
+  .team-info .close:disabled {
+    background: #2b2b28;
+    color: #2b2b28;
+  }
+  
