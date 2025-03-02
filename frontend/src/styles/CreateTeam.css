@@ -178,7 +178,7 @@ body {
     }
 
     .controls-container {
-        order: -1; /* Moves controls to the top */
+        order: 1; /* Moves controls to the top */
         width: 90%; /* Make it take most of the screen width */
         text-align: center; /* Center align text */
     }
