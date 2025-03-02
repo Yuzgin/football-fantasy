@@ -226,13 +226,13 @@ const CreateTeam = () => {
 
               <div className="budget-display">Budget: £{Number(budget).toFixed(1)}m</div>
 
-              <div className="selected-players">
-                {renderSelectedPlayers()}
-              </div>
-
               <button type="submit" disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}>
                 Create Team
               </button>
+
+              <div className="selected-players">
+                {renderSelectedPlayers()}
+              </div>
             </form>
           </div>
         </div>

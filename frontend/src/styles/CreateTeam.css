@@ -44,7 +44,7 @@
 .controls-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align content to the left */
+    align-items: center; /* Align content to the left */
     padding: 10px;
     background-color: #2b2b28; /* Light background for contrast */
     border-radius: 10px; /* Rounded corners */
