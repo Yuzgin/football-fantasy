@@ -39,7 +39,7 @@ const OtherTeam = () => {
 
       const selectedPlayers = mapPlayersToPositions(teamSnapshotData.players);
       setSelectedPlayers(selectedPlayers);
-      setTeamValue(teamSnapshotData.players.reduce((total, player) => total + player.price, 0));
+      setTeamValue(teamSnapshotData.players.reduce((total, player) => total + Number(player.price), 0));
     } catch (error) {
       console.error('Error fetching team snapshot:', error);
       setTeamSnapshot(null);
@@ -73,7 +73,7 @@ const OtherTeam = () => {
 
       const selectedPlayers = mapPlayersToPositions(teamSnapshotData.players);
       setSelectedPlayers(selectedPlayers);
-      setTeamValue(teamSnapshotData.players.reduce((total, player) => total + player.price, 0));
+      setTeamValue(teamSnapshotData.players.reduce((total, player) => total + Number(player.price), 0));
     } catch (error) {
       console.error('Error fetching team snapshot for week:', error);
       setTeamSnapshot(null);
