@@ -135,6 +135,11 @@ body {
     box-sizing: border-box;
 }
 
+.position-group-5 {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Reduced gap for 5 players (half of the normal 60px) */
+}
 
 
 /* Media query for smaller screens (e.g., iPhones) */

@@ -111,6 +111,13 @@ const OtherTeam = () => {
     setShowPlayerStats(true);
   };
 
+  const getPositionCount = (positionType) => {
+    if (!selectedPlayers || !selectedPlayers[positionType]) {
+      return 0;
+    }
+    return selectedPlayers[positionType].length;
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -154,7 +161,7 @@ const OtherTeam = () => {
 
             {/* Render midfielders */}
             {selectedPlayers.Midfielder.length > 0 && (
-              <div className="position-group">
+              <div className={`position-group ${getPositionCount('Midfielder') === 5 ? 'position-group-5' : ''}`}>
                 {selectedPlayers.Midfielder.map((midfielderId) => (
                   <PlayerViewPoints
                     key={midfielderId}

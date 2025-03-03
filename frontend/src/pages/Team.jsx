@@ -185,7 +185,7 @@ const TeamPage = () => {
                           {(additionalDefenderAllowed || selectedPlayers["Defender-5"]) && renderTeamPlayer("Defender-5")}
                       </div>
 
-                      <div className="position-group">
+                      <div className={`position-group ${getPositionCount('Midfielder') === 5 ? 'position-group-5' : ''}`}>
                           {formations[selectedFormation]
                               .filter(position => position.startsWith("Midfielder"))
                               .map(position => renderTeamPlayer(position))}
