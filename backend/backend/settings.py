@@ -192,3 +192,14 @@ SESSION_COOKIE_SECURE = True
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+# RESET PASSWORD EMAIL SETTINGS
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # During development only
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # For production
+EMAIL_HOST = "smtp.ionos.com"  # Use your email provider's SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")

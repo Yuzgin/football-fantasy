@@ -6,6 +6,7 @@ import PlayerViewPoints from '../components/PlayerViewPoints';
 import PlayerStats from '../components/PlayerStats';
 import '../styles/Modal.css';
 import '../styles/OtherTeam.css';
+import '../styles/TeamInfo.css';
 
 const OtherTeam = () => {
   const [players, setPlayers] = useState([]);
@@ -188,28 +189,30 @@ const OtherTeam = () => {
             )}
           </div>
         </div>
-
         <div className="teamdetail-container">
-          <h2>{teamSnapshot.team.name}: Gameweek {teamSnapshot.game_week.week}</h2>
-          <p>Points: {teamSnapshot.weekly_points}</p>
-          <p>Team Value: £{teamValue}m</p>
+          <div className="team-info">
+            <h2>{teamSnapshot.team.name}</h2>
+            <p>Gameweek {teamSnapshot.game_week.week}</p>
+            <p>Points: {teamSnapshot.weekly_points}</p>
+            <p>Team Value: £{teamValue}m</p>
 
-          {/* Navigation buttons */}
-          <button
-            className="close"
-            onClick={handlePrevWeek}
-            disabled={currentWeek === 1}
-          >
-            Previous Week
-          </button>
+            {/* Navigation buttons */}
+            <button
+              className="close"
+              onClick={handlePrevWeek}
+              disabled={currentWeek === 1}
+            >
+              Previous Week
+            </button>
 
-          <button
-            className="close"
-            onClick={handleNextWeek}
-            disabled={currentWeek === maxWeek}
-          >
-            Next Week
-          </button>
+            <button
+              className="close"
+              onClick={handleNextWeek}
+              disabled={currentWeek === maxWeek}
+            >
+              Next Week
+            </button>
+          </div>
         </div>
       </div>
 

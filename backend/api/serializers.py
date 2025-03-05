@@ -1,6 +1,13 @@
 from datetime import timedelta
 from rest_framework import serializers
 from api.models import CustomUser, Player, Team, Match, PlayerGameStats, GameWeek, TeamSnapshot, Fixture, WomensFixture
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,6 +23,50 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = CustomUser.objects.create_user(**validated_data)
         return user
+    
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        if not User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No user is associated with this email address.")
+        return value
+
+    def send_reset_email(self):
+        """Sends password reset email with token and UID"""
+        email = self.validated_data["email"]
+        user = User.objects.get(email=email)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+
+        send_mail(
+            "Password Reset Request",
+            f"Click the link below to reset your password:\n\n{reset_url}",
+            "no-reply@example.com",
+            [email],
+            fail_silently=False,
+        )
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, min_length=6)
+
+    def validate(self, data):
+        try:
+            uid = force_str(urlsafe_base64_decode(data["uid"]))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            raise serializers.ValidationError("Invalid token")
+
+        if not default_token_generator.check_token(user, data["token"]):
+            raise serializers.ValidationError("Token is invalid or expired")
+
+        user.set_password(data["new_password"])
+        user.save()
+        return data
 
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:

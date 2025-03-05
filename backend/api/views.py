@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
 from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
 from .serializers import FixtureSerializer, WomensFixtureSerializer
@@ -7,13 +7,13 @@ from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek
 import sys
 from api.models import CustomUser, Team, Match
 from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 import logging
 from django.utils import timezone
 from django.db.models import Q
 from django.utils.timezone import now
+from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 
 
 
@@ -47,7 +47,25 @@ class CreateUserView(generics.CreateAPIView):
         # Print username and password to terminal
         print(f"New user registration request - Email: {email}, Password: {password}", file=sys.stdout)
         return super().post(request, *args, **kwargs)
+        
 
+class PasswordResetRequestView(generics.GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.send_reset_email()
+        return Response({"message": "Password reset link sent."}, status=status.HTTP_200_OK)
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response({"message": "Password reset successful."}, status=status.HTTP_200_OK)
+    
 
 class TeamDetailOrCreateView(generics.GenericAPIView):
     serializer_class = TeamSerializer
