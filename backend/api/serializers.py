@@ -98,7 +98,7 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
         elif player.position == "Midfielder":
             points += goals * 5 + assists * 3 + clean_sheets * 1
         elif player.position == "Defender":
-            points += goals * 6 + assists * 4 + clean_sheets * 3
+            points += goals * 6 + assists * 4 + clean_sheets * 4
         elif player.position == "Goalkeeper":
             points += goals * 8 + assists * 7 + clean_sheets * 5
         points -= yellow_cards * 1 + red_cards * 3
