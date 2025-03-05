@@ -11,3 +11,5 @@ export { default as OtherTeam } from './OtherTeam';
 export { default as LMS } from './LMS';
 export { default as Mens } from './Mens';
 export { default as Womens } from './Womens';
+export { default as ForgotPassword } from './ForgotPassword';
+export { default as ResetPassword } from './ResetPassword';

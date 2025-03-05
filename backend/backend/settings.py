@@ -15,7 +15,8 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+dotenv_path = os.path.join(os.path.dirname(__file__), "../.env")  # Adjust path if needed
+load_dotenv(dotenv_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -194,12 +195,22 @@ USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-# RESET PASSWORD EMAIL SETTINGS
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # During development only
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" # For production
-EMAIL_HOST = "smtp.ionos.com"  # Use your email provider's SMTP server
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+### RESET PASSWORD EMAIL SETTINGS
+
+
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # During development only
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # For production
+
+# IONOS SMTP Configuration
+EMAIL_HOST = "smtp.ionos.co.uk"
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False  # TLS is used for port 587, IONOS uses SSL
+EMAIL_USE_SSL = True   # SSL is required for port 465
+
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+# EMAIL_HOST_USER = "EMAIL"  # Your IONOS email
+# EMAIL_HOST_PASSWORD = "Paasword"  # Replace with your actual password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Ensures consistency in email sending

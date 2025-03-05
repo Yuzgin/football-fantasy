@@ -52,11 +52,18 @@ function Form({ route, method }) {
             <div className="button-container">
                 <button className='form-button' type='submit'>{name}</button>
                 {method === "login" && (
-                    <Link to="/register" className="register-link">
-                        <button className='form-button register-button' type='button'>
-                            Register
-                        </button>
-                    </Link>
+                    <>
+                        <Link to="/register" className="register-link">
+                            <button className='form-button register-button' type='button'>
+                                Register
+                            </button>
+                        </Link>
+                        <Link to="/forgot-password" className="forgot-password-link">
+                            <button className='form-button forgot-password-button' type='button'>
+                                Forgot Password?
+                            </button>
+                        </Link>
+                    </>
                 )}
             </div>
         </form>
@@ -64,3 +71,4 @@ function Form({ route, method }) {
 }
 
 export default Form;
+

@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
 
@@ -39,12 +40,16 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+        reset_url = f"https://langwithfootball.com/reset-password/{uid}/{token}/"
+
+        # 🔹 Debug: Print email credentials before sending
+        # print("EMAIL_HOST_USER:", settings.EMAIL_HOST_USER)
+        # print("EMAIL_HOST_PASSWORD:", settings.EMAIL_HOST_PASSWORD)  # ⚠️ Be careful in production
 
         send_mail(
             "Password Reset Request",
             f"Click the link below to reset your password:\n\n{reset_url}",
-            "no-reply@example.com",
+            "no-reply@langwithfootball.com",
             [email],
             fail_silently=False,
         )

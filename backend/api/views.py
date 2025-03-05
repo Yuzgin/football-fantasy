@@ -50,6 +50,7 @@ class CreateUserView(generics.CreateAPIView):
         
 
 class PasswordResetRequestView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
     serializer_class = PasswordResetRequestSerializer
 
     def post(self, request, *args, **kwargs):
@@ -59,6 +60,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
         return Response({"message": "Password reset link sent."}, status=status.HTTP_200_OK)
 
 class PasswordResetConfirmView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
     serializer_class = PasswordResetConfirmSerializer
 
     def post(self, request, *args, **kwargs):

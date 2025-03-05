@@ -9,5 +9,7 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api-auth/", include("rest_framework.urls")),
+    path("api/password-reset/", PasswordResetRequestView.as_view(), name="password_reset"),
+    path("api/reset-password/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("api/", include("api.urls")),
 ]
