@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils import timezone  # Make sure this import is there
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from api.managers import CustomUserManager
