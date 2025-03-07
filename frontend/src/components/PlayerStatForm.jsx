@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/PlayerStatForm.css';
 
 const PlayerStatForm = ({ stat, index, players, handlePlayerStatChange }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter players based on the search query
+  const filteredPlayers = players.filter(player =>
+    player.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="player-stat-form">
       <label>
         Player:
+        {/* Add Search Input Field */}
+        <input
+          type="text"
+          placeholder="Search for a player"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        {/* Player Select Dropdown */}
         <select value={stat.player} onChange={(e) => handlePlayerStatChange(index, 'player', e.target.value)}>
           <option value="">Select Player</option>
-          {players.map(player => (
+          {filteredPlayers.map(player => (
             <option key={player.id} value={player.id}>{player.name}</option>
           ))}
         </select>
