@@ -181,6 +181,12 @@ class PlayerSerializer(serializers.ModelSerializer):
             )
             return sum(stat.points for stat in stats)
         return 0
+    
+class PlayerPointsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['id', 'name', 'points']
+
 
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)

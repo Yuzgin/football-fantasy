@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
+from .serializers import PlayerPointsSerializer
 
 
 
@@ -26,6 +27,10 @@ class PlayerListView(generics.ListCreateAPIView):
     def get_queryset(self):
         return Player.objects.all()
 
+
+class PlayerPointsListView(generics.ListAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerPointsSerializer
 
 
 class PlayerDelete(generics.DestroyAPIView):
