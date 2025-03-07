@@ -23,7 +23,10 @@ const Home = () => {
 
   const getPlayers = () => {
     api.get('/api/players/')
-      .then((res) => res.data)
+      .then((res) => {
+        console.log("Full players response:", res.data); // Log the entire response
+        return res.data;
+      })
       .then((data) => setPlayers(data))
       .catch((err) => alert(`Error fetching players: ${err.message}`));
   };
