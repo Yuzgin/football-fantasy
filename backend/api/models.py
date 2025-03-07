@@ -39,6 +39,10 @@ class Player(models.Model):
     price = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
     points = models.IntegerField(default=0, null=True, blank=True)
 
+    # Displays name of player in admin panel
+
+    def __str__(self):
+        return self.name if self.name else "Unnamed Player"
 
 class Team(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
