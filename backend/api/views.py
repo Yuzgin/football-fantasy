@@ -145,31 +145,6 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         team.players.set(players)
         team.save()
 
-        # NEW CODE: Handle snapshot creation or update
-        current_game_week = GameWeek.objects.filter(
-            start_date__lte=timezone.now().date(),
-            end_date__gte=timezone.now().date()
-        ).first()
-
-        if current_game_week:
-            # Check if a snapshot for the current game week already exists
-            snapshot = TeamSnapshot.objects.filter(team=team, game_week=current_game_week).first()
-
-            if snapshot:
-                # Update the existing snapshot
-                snapshot.players.set(players)
-                snapshot.weekly_points = 0  # Reset weekly points if necessary
-                snapshot.save()
-            else:
-                # Create a new snapshot
-                snapshot = TeamSnapshot.objects.create(
-                    team=team,
-                    game_week=current_game_week,
-                    weekly_points=0  # Initialize weekly points to 0
-                )
-                snapshot.players.set(players)
-                snapshot.save()
-
         # OLD CODE: Return the updated team data
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_200_OK)
