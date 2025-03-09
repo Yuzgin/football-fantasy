@@ -6,7 +6,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # Fetch the player named "Quinn"
-        player_name = Player.objects.filter(name="North")  # Replace with the player's name you want to update
+        player_name = Player.objects.filter(name="Irving")  # Replace with the player's name you want to update
 
         if not player_name.exists():
             self.stdout.write(self.style.WARNING('No players named Player found.'))
@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
         # Update weekly_points for each affected snapshot
         for snapshot in affected_snapshots:
-            snapshot.weekly_points += 0
+            snapshot.weekly_points += 2
             snapshot.save()
 
         self.stdout.write(self.style.SUCCESS(f"Updated {affected_snapshots.count()} TeamSnapshots by adding points."))
