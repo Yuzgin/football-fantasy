@@ -54,6 +54,16 @@ const PlayerStatForm = ({ stat, index, players, handlePlayerStatChange }) => {
         Clean Sheets:
         <input type="number" placeholder="Clean Sheets" value={stat.clean_sheets} onChange={(e) => handlePlayerStatChange(index, 'clean_sheets', e.target.value)} />
       </label>
+
+      <label>
+        MOTM:
+        <input type="number" placeholder="MOTM" value={stat.MOTM} onChange={(e) => handlePlayerStatChange(index, 'MOTM', e.target.value)} />
+      </label>
+
+      <label>
+        Pen_Saves:
+        <input type="number" placeholder="Pen_Saves" value={stat.Pen_Saves} onChange={(e) => handlePlayerStatChange(index, 'Pen_Saves', e.target.value)} />
+      </label>
     </div>
   );
 };

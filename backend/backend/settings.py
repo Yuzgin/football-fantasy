@@ -42,6 +42,7 @@ ALLOWED_HOSTS = [
     'ec2-18-170-162-224.eu-west-2.compute.amazonaws.com',
     'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com',
     'd257m9yf5awtwy.cloudfront.net', 
+    'http://127.0.0.1:8000/'
     '144.21.51.162']
 
 
@@ -186,8 +187,10 @@ CORS_ALLOWS_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://www.langwithfootball.com',
     'https://d257m9yf5awtwy.cloudfront.net',
+    'http://127.0.0.1:8000/'
 ]
 
+# NEVER SET False IN PRODUCTION
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 

@@ -38,6 +38,8 @@ class Player(models.Model):
     games_played = models.IntegerField(default=0, null=True, blank=True)
     price = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
     points = models.IntegerField(default=0, null=True, blank=True)
+    MOTM = models.IntegerField(default=0, null=True, blank=True)
+    Pen_Saves = models.IntegerField(default=0, null=True, blank=True)
 
     # Displays name of player in admin panel
 
@@ -85,6 +87,8 @@ class PlayerGameStats(models.Model):
     yellow_cards = models.IntegerField(default=0)
     red_cards = models.IntegerField(default=0)
     clean_sheets = models.IntegerField(default=0)
+    MOTM = models.IntegerField(default=0)
+    Pen_Saves = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
 
     def __str__(self):

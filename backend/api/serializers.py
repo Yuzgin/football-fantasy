@@ -85,12 +85,13 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PlayerGameStats
-        fields = ['id', 'player', 'match', 'goals', 'assists', 'yellow_cards', 'red_cards', 'clean_sheets', 'points', 'game_week']
+        fields = ['id', 'player', 'match', 'goals', 'assists', 'yellow_cards', 'red_cards', 'clean_sheets',
+                  'points', 'game_week', 'MOTM', 'Pen_Saves']
 
     def get_game_week(self, obj):
         return obj.match.game_week.id if obj.match and obj.match.game_week else None
 
-    def calculate_points(self, player, goals, assists, yellow_cards, red_cards, clean_sheets):
+    def calculate_points(self, player, goals, assists, yellow_cards, red_cards, clean_sheets, MOTM, Pen_Saves):
         # Custom points calculation logic
         points = 2  # Base points for all players
         if player.position == "Attacker":
@@ -100,8 +101,9 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
         elif player.position == "Defender":
             points += goals * 6 + assists * 4 + clean_sheets * 4
         elif player.position == "Goalkeeper":
-            points += goals * 8 + assists * 7 + clean_sheets * 5
+            points += goals * 8 + assists * 5 + clean_sheets * 5
         points -= yellow_cards * 1 + red_cards * 3
+        points += MOTM * 2 + Pen_Saves * 5
         return points
 
     def update_player_total_points(self, player, points, action='add'):
@@ -120,7 +122,9 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
             validated_data['assists'],
             validated_data['yellow_cards'],
             validated_data['red_cards'],
-            validated_data['clean_sheets']
+            validated_data['clean_sheets'],
+            validated_data['MOTM'],
+            validated_data['Pen_Saves'],
         )
         validated_data['points'] = points
         self.update_player_total_points(player, points, action='add')  # Add points to player total_points
@@ -137,7 +141,9 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
             validated_data.get('assists', instance.assists),
             validated_data.get('yellow_cards', instance.yellow_cards),
             validated_data.get('red_cards', instance.red_cards),
-            validated_data.get('clean_sheets', instance.clean_sheets)
+            validated_data.get('clean_sheets', instance.clean_sheets),
+            validated_data.get('MOTM', instance.MOTM),
+            validated_data.get('Pen_Saves', instance.Pen_Saves),
         )
         validated_data['points'] = new_points
         updated_instance = super().update(instance, validated_data)
@@ -168,7 +174,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "position", "points", "price", "team",
             "game_stats", "goals", "assists", "clean_sheets", "games_played",
-            "points", "yellow_cards", "red_cards"
+            "points", "yellow_cards", "red_cards", "MOTM", "Pen_Saves"
         ]
 
     def get_points(self, player):

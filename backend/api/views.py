@@ -240,6 +240,8 @@ class MatchListCreateView(generics.ListCreateAPIView):
         player.yellow_cards += stat_instance.yellow_cards
         player.red_cards += stat_instance.red_cards
         player.clean_sheets += stat_instance.clean_sheets
+        player.MOTM += stat_instance.MOTM
+        player.Pen_Saves += stat_instance.Pen_Saves
         player.games_played += 1  # Increment games played
         player.save()
 
