@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer
+from django.db.models import Sum
 
 
 
@@ -315,13 +316,23 @@ class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
         return context
 
 
+# class TeamListView(generics.ListCreateAPIView):
+#     serializer_class = TeamSerializer
+#     permission_classes = [AllowAny]
+
+#     def get_queryset(self):
+#         # Sort teams by total_points in descending order at the DB level
+#         return Team.objects.order_by('-total_points')
+
 class TeamListView(generics.ListCreateAPIView):
     serializer_class = TeamSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        # ✅ Sort teams by total_points in descending order at the DB level
-        return Team.objects.order_by('-total_points')
+        return Team.objects.annotate(
+            total_points=Sum('snapshots__weekly_points')
+        ).select_related('user').prefetch_related('players', 'snapshots').order_by('-total_points')
+
 
 class TeamDetailView(generics.RetrieveAPIView):
     queryset = Team.objects.all()
