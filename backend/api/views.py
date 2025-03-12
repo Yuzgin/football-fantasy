@@ -320,7 +320,8 @@ class TeamListView(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Team.objects.all()
+        # ✅ Sort teams by total_points in descending order at the DB level
+        return Team.objects.order_by('-total_points')
 
 class TeamDetailView(generics.RetrieveAPIView):
     queryset = Team.objects.all()

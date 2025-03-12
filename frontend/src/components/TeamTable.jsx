@@ -3,25 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/Table.css';
 
 const TeamTable = ({ teams }) => {
-    const navigate = useNavigate(); // Hook to programmatically navigate
-
-    // Sort teams by total points in descending order
-    const sortedTeams = [...teams].sort((a, b) => b.total_points - a.total_points);
+    const navigate = useNavigate();
 
     const handleRowClick = (teamId) => {
-        navigate(`/team/${teamId}`); // Navigate to the team detail page
+        navigate(`/team/${teamId}`);
     };
 
     return (
         <table className="team-table">
             <thead>
                 <tr>
-                    <th style={{ width: '200px' }}>Fantasy League Table</th> {/* Adjust header cell width */}
+                    <th style={{ width: '200px' }}>Fantasy League Table</th>
                     <th>Points</th>
                 </tr>
             </thead>
             <tbody>
-                {sortedTeams.map((team, index) => (
+                {teams.map((team, index) => (
                     <tr
                         key={team.id}
                         onClick={() => handleRowClick(team.id)}
