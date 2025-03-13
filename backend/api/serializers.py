@@ -250,3 +250,15 @@ class WomensFixtureSerializer(serializers.ModelSerializer):
     class Meta:
         model = WomensFixture
         fields = ['id', 'team1', 'team2', 'location', 'date', 'time']
+
+
+class LeagueTableSerializer(serializers.ModelSerializer):
+    total_points = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'total_points']
+
+    def get_total_points(self, team):
+        # Sum the weekly points from all snapshots related to this team
+        return sum(snapshot.weekly_points for snapshot in team.snapshots.all())
