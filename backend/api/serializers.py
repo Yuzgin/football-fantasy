@@ -196,7 +196,6 @@ class PlayerPointsSerializer(serializers.ModelSerializer):
 
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)
-    total_points = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
