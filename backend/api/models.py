@@ -51,7 +51,7 @@ class Team(models.Model):
     players = models.ManyToManyField(Player, related_name='team_players')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='team_user')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
-    total_points = models.IntegerField(default=0)
+    total_points = models.IntegerField(default=0, db_index=True)
 
     def __str__(self):
         return self.name
