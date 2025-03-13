@@ -1,7 +1,7 @@
 from rest_framework import generics, viewsets, status
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
 from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
-from .serializers import FixtureSerializer, WomensFixtureSerializer
+from .serializers import FixtureSerializer, WomensFixtureSerializer, LeagueTableSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek, Fixture, WomensFixture
 import sys
@@ -317,7 +317,7 @@ class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class TeamListView(generics.ListCreateAPIView):
-    serializer_class = TeamSerializer
+    serializer_class = LeagueTableSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
