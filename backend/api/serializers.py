@@ -202,11 +202,6 @@ class TeamSerializer(serializers.ModelSerializer):
         model = Team
         fields = ['id', 'name', 'players', 'total_points', 'created_at']
 
-    def get_total_points(self, team):
-        # Sum the weekly points from all snapshots related to this team
-        total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
-        return total_points
-
 
 class GameWeekSerializer(serializers.ModelSerializer):
     class Meta:
