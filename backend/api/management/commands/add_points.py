@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
         # Update weekly_points for each affected snapshot
         for snapshot in affected_snapshots:
-            snapshot.weekly_points += 2
+            snapshot.weekly_points -= 2
             snapshot.save()
 
         self.stdout.write(self.style.SUCCESS(f"Updated {affected_snapshots.count()} TeamSnapshots by adding points."))
