@@ -10,6 +10,7 @@ const MatchList = ({ matches, deleteMatch }) => {
           <li key={match.id} className="match-item">
             <div className="match-info">
               <span className="teams">{match.team1} vs {match.team2}</span>
+              <span className="score">{match.team1_score} - {match.team2_score}</span>
               <span className="match-date">{new Date(match.date).toLocaleDateString()} {new Date(match.date).toLocaleTimeString()}</span>
             </div>
             <button className="delete-button" onClick={() => deleteMatch(match.id)}>Delete</button>

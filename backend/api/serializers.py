@@ -76,7 +76,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        fields = ['id', 'date', 'team1', 'team2', 'game_week']
+        fields = ['id', 'date', 'team1', 'team2', 'team1_score', 'team2_score', 'game_week']
 
 
 class PlayerGameStatsSerializer(serializers.ModelSerializer):

@@ -8,6 +8,8 @@ const MatchPage = () => {
   const [matches, setMatches] = useState([]);
   const [team1, setTeam1] = useState('');
   const [team2, setTeam2] = useState('');
+  const [team1_score, setTeam1_score] = useState('');
+  const [team2_score, setTeam2_score] = useState('');
   const [date, setDate] = useState('');
   const [playersStats, setPlayersStats] = useState([
     { player: '', goals: 0, assists: 0, yellow_cards: 0, red_cards: 0, clean_sheets: 0, points: 0,
@@ -47,7 +49,7 @@ const MatchPage = () => {
   const createMatch = (e) => {
     e.preventDefault();
   
-    const matchData = { team1, team2, date };
+    const matchData = { team1, team2, team1_score, team2_score, date };
     const formattedPlayerStats = playersStats.map(stat => ({
       ...stat,
       goals: parseInt(stat.goals),
@@ -97,6 +99,10 @@ const MatchPage = () => {
         setTeam1={setTeam1}
         team2={team2}
         setTeam2={setTeam2}
+        team1_score={team1_score}
+        setTeam1_score={setTeam1_score}
+        team2_score={team2_score}
+        setTeam2_score={setTeam2_score}
         date={date}
         setDate={setDate}
         playersStats={playersStats}

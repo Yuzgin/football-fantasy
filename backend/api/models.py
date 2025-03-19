@@ -76,6 +76,8 @@ class Match(models.Model):
     date = models.DateTimeField()
     team1 = models.CharField(max_length=255)
     team2 = models.CharField(max_length=255)
+    team1_score = models.IntegerField(default=0)
+    team2_score = models.IntegerField(default=0)
     game_week = models.ForeignKey(GameWeek, on_delete=models.SET_NULL, null=True, blank=True)
 
 
