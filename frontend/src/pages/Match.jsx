@@ -35,6 +35,15 @@ const MatchPage = () => {
       .catch((err) => alert(`Error fetching players: ${err.message}`));
   };
 
+  useEffect(() => {
+    const updatedStats = playersStats.map(stat => ({
+      ...stat,
+      clean_sheets: team2_score === '0' ? 1 : 0
+    }));
+    setPlayersStats(updatedStats);
+  }, [team2_score]);
+  
+
   const handlePlayerStatChange = (index, field, value) => {
     const updatedStats = [...playersStats];
     updatedStats[index][field] = value;
