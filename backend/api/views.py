@@ -21,6 +21,14 @@ from django.db.models import Sum
 
 # Create your views here.
 
+class GetUserView(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 class PlayerListView(generics.ListCreateAPIView):
     serializer_class = PlayerSerializer
     permission_classes = [AllowAny]

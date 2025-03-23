@@ -6,6 +6,7 @@ router = DefaultRouter()
 router.register(r'team-snapshots', views.TeamSnapshotViewSet, basename='team-snapshots')
 
 urlpatterns = [
+    path('user/', views.GetUserView.as_view(), name='user'),
     path('players/', views.PlayerListView.as_view(), name='players'),
     path('players/delete/<int:pk>/', views.PlayerDelete.as_view(), name='delete_player'),
     path('teams/', views.TeamListView.as_view(), name='teams'),

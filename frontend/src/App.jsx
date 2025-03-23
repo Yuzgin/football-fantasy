@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import * as Pages from './pages';
 import ProtectedRoute from './components/ProtectedRoute';
+import StaffRoute from './components/StaffRoute';
 import Header from './components/Header';
 
 function Logout() {
@@ -24,7 +25,7 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Pages.Home /></ProtectedRoute>} />
             <Route path="/CreateTeam" element={<ProtectedRoute><Pages.CreateTeam /></ProtectedRoute>} />
             <Route path="/Team" element={<ProtectedRoute><Pages.Team /></ProtectedRoute>} />
-            <Route path="/Match" element={<ProtectedRoute><Pages.Match /></ProtectedRoute>} />
+            <Route path="/Match" element={<StaffRoute><Pages.Match /></StaffRoute>} />
             <Route path="/TeamTransfers" element={<ProtectedRoute><Pages.TeamTransfers /></ProtectedRoute>} />
             <Route path="/team/:teamId" element={<Pages.OtherTeam />} />
             <Route path="/Players" element={<ProtectedRoute><Pages.Players /></ProtectedRoute>} />
