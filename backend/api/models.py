@@ -82,7 +82,7 @@ class Match(models.Model):
     game_week = models.ForeignKey(GameWeek, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.team1} vs {self.team2} on {self.date.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.team1} vs {self.team2}"
 
 
 class PlayerGameStats(models.Model):
