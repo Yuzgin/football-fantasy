@@ -81,6 +81,9 @@ class Match(models.Model):
     team2_score = models.IntegerField(default=0)
     game_week = models.ForeignKey(GameWeek, on_delete=models.SET_NULL, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.team1} vs {self.team2} on {self.date.strftime('%Y-%m-%d %H:%M')}"
+
 
 class PlayerGameStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_stats')
