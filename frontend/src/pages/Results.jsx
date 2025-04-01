@@ -34,13 +34,13 @@ const Mens = () => {
         {loading ? (
           <p>Loading matches...</p>
         ) : matches.length > 0 ? (
-          <div className="match-table">
+          <div className="results-table">
             <table>
               <thead>
                 <tr>
                   <th>Home</th>
+                  <th>Score</th>
                   <th>Away</th>
-                  <th>Location</th>
                   <th>Date</th>
                 </tr>
               </thead>
@@ -48,8 +48,8 @@ const Mens = () => {
                 {matches.map((match) => (
                   <tr key={match.id}>
                     <td>{match.team1}</td>
+                    <td>{match.team1_score} - {match.team2_score}</td>
                     <td>{match.team2}</td>
-                    <td>{match.location}</td>
                     <td>{new Date(match.date).toLocaleDateString('en-GB')}</td>
                   </tr>
                 ))}

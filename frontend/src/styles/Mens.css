@@ -40,3 +40,30 @@
     font-weight: bold;
   }
   
+
+  .results-table {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  .results-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .results-table th,
+  .results-table td {
+    color: black;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+  }
+  
+  .results-table th {
+    color: white;
+    background-color: black;
+    font-weight: bold;
+  }
+  
