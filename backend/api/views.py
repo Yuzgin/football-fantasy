@@ -451,6 +451,8 @@ class ResultsListView(generics.ListAPIView):
     def get_queryset(self):
         past_only = self.request.query_params.get('past', None)
         today = now().date()
+
         if past_only:
-            return Match.objects.filter(date__lt=today).order_by('date')[:8]
-        return Match.objects.all()
+            return Match.objects.filter(date__lt=today).order_by('-date')[:8]  # Most recent past matches
+        return Match.objects.all().order_by('-date')  # Most recent matches first
+
