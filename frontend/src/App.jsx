@@ -33,6 +33,7 @@ function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/register" element={<RegisterAndLogout />} />
             <Route path="/mens" element={<Pages.Mens />} />
+            <Route path="/results" element={<Pages.Results />} />
             <Route path="/womens" element={<Pages.Womens />} />
             <Route path="/LMS" element={<Pages.LMS />} />
             <Route path="/forgot-password" element={<Pages.ForgotPassword />} />

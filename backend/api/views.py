@@ -2,6 +2,7 @@ from rest_framework import generics, viewsets, status
 from .serializers import UserSerializer, PlayerSerializer, TeamSerializer, MatchSerializer
 from .serializers import PlayerGameStatsSerializer, TeamSnapshotSerializer, GameWeekSerializer
 from .serializers import FixtureSerializer, WomensFixtureSerializer, LeagueTableSerializer
+from .serializers import ResultsSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Player, Team, Match, PlayerGameStats, TeamSnapshot, GameWeek, Fixture, WomensFixture
 import sys
@@ -438,3 +439,19 @@ class WomensFixtureListView(generics.ListAPIView):
         if upcoming_only:
             return WomensFixture.objects.filter(date__gte=today).order_by('date')[:8]
         return WomensFixture.objects.all()
+    
+class ResultsListView(generics.ListAPIView):
+    """
+    Handle GET requests for listing results.
+    Supports filtering for past results.
+    """
+    serializer_class = ResultsSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        past_only = self.request.query_params.get('past', None)
+        today = now().date()
+
+        if past_only:
+            return Fixture.objects.filter(date__lt=today).order_by('-date')[:8]
+        return Fixture.objects.all()

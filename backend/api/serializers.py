@@ -262,3 +262,9 @@ class LeagueTableSerializer(serializers.ModelSerializer):
     def get_total_points(self, team):
         # Sum the weekly points from all snapshots related to this team
         return sum(snapshot.weekly_points for snapshot in team.snapshots.all())
+
+
+class ResultsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ['id', 'team1', 'team2', 'team1_score', 'team2_score', 'date']
