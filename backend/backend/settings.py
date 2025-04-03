@@ -187,8 +187,10 @@ CORS_ALLOWS_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'https://www.langwithfootball.com',
     'https://d257m9yf5awtwy.cloudfront.net',
-    'http://127.0.0.1:8000/'
+    'http://127.0.0.1:8000/',
     'http://localhost:8000',
+    "capacitor://localhost",
+    "http://localhost",
 ]
 
 # NEVER SET False IN PRODUCTION
