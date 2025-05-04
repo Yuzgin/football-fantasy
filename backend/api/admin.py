@@ -15,21 +15,11 @@ from api.models import (
 class PlayerAdmin(admin.ModelAdmin):
     list_display = (
         'name',
-        'position',
-        'team',
-        'games_played',
-        'goals',
-        'assists',
-        'yellow_cards',
-        'red_cards',
-        'clean_sheets',
-        'MOTM',
-        'Pen_Saves',
         'price',
         'points',
     )
     ordering = ('-points',)            # sort by points descending
-    search_fields = ('name', 'team')   # handy for finding specific players
+    search_fields = ('name')   # handy for finding specific players
 
 # --- Other models (unchanged) ---
 admin.site.register(CustomUser)
