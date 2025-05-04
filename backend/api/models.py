@@ -45,7 +45,7 @@ class Player(models.Model):
     # Displays name of player in admin panel
 
     def __str__(self):
-        return self.name if self.name else "Unnamed Player"
+        return f"{self.name or 'Unnamed Player'} – {self.points} points"
 
 class Team(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
