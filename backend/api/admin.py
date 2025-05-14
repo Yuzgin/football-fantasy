@@ -19,7 +19,7 @@ class PlayerAdmin(admin.ModelAdmin):
         'points',
     )
     ordering = ('-points',)            # sort by points descending
-    search_fields = ('name')   # handy for finding specific players
+    search_fields = ['name']   # handy for finding specific players
 
 # --- Other models (unchanged) ---
 admin.site.register(CustomUser)
