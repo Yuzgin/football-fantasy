@@ -1,49 +1,67 @@
 from django.core.management.base import BaseCommand
+from django.db.models import Sum
 from api.models import Player, PlayerGameStats
 
 class Command(BaseCommand):
-    help = "Updates points for all players based on PlayerGameStats and Player model"
+    help = "Updates points for all players based on PlayerGameStats"
 
-    def calculate_points(self, player):
-        points = 0  # Start with zero points for each player
+    def calculate_points(self, player, stats_totals):
+        points = 0
 
-        # Get all PlayerGameStats for this player to calculate how many matches they played
-        player_stats = PlayerGameStats.objects.filter(player=player)
-        num_matches = player_stats.count()  # This will give the number of matches the player participated in
-
-        # Add 2 points for each match played
+        # Matches played is just the number of stat entries
+        num_matches = stats_totals['match_count'] or 0
         points += num_matches * 2
 
-        # Now calculate the points based on the player's own stats
+        goals = stats_totals['goals'] or 0
+        assists = stats_totals['assists'] or 0
+        clean_sheets = stats_totals['clean_sheets'] or 0
+        yellow_cards = stats_totals['yellow_cards'] or 0
+        red_cards = stats_totals['red_cards'] or 0
+        motm = stats_totals['MOTM'] or 0
+        pen_saves = stats_totals['Pen_Saves'] or 0
+
         if player.position == "Attacker":
-            points += player.goals * 4 + player.assists * 3
+            points += goals * 4 + assists * 3
         elif player.position == "Midfielder":
-            points += player.goals * 5 + player.assists * 3 + player.clean_sheets * 1
+            points += goals * 5 + assists * 3 + clean_sheets * 1
         elif player.position == "Defender":
-            points += player.goals * 6 + player.assists * 4 + player.clean_sheets * 4
+            points += goals * 6 + assists * 4 + clean_sheets * 4
         elif player.position == "Goalkeeper":
-            points += player.goals * 8 + player.assists * 7 + player.clean_sheets * 5
+            points += goals * 8 + assists * 7 + clean_sheets * 5 + pen_saves * 5
 
-        # Deduct points for yellow and red cards
-        points -= player.yellow_cards * 1 + player.red_cards * 3
+        points += motm * 2
+        points -= yellow_cards * 1 + red_cards * 3
 
-        return points
+        return points, num_matches
 
     def handle(self, *args, **kwargs):
-        # Optionally filter by player name, for debugging or one-off updates
-        player_name = "Quinn"  # Replace with the player's name you want to update
-        
-        # Uncomment the next line to target a specific player by name
-        # players = Player.objects.filter(name=player_name)
-
-        # In production, loop through all players
-        players = Player.objects.all() if player_name == "name" else Player.objects.filter(name=player_name)
+        players = Player.objects.all()
 
         for player in players:
-            total_points = self.calculate_points(player)
+            stats = PlayerGameStats.objects.filter(player=player)
+            totals = stats.aggregate(
+                goals=Sum('goals'),
+                assists=Sum('assists'),
+                yellow_cards=Sum('yellow_cards'),
+                red_cards=Sum('red_cards'),
+                clean_sheets=Sum('clean_sheets'),
+                MOTM=Sum('MOTM'),
+                Pen_Saves=Sum('Pen_Saves'),
+                match_count=Sum('id')  # We'll count the actual queryset length
+            )
+            totals['match_count'] = stats.count()  # Actual match count
 
-            # Update player's points in the database
+            total_points, games_played = self.calculate_points(player, totals)
+
             player.points = total_points
+            player.games_played = games_played
+            player.goals = totals['goals'] or 0
+            player.assists = totals['assists'] or 0
+            player.clean_sheets = totals['clean_sheets'] or 0
+            player.yellow_cards = totals['yellow_cards'] or 0
+            player.red_cards = totals['red_cards'] or 0
+            player.MOTM = totals['MOTM'] or 0
+            player.Pen_Saves = totals['Pen_Saves'] or 0
             player.save()
 
-            self.stdout.write(self.style.SUCCESS(f"Updated points for {player.name}: {total_points}"))
+            self.stdout.write(self.style.SUCCESS(f"Updated {player.name}: {total_points} pts"))
