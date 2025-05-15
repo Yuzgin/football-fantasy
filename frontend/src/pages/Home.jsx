@@ -2,18 +2,18 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import Header from '../components/Header';
 import TeamTable from '../components/TeamTable';
-import StatTable from '../components/StatsTable';
+import StatTableGoals from '../components/StatTableGoals';
 import StatsTablePoints from '../components/StatsTablePoints';
 import '../styles/Home.css'; // Import the CSS for the home layout
 
 const Home = () => {
   const [teams, setTeams] = useState([]);
-  const [players, setPlayers] = useState([]);
+  const [playersGoals, setPlayersGoals] = useState([]);
   const [playersPoints, setPlayersPoints] = useState([]);
 
   useEffect(() => {
     getTeams();
-    getPlayers();
+    getPlayersGoals();
     getPlayersPoints();
   }, []);
 
@@ -24,13 +24,13 @@ const Home = () => {
       .catch((err) => alert(`Error fetching teams: ${err.message}`));
   };
 
-  const getPlayers = () => {
-    api.get('/api/players/')
+  const getPlayersGoals = () => {
+    api.get('/api/player-points/')
       .then((res) => {
         console.log("Full players response:", res.data); // Log the entire response
         return res.data;
       })
-      .then((data) => setPlayers(data))
+      .then((data) => setPlayersGoals(data))
       .catch((err) => alert(`Error fetching players: ${err.message}`));
   };
 
@@ -54,7 +54,7 @@ const Home = () => {
         </div>
         <div className="table-wrapper">
           <StatTable
-            players={players}
+            players={playersGoals}
             stat="Goals"
             title="Top Scorers"
           />
