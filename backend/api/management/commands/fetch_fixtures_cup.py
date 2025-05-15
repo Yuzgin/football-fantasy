@@ -19,32 +19,41 @@ class Command(BaseCommand):
         csv_data = StringIO(response.text)
         reader = csv.DictReader(csv_data)
 
+        # Normalize headers by stripping whitespace
+        reader.fieldnames = [h.strip() for h in reader.fieldnames]
+
+        # Optional: debug print to verify headers
+        print("CSV headers:", reader.fieldnames)
+
         today = datetime.now().date()
 
         for row in reader:
             try:
+                # Clean each row's keys in case they're also messy
+                row = {k.strip(): v.strip() for k, v in row.items()}
+
                 # Parse date and time
                 fixture_date = datetime.strptime(row["Date"], "%d/%m/%Y").date()
                 fixture_time = datetime.strptime(row["Time"], "%H:%M").time()
-                location = row["Location"].strip()
+                location = row["Location"]
 
                 # Parse teams
-                team1 = row["A"].strip()
-                team2 = row["B"].strip()
+                team1 = row["A"]
+                team2 = row["B"]
 
                 # Filter out blank or incomplete rows
                 if not team1 or not team2:
                     continue
 
-                # Filter by Langwith fixtures only (remove this check if you want all fixtures)
+                # Only keep Langwith fixtures (optional – remove this condition for all teams)
                 if "Langwith" not in team1 and "Langwith" not in team2:
                     continue
 
-                # Only add fixtures today or in future
+                # Only add fixtures from today onwards
                 if fixture_date < today:
                     continue
 
-                # Save to DB
+                # Save or update in database
                 obj, created = Fixture.objects.update_or_create(
                     team1=team1,
                     team2=team2,
