@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
-from .serializers import PlayerPointsSerializer
+from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
 from django.db.models import Sum
 
 
@@ -41,6 +41,10 @@ class PlayerListView(generics.ListCreateAPIView):
 class PlayerPointsListView(generics.ListAPIView):
     queryset = Player.objects.all()
     serializer_class = PlayerPointsSerializer
+
+class PlayerGoalsListView(generics.ListAPIView):
+    queryset = Player.objects.all()
+    serializer_class = PlayerGoalsSerializer
 
 
 class PlayerDelete(generics.DestroyAPIView):

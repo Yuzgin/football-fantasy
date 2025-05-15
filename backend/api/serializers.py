@@ -193,6 +193,11 @@ class PlayerPointsSerializer(serializers.ModelSerializer):
         model = Player
         fields = ['id', 'name', 'points']
 
+class PlayerGoalsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Player
+        fields = ['id', 'name', 'goals']
+
 
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)

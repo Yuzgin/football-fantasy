@@ -25,7 +25,7 @@ const Home = () => {
   };
 
   const getPlayersGoals = () => {
-    api.get('/api/player-points/')
+    api.get('/api/player-goals/')
       .then((res) => {
         console.log("Full players response:", res.data); // Log the entire response
         return res.data;
