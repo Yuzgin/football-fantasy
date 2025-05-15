@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import Header from '../components/Header';
 import TeamTable from '../components/TeamTable';
-import StatTableGoals from '../components/StatTableGoals';
+import StatsTableGoals from '../components/StatsTableGoals';
 import StatsTablePoints from '../components/StatsTablePoints';
 import '../styles/Home.css'; // Import the CSS for the home layout
 
@@ -53,7 +53,7 @@ const Home = () => {
           <TeamTable teams={teams} />
         </div>
         <div className="table-wrapper">
-          <StatTable
+          <StatsTableGoals
             players={playersGoals}
             stat="Goals"
             title="Top Scorers"
