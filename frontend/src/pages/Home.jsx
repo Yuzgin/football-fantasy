@@ -55,7 +55,7 @@ const Home = () => {
         <div className="table-wrapper">
           <StatsTableGoals
             players={playersGoals}
-            stat="Goals"
+            goal="Goals"
             title="Top Scorers"
           />
         </div>
