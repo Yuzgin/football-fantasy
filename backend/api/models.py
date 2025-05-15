@@ -1,139 +1,67 @@
-from django.utils import timezone  # Make sure this import is there
-from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
-from api.managers import CustomUserManager
+from django.core.management.base import BaseCommand
+from django.db.models import Sum
+from api.models import Player, PlayerGameStats
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    is_superuser = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
+class Command(BaseCommand):
+    help = "Updates points for all players based on PlayerGameStats"
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
-    objects = CustomUserManager()
+    def calculate_points(self, player, stats_totals):
+        points = 0
 
-    groups = models.ManyToManyField(Group, related_name='customuser_set')
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        related_name='custom_user_permissions_set',
-        related_query_name='user',
-    )
-    
-    def __str__(self):
-        return self.email
+        # Matches played is just the number of stat entries
+        num_matches = stats_totals['match_count'] or 0
+        points += num_matches * 2
 
+        goals = stats_totals['goals'] or 0
+        assists = stats_totals['assists'] or 0
+        clean_sheets = stats_totals['clean_sheets'] or 0
+        yellow_cards = stats_totals['yellow_cards'] or 0
+        red_cards = stats_totals['red_cards'] or 0
+        motm = stats_totals['MOTM'] or 0
+        pen_saves = stats_totals['Pen_Saves'] or 0
 
-class Player(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
-    position = models.CharField(max_length=20, null=True, blank=True)
-    team = models.CharField(max_length=255, null=True, blank=True)
-    goals = models.IntegerField(default=0, null=True, blank=True)
-    assists = models.IntegerField(default=0, null=True, blank=True)
-    yellow_cards = models.IntegerField(default=0, null=True, blank=True)
-    red_cards = models.IntegerField(default=0, null=True, blank=True)
-    clean_sheets = models.IntegerField(default=0, null=True, blank=True)
-    games_played = models.IntegerField(default=0, null=True, blank=True)
-    price = models.DecimalField(max_digits=4, decimal_places=1, null=True, blank=True)
-    points = models.IntegerField(default=0, null=True, blank=True)
-    MOTM = models.IntegerField(default=0, null=True, blank=True)
-    Pen_Saves = models.IntegerField(default=0, null=True, blank=True)
+        if player.position == "Attacker":
+            points += goals * 4 + assists * 3
+        elif player.position == "Midfielder":
+            points += goals * 5 + assists * 3 + clean_sheets * 1
+        elif player.position == "Defender":
+            points += goals * 6 + assists * 4 + clean_sheets * 4
+        elif player.position == "Goalkeeper":
+            points += goals * 8 + assists * 7 + clean_sheets * 5 + pen_saves * 5
 
-    # Displays name of player in admin panel
+        points += motm * 2
+        points -= yellow_cards * 1 + red_cards * 3
 
-    def __str__(self):
-        return f"{self.name or 'Unnamed Player'} – {self.points} points"
+        return points, num_matches
 
-class Team(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
-    players = models.ManyToManyField(Player, related_name='team_players')
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='team_user')
-    created_at = models.DateTimeField(auto_now_add=True, null=True)
-    total_points = models.IntegerField(default=0, db_index=True)
+    def handle(self, *args, **kwargs):
+        players = Player.objects.all()
 
-    def __str__(self):
-        return self.name
-    
+        for player in players:
+            stats = PlayerGameStats.objects.filter(player=player)
+            totals = stats.aggregate(
+                goals=Sum('goals'),
+                assists=Sum('assists'),
+                yellow_cards=Sum('yellow_cards'),
+                red_cards=Sum('red_cards'),
+                clean_sheets=Sum('clean_sheets'),
+                MOTM=Sum('MOTM'),
+                Pen_Saves=Sum('Pen_Saves'),
+                match_count=Sum('id')  # We'll count the actual queryset length
+            )
+            totals['match_count'] = stats.count()  # Actual match count
 
-class GameWeek(models.Model):
-    week = models.IntegerField(default = 0)
-    start_date = models.DateField()
-    end_date = models.DateField()
+            total_points, games_played = self.calculate_points(player, totals)
 
-    @classmethod
-    def get_current_game_week(cls):
-        today = timezone.now().date()
-        return cls.objects.filter(start_date__lte=today, end_date__gte=today).first()
+            player.points = total_points
+            player.games_played = games_played
+            player.goals = totals['goals'] or 0
+            player.assists = totals['assists'] or 0
+            player.clean_sheets = totals['clean_sheets'] or 0
+            player.yellow_cards = totals['yellow_cards'] or 0
+            player.red_cards = totals['red_cards'] or 0
+            player.MOTM = totals['MOTM'] or 0
+            player.Pen_Saves = totals['Pen_Saves'] or 0
+            player.save()
 
-
-    def __str__(self):
-        return f"Game Week {self.start_date} - {self.end_date}"
-    
-
-class Match(models.Model):
-    date = models.DateTimeField()
-    team1 = models.CharField(max_length=255)
-    team2 = models.CharField(max_length=255)
-    team1_score = models.IntegerField(default=0)
-    team2_score = models.IntegerField(default=0)
-    game_week = models.ForeignKey(GameWeek, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.team1} vs {self.team2}"
-
-
-class PlayerGameStats(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_stats')
-    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='game_stats')
-    goals = models.IntegerField(default=0)
-    assists = models.IntegerField(default=0)
-    yellow_cards = models.IntegerField(default=0)
-    red_cards = models.IntegerField(default=0)
-    clean_sheets = models.IntegerField(default=0)
-    MOTM = models.IntegerField(default=0)
-    Pen_Saves = models.IntegerField(default=0)
-    points = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.player.name} - {self.match}"
-
-
-class TeamSnapshot(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='snapshots')
-    players = models.ManyToManyField(Player, related_name='snapshot_players')
-    game_week = models.ForeignKey(GameWeek, on_delete=models.CASCADE, related_name='team_snapshots')
-    snapshot_date = models.DateField(auto_now_add=True)
-    weekly_points = models.IntegerField(default=0)
-
-    def __str__(self):
-        return f"{self.team.name} - {self.game_week.start_date} to {self.game_week.end_date}"
-
-
-class Fixture(models.Model):
-    team1 = models.CharField(max_length=100)
-    team2 = models.CharField(max_length=100)
-    location = models.CharField(max_length=200)
-    date = models.DateField()
-    time = models.TimeField()
-
-    class Meta:
-        unique_together = ('team1', 'team2')
-
-    def __str__(self):
-        return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"
-
-class WomensFixture(models.Model):
-    team1 = models.CharField(max_length=100)
-    team2 = models.CharField(max_length=100)
-    location = models.CharField(max_length=200)
-    date = models.DateField()
-    time = models.TimeField()
-
-    class Meta:
-        unique_together = ('team1', 'team2')
-    
-    def __str__(self):
-        return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"
+            self.stdout.write(self.style.SUCCESS(f"Updated {player.name}: {total_points} pts"))
