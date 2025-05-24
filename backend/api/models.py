@@ -123,7 +123,8 @@ class Fixture(models.Model):
         unique_together = ('team1', 'team2')
 
     def __str__(self):
-        return f"{self.team1} vs {self.team2} on {self.date} at {self.location}"
+        formatted_date = f"{self.date.day} {self.date.strftime('%B')}"
+        return f"{self.team1} vs {self.team2} on {formatted_date}"
 
 class WomensFixture(models.Model):
     team1 = models.CharField(max_length=100)
