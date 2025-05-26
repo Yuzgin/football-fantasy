@@ -29,7 +29,7 @@ const Mens = () => {
 
   const fetchResults = async () => {
     try {
-      const response = await api.get("/api/matches/");
+      const response = await api.get("/api/results/");
       console.log("API Results Response:", response.data); // Debugging API results response
       setResults(Array.isArray(response.data) ? response.data : []); // Ensure results is an array
     } catch (error) {
@@ -75,7 +75,7 @@ const Mens = () => {
         )}
       </div>
 
-      <div className="content-container">
+      {/* <div className="content-container">
         <h1>Mens Results</h1>
 
         {loading ? (
@@ -108,7 +108,7 @@ const Mens = () => {
         ) : (
           <p>No Matches Played Yet.</p>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
