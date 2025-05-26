@@ -120,6 +120,7 @@ class Fixture(models.Model):
     time = models.TimeField()
 
     class Meta:
+        ordering = ['date', 'time']
         unique_together = ('team1', 'team2')
 
     def __str__(self):
