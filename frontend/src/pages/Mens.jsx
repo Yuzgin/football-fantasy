@@ -6,9 +6,11 @@ import "../styles/Mens.css";
 const Mens = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [results, setResults] = useState([]);
 
   useEffect(() => {
     fetchMatches();
+    fetchResults();
   }, []);
 
   const fetchMatches = async () => {
@@ -22,6 +24,16 @@ const Mens = () => {
       console.error("Error fetching matches:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchResults = async () => {
+    try {
+      const response = await api.get("/api/matches/");
+      console.log("API Results Response:", response.data); // Debugging API results response
+      setResults(Array.isArray(response.data) ? response.data : []); // Ensure results is an array
+    } catch (error) {
+      console.error("Error fetching results:", error);
     }
   };
 
@@ -60,6 +72,41 @@ const Mens = () => {
           </div>
         ) : (
           <p>No fixtures left for semester.</p>
+        )}
+      </div>
+
+      <div className="content-container">
+        <h1>Mens Results</h1>
+
+        {loading ? (
+          <p>Loading matches...</p>
+        ) : results.length > 0 ? (
+          <div className="match-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Home</th>
+                  <th>Away</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((result) => (
+                  <tr key={result.id}>
+                    <td>{result.team1}</td>
+                    <td>{result.team2}</td>
+                    <td>{result.team1_score} - {result.team2_score}</td>
+                    <td>{new Date(result.date).toLocaleDateString('en-GB')}</td>
+                    <td>{new Date(result.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>No Matches Played Yet.</p>
         )}
       </div>
     </div>
