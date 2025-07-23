@@ -121,6 +121,8 @@ const CreateTeam = () => {
 
   const additionalAttackerAllowed =
     getPositionCount('Attacker') === 2 &&
+    getPositionCount('Midfielder') < 5 &&
+    getPositionCount('Defender') < 5 &&
     getSelectedPlayerCount() <= 9;
 
   const onlyOneAttackerAllowed =
