@@ -7,7 +7,11 @@ import Header from '../components/Header';
 import '../styles/CreateTeam.css'; // Import the CSS file
 
 const formations = {
-  "4-4-2": ["Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
+  "4-4-2": [
+    "Defender-1", "Defender-2", "Defender-3", "Defender-4",
+    "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4",
+    "Attacker-1", "Attacker-2"
+  ],
 };
 
 const CreateTeam = () => {
@@ -38,11 +42,9 @@ const CreateTeam = () => {
   const checkIfUserHasTeam = async () => {
     try {
       const response = await api.get('/api/team/');
-      if (response.data) {
-        setHasTeam(true);
-      }
+      if (response.data) setHasTeam(true);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      if (error.response?.status === 404) {
         setHasTeam(false);
       } else {
         console.error('Error checking team:', error);
@@ -66,71 +68,75 @@ const CreateTeam = () => {
   const handlePlayerSelect = (playerId) => {
     const player = players.find((p) => p.id === playerId);
     const playerPrice = Number(player.price); // Ensure it's a number
-  
+
     if (budget - playerPrice >= 0) {
-      setSelectedPlayers((prevSelectedPlayers) => ({
-        ...prevSelectedPlayers,
+      setSelectedPlayers((prev) => ({
+        ...prev,
         [currentPosition]: playerId,
       }));
-      setBudget((prevBudget) => prevBudget - playerPrice);
+      setBudget((prev) => prev - playerPrice);
       setShowPlayerModal(false);
       setCurrentPosition(null);
     }
   };
-  
+
   const handlePlayerDeselect = (position) => {
     const playerId = selectedPlayers[position];
     const player = players.find((p) => p.id === playerId);
-    const playerPrice = Number(player.price); // Ensure it's a number
-  
-    setSelectedPlayers((prevSelectedPlayers) => {
-      const updatedPlayers = { ...prevSelectedPlayers };
-      delete updatedPlayers[position];
-      return updatedPlayers;
-    });
-    setBudget((prevBudget) => prevBudget + playerPrice);
-  };  
+    const playerPrice = Number(player.price);
 
-  const isPlayerSelected = (playerId) => Object.values(selectedPlayers).includes(playerId);
+    setSelectedPlayers((prev) => {
+      const updated = { ...prev };
+      delete updated[position];
+      return updated;
+    });
+    setBudget((prev) => prev + playerPrice);
+  };
+
+  const isPlayerSelected = (playerId) =>
+    Object.values(selectedPlayers).includes(playerId);
 
   const openPlayerModal = (position) => {
     setCurrentPosition(position);
     setShowPlayerModal(true);
   };
 
-  const getSelectedPlayerCount = () => 
-    Object.keys(selectedPlayers).filter(position => position !== "Goalkeeper").length;
+  const getSelectedPlayerCount = () =>
+    Object.keys(selectedPlayers).filter((pos) => pos !== "Goalkeeper").length;
 
-  const getPositionCount = (positionType) =>
-    Object.keys(selectedPlayers).filter((pos) => pos.startsWith(positionType)).length;
+  const getPositionCount = (type) =>
+    Object.keys(selectedPlayers).filter((pos) => pos.startsWith(type)).length;
 
   const additionalDefenderAllowed =
     getPositionCount('Defender') === 4 &&
     getPositionCount('Midfielder') < 5 &&
+    getPositionCount('Attacker') < 3 &&
     getSelectedPlayerCount() <= 9;
 
   const additionalMidfielderAllowed =
     getPositionCount('Midfielder') === 4 &&
     getPositionCount('Defender') < 5 &&
+    getPositionCount('Attacker') < 3 &&
     getSelectedPlayerCount() <= 9;
 
   const additionalAttackerAllowed =
-    getPositionCount('Attacker') === 2 && getSelectedPlayerCount() <= 9;
+    getPositionCount('Attacker') === 2 &&
+    getSelectedPlayerCount() <= 9;
 
   const onlyOneAttackerAllowed =
     (getPositionCount('Defender') === 4 && getPositionCount('Midfielder') === 5) ||
     (getPositionCount('Defender') === 5 && getPositionCount('Midfielder') === 4);
 
   const renderTeamPlayer = (position) => {
-    const totalSelectedPlayers = getSelectedPlayerCount();
-    const playerAssigned = selectedPlayers[position];
+    const total = getSelectedPlayerCount();
+    const assigned = selectedPlayers[position];
 
-    if (totalSelectedPlayers < 10 || playerAssigned) {
+    if (total < 10 || assigned) {
       return (
         <TeamPlayer
           key={position}
           position={position}
-          selectedPlayer={players.find((p) => p.id === playerAssigned)}
+          selectedPlayer={players.find((p) => p.id === assigned)}
           openPlayerModal={openPlayerModal}
           handlePlayerDeselect={handlePlayerDeselect}
         />
@@ -140,34 +146,25 @@ const CreateTeam = () => {
   };
 
   const renderSelectedPlayers = () => {
-    const positions = ["Goalkeeper", "Defender", "Midfielder", "Attacker"];
-    return positions.map((positionType) => {
-      const selectedInPosition = Object.keys(selectedPlayers)
-        .filter((pos) => pos.startsWith(positionType))
+    const types = ["Goalkeeper", "Defender", "Midfielder", "Attacker"];
+    return types.map((type) => {
+      const items = Object.keys(selectedPlayers)
+        .filter((pos) => pos.startsWith(type))
         .map((pos) => {
           const player = players.find((p) => p.id === selectedPlayers[pos]);
-          return player ? (
-            <div key={pos}>
-              {player.name} - £{player.price}m
-            </div>
-          ) : null;
+          return player ? <div key={pos}>{player.name} - £{player.price}m</div> : null;
         });
-      return selectedInPosition.length > 0 ? (
-        <div key={positionType}>
-          <strong>{positionType}s:</strong>
-          {selectedInPosition}
+      return items.length > 0 ? (
+        <div key={type}>
+          <strong>{type}s:</strong>
+          {items}
         </div>
       ) : null;
     });
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (hasTeam) {
-    return <Navigate to="/team" replace />;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (hasTeam) return <Navigate to="/team" replace />;
 
   return (
     <div>
@@ -187,26 +184,26 @@ const CreateTeam = () => {
 
               <div className="position-group">
                 {formations[selectedFormation]
-                  .filter(position => position.startsWith("Defender"))
-                  .map(position => renderTeamPlayer(position))}
+                  .filter((pos) => pos.startsWith("Defender"))
+                  .map((pos) => renderTeamPlayer(pos))}
                 {(additionalDefenderAllowed || selectedPlayers["Defender-5"]) && renderTeamPlayer("Defender-5")}
               </div>
 
               <div className="position-group">
                 {formations[selectedFormation]
-                  .filter(position => position.startsWith("Midfielder"))
-                  .map(position => renderTeamPlayer(position))}
+                  .filter((pos) => pos.startsWith("Midfielder"))
+                  .map((pos) => renderTeamPlayer(pos))}
                 {(additionalMidfielderAllowed || selectedPlayers["Midfielder-5"]) && renderTeamPlayer("Midfielder-5")}
               </div>
 
               <div className="position-group">
                 {formations[selectedFormation]
-                  .filter(position => position.startsWith("Attacker"))
-                  .map(position => {
-                    if (position === "Attacker-2" && onlyOneAttackerAllowed && !selectedPlayers["Attacker-2"]) {
+                  .filter((pos) => pos.startsWith("Attacker"))
+                  .map((pos) => {
+                    if (pos === "Attacker-2" && onlyOneAttackerAllowed && !selectedPlayers["Attacker-2"]) {
                       return null;
                     }
-                    return renderTeamPlayer(position);
+                    return renderTeamPlayer(pos);
                   })}
                 {(additionalAttackerAllowed || selectedPlayers["Attacker-3"]) && renderTeamPlayer("Attacker-3")}
               </div>
@@ -224,9 +221,12 @@ const CreateTeam = () => {
                 required
               />
 
-              <div className="budget-display">Budget: £{Number(budget).toFixed(1)}m</div>
+              <div className="budget-display">Budget: £{budget.toFixed(1)}m</div>
 
-              <button type="submit" disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}>
+              <button
+                type="submit"
+                disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}
+              >
                 Create Team
               </button>
 
