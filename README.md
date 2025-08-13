@@ -4,7 +4,7 @@ Full stack web application for playing football fantasy within my univsersity fo
 
 Uses Django-React framework with axios for streamlining API communcation.
 
-Uses AWS EC2, S3 and Cloudfront for current deployment at www.langwithfootball.com
+Uses Oracle for current deployment at www.langwithfootball.com
 
 
 
