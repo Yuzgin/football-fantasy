@@ -1,16 +1,19 @@
 /* Table.css */
 
 .team-table {
-  width: auto; /* Allow the table width to adjust naturally */
+  width: 100%;
   border-collapse: collapse;
-  font-size: 18px;
+  font-size: 16px;
   text-align: left;
-  border: 1px solid #ddd;
+  border: 1px solid #2d2d2d;
+  background: #1f1f1f;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .team-table th, .team-table td {
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 12px 14px;
+  border-bottom: 1px solid #2d2d2d;
 }
 
 .team-table thead {
@@ -19,14 +22,17 @@
 
 .team-table th {
   color: black;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .team-table tbody tr:nth-child(odd) {
-  background-color: #525252; /* Light grey */
+  background-color: #2a2a2a; /* Dark grey */
 }
 
 .team-table tbody tr:nth-child(even) {
-  background-color: #404040; /* Slightly darker grey */
+  background-color: #242424; /* Slightly darker grey */
 }
 
 .team-table td:nth-child(2), .team-table th:nth-child(2) {
@@ -35,6 +41,11 @@
 
 .team-table tr {
   height: auto; /* Allow rows to grow naturally based on content */
+  transition: background-color 120ms ease-in-out;
+}
+
+.team-table tbody tr:hover {
+  background-color: #333333;
 }
 
 .team-table {

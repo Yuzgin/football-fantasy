@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import api from "../api"; // Use the custom API instance
 import Header from "../components/Header"; // Assuming you have a Header component for consistency
 import "../styles/Mens.css";
+import "../styles/Table.css";
 
 const Mens = () => {
   const [matches, setMatches] = useState([]);
@@ -35,7 +36,7 @@ const Mens = () => {
           <p>Loading matches...</p>
         ) : matches.length > 0 ? (
           <div className="results-table">
-            <table>
+            <table className="team-table">
               <thead>
                 <tr>
                   <th>Home</th>
@@ -57,7 +58,7 @@ const Mens = () => {
             </table>
           </div>
         ) : (
-          <p>No results yet.</p>
+          <div className="empty-state">No results yet this semester.</div>
         )}
       </div>
     </div>
