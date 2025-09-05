@@ -1,6 +1,6 @@
 from django.utils import timezone  # Make sure this import is there
 from django.db import models
-from django.db.models import F
+from django.db.models import Sum
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from api.managers import CustomUserManager
 
@@ -47,6 +47,33 @@ class Player(models.Model):
 
     def __str__(self):
         return f"{self.name or 'Unnamed Player'} – {self.points} points"
+
+
+    def recalculate_totals(self):
+        totals = self.game_stats.aggregate(
+            goals=Sum('goals'),
+            assists=Sum('assists'),
+            yellow_cards=Sum('yellow_cards'),
+            red_cards=Sum('red_cards'),
+            clean_sheets=Sum('clean_sheets'),
+            MOTM=Sum('MOTM'),
+            Pen_Saves=Sum('Pen_Saves'),
+            points=Sum('points'),
+        )
+        self.goals = totals['goals'] or 0
+        self.assists = totals['assists'] or 0
+        self.yellow_cards = totals['yellow_cards'] or 0
+        self.red_cards = totals['red_cards'] or 0
+        self.clean_sheets = totals['clean_sheets'] or 0
+        self.MOTM = totals['MOTM'] or 0
+        self.Pen_Saves = totals['Pen_Saves'] or 0
+        self.points = totals['points'] or 0
+        self.games_played = self.game_stats.count()
+        self.save(update_fields=[
+            'goals', 'assists', 'yellow_cards', 'red_cards',
+            'clean_sheets', 'MOTM', 'Pen_Saves', 'points', 'games_played'
+        ])
+        
 
 class Team(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
@@ -119,93 +146,21 @@ class PlayerGameStats(models.Model):
         return points
 
     def save(self, *args, **kwargs):
-        is_update = self.pk is not None
-        if is_update:
-            old_stats = PlayerGameStats.objects.get(pk=self.pk)
-            old_points = old_stats.points
-            old_player_id = old_stats.player_id
-            old_goals = old_stats.goals
-            old_assists = old_stats.assists
-            old_yellow = old_stats.yellow_cards
-            old_red = old_stats.red_cards
-            old_clean = old_stats.clean_sheets
-            old_motm = old_stats.MOTM
-            old_pen = old_stats.Pen_Saves
-        else:
-            old_points = 0
-            old_player_id = self.player_id
-            old_goals = 0
-            old_assists = 0
-            old_yellow = 0
-            old_red = 0
-            old_clean = 0
-            old_motm = 0
-            old_pen = 0
+        old_player = None
+        if self.pk:
+            old_player = PlayerGameStats.objects.get(pk=self.pk).player
 
-        # Always recalculate points so admin edits stay in sync
         self.points = self.calculate_points()
-
         super().save(*args, **kwargs)
 
-        if is_update and old_player_id != self.player_id:
-            Player.objects.filter(pk=old_player_id).update(
-                points=F('points') - old_points,
-                goals=F('goals') - old_goals,
-                assists=F('assists') - old_assists,
-                yellow_cards=F('yellow_cards') - old_yellow,
-                red_cards=F('red_cards') - old_red,
-                clean_sheets=F('clean_sheets') - old_clean,
-                MOTM=F('MOTM') - old_motm,
-                Pen_Saves=F('Pen_Saves') - old_pen,
-                games_played=F('games_played') - 1,
-            )
-            Player.objects.filter(pk=self.player_id).update(
-                points=F('points') + self.points,
-                goals=F('goals') + self.goals,
-                assists=F('assists') + self.assists,
-                yellow_cards=F('yellow_cards') + self.yellow_cards,
-                red_cards=F('red_cards') + self.red_cards,
-                clean_sheets=F('clean_sheets') + self.clean_sheets,
-                MOTM=F('MOTM') + self.MOTM,
-                Pen_Saves=F('Pen_Saves') + self.Pen_Saves,
-                games_played=F('games_played') + 1,
-            )
-        else:
-            delta_points = self.points - old_points
-            delta_goals = self.goals - old_goals
-            delta_assists = self.assists - old_assists
-            delta_yellow = self.yellow_cards - old_yellow
-            delta_red = self.red_cards - old_red
-            delta_clean = self.clean_sheets - old_clean
-            delta_motm = self.MOTM - old_motm
-            delta_pen = self.Pen_Saves - old_pen
-            updates = {
-                'points': F('points') + delta_points,
-                'goals': F('goals') + delta_goals,
-                'assists': F('assists') + delta_assists,
-                'yellow_cards': F('yellow_cards') + delta_yellow,
-                'red_cards': F('red_cards') + delta_red,
-                'clean_sheets': F('clean_sheets') + delta_clean,
-                'MOTM': F('MOTM') + delta_motm,
-                'Pen_Saves': F('Pen_Saves') + delta_pen,
-            }
-            if not is_update:
-                updates['games_played'] = F('games_played') + 1
-            Player.objects.filter(pk=self.player_id).update(**updates)
+      if old_player and old_player != self.player:
+            old_player.recalculate_totals()
+        self.player.recalculate_totals()
 
     def delete(self, *args, **kwargs):
-        Player.objects.filter(pk=self.player_id).update(
-            points=F('points') - self.points,
-            goals=F('goals') - self.goals,
-            assists=F('assists') - self.assists,
-            yellow_cards=F('yellow_cards') - self.yellow_cards,
-            red_cards=F('red_cards') - self.red_cards,
-            clean_sheets=F('clean_sheets') - self.clean_sheets,
-            MOTM=F('MOTM') - self.MOTM,
-            Pen_Saves=F('Pen_Saves') - self.Pen_Saves,
-            games_played=F('games_played') - 1,
-        )
+        player = self.player
         super().delete(*args, **kwargs)
+        player.recalculate_totals()
 
 
 class TeamSnapshot(models.Model):
