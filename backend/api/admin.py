@@ -24,7 +24,13 @@ class PlayerAdmin(admin.ModelAdmin):
 # --- Other models (unchanged) ---
 admin.site.register(CustomUser)
 admin.site.register(Match)
-admin.site.register(PlayerGameStats)
+@admin.register(PlayerGameStats)
+class PlayerGameStatsAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        obj.save()
+
+    def delete_model(self, request, obj):
+        obj.delete()
 admin.site.register(GameWeek)
 admin.site.register(TeamSnapshot)
 admin.site.register(Fixture)
