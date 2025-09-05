@@ -42,13 +42,13 @@ class PlayerGameStatsPointsTests(TestCase):
         self.player.refresh_from_db()
         self.assertEqual(self.player.points, 0)
 
-    def test_player_points_sync_without_serializer(self):
+    def test_player_stats_sync_without_serializer(self):
         stats = PlayerGameStats.objects.create(
             player=self.player,
             match=self.match,
             goals=1,
-            assists=0,
-            yellow_cards=0,
+            assists=1,
+            yellow_cards=1,
             red_cards=0,
             clean_sheets=0,
             MOTM=0,
@@ -56,14 +56,25 @@ class PlayerGameStatsPointsTests(TestCase):
         )
 
         self.player.refresh_from_db()
-        self.assertEqual(self.player.points, 6)
+        self.assertEqual(self.player.points, 8)
+        self.assertEqual(self.player.goals, 1)
+        self.assertEqual(self.player.assists, 1)
+        self.assertEqual(self.player.yellow_cards, 1)
 
         stats.goals = 2
+        stats.assists = 2
+        stats.yellow_cards = 0
         stats.save()
 
         self.player.refresh_from_db()
-        self.assertEqual(self.player.points, 10)
+        self.assertEqual(self.player.points, 16)
+        self.assertEqual(self.player.goals, 2)
+        self.assertEqual(self.player.assists, 2)
+        self.assertEqual(self.player.yellow_cards, 0)
 
         stats.delete()
         self.player.refresh_from_db()
         self.assertEqual(self.player.points, 0)
+        self.assertEqual(self.player.goals, 0)
+        self.assertEqual(self.player.assists, 0)
+        self.assertEqual(self.player.yellow_cards, 0)
