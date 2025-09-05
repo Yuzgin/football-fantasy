@@ -114,6 +114,22 @@ class Match(models.Model):
         return f"{self.team1} vs {self.team2} on {formatted_date}"
 
 
+class PlayerGameStatsManager(models.Manager):
+    def update(self, **kwargs):
+        """Override update to trigger recalculation"""
+        result = super().update(**kwargs)
+        # After bulk update, recalculate all affected players
+        from django.db import transaction
+        transaction.on_commit(self._recalculate_affected_players)
+        return result
+    
+    def _recalculate_affected_players(self):
+        """Recalculate totals for all players with game stats"""
+        players = Player.objects.filter(game_stats__isnull=False).distinct()
+        for player in players:
+            player.recalculate_totals()
+
+
 class PlayerGameStats(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_stats')
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='game_stats')
@@ -125,6 +141,8 @@ class PlayerGameStats(models.Model):
     MOTM = models.IntegerField(default=0)
     Pen_Saves = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
+    
+    objects = PlayerGameStatsManager()
 
     def __str__(self):
         return f"{self.player.name} - {self.match}"

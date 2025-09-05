@@ -32,9 +32,24 @@ class PlayerAdmin(admin.ModelAdmin):
         'name',
         'price',
         'points',
+        'goals',
+        'assists',
+        'games_played',
     )
     ordering = ('-points',)            # sort by points descending
     search_fields = ['name']   # handy for finding specific players
+    actions = ['recalculate_player_totals_action']
+    
+    def recalculate_player_totals_action(self, request, queryset):
+        """Admin action to recalculate player totals"""
+        for player in queryset:
+            player.recalculate_totals()
+        
+        self.message_user(
+            request,
+            f"Recalculated totals for {queryset.count()} players."
+        )
+    recalculate_player_totals_action.short_description = "Recalculate selected player totals"
 
 # --- Other models (unchanged) ---
 admin.site.register(CustomUser)
@@ -45,7 +60,8 @@ class PlayerGameStatsAdmin(admin.ModelAdmin):
     list_display = ('player', 'match', 'goals', 'assists', 'points')
     list_filter = ('player', 'match')
     search_fields = ('player__name', 'match__team1', 'match__team2')
-    actions = ['recalculate_player_totals']
+    actions = ['recalculate_player_totals', 'force_recalculate_all_players']
+    list_editable = ('goals', 'assists', 'yellow_cards', 'red_cards', 'clean_sheets', 'MOTM', 'Pen_Saves')
     
     def save_model(self, request, obj, form, change):
         # Store the player before saving
@@ -102,6 +118,43 @@ class PlayerGameStatsAdmin(admin.ModelAdmin):
             f"Recalculated totals for {len(players_updated)} players."
         )
     recalculate_player_totals.short_description = "Recalculate player totals"
+    
+    def force_recalculate_all_players(self, request, queryset):
+        """Admin action to recalculate ALL player totals"""
+        from api.models import Player
+        players = Player.objects.all()
+        for player in players:
+            player.recalculate_totals()
+        
+        self.message_user(
+            request,
+            f"Recalculated totals for ALL {players.count()} players."
+        )
+    force_recalculate_all_players.short_description = "Recalculate ALL player totals"
+    
+    def changelist_view(self, request, extra_context=None):
+        """Override changelist to handle bulk edits"""
+        if request.method == 'POST' and '_save' in request.POST:
+            # This handles bulk edits from the changelist
+            response = super().changelist_view(request, extra_context)
+            
+            # After bulk save, recalculate all affected players
+            self._recalculate_all_players()
+            
+            return response
+        
+        return super().changelist_view(request, extra_context)
+    
+    def _recalculate_all_players(self):
+        """Helper method to recalculate all player totals"""
+        from api.models import Player
+        players = Player.objects.filter(game_stats__isnull=False).distinct()
+        for player in players:
+            player.recalculate_totals()
+    
+    def get_queryset(self, request):
+        """Override to use custom queryset"""
+        return super().get_queryset(request)
 admin.site.register(GameWeek)
 admin.site.register(TeamSnapshot)
 admin.site.register(Fixture)
