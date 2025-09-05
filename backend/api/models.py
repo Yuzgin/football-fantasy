@@ -153,7 +153,7 @@ class PlayerGameStats(models.Model):
         self.points = self.calculate_points()
         super().save(*args, **kwargs)
 
-      if old_player and old_player != self.player:
+        if old_player and old_player != self.player:
             old_player.recalculate_totals()
         self.player.recalculate_totals()
 
