@@ -82,6 +82,7 @@ class MatchSerializer(serializers.ModelSerializer):
 class PlayerGameStatsSerializer(serializers.ModelSerializer):
     game_week = serializers.SerializerMethodField()
     match = serializers.PrimaryKeyRelatedField(queryset=Match.objects.all())  # Default for PUT/POST
+    points = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = PlayerGameStats

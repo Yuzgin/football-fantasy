@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from api.models import Player, Match
+from api.models import Player, Match, PlayerGameStats
 from api.serializers import PlayerGameStatsSerializer
 
 
@@ -34,6 +34,32 @@ class PlayerGameStatsPointsTests(TestCase):
         update_serializer = PlayerGameStatsSerializer(stats, data={"goals": 2}, partial=True)
         self.assertTrue(update_serializer.is_valid(), update_serializer.errors)
         stats = update_serializer.save()
+
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.points, 10)
+
+        stats.delete()
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.points, 0)
+
+    def test_player_points_sync_without_serializer(self):
+        stats = PlayerGameStats.objects.create(
+            player=self.player,
+            match=self.match,
+            goals=1,
+            assists=0,
+            yellow_cards=0,
+            red_cards=0,
+            clean_sheets=0,
+            MOTM=0,
+            Pen_Saves=0,
+        )
+
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.points, 6)
+
+        stats.goals = 2
+        stats.save()
 
         self.player.refresh_from_db()
         self.assertEqual(self.player.points, 10)

@@ -102,6 +102,22 @@ class PlayerGameStats(models.Model):
     def __str__(self):
         return f"{self.player.name} - {self.match}"
 
+    def calculate_points(self):
+        """Compute points based on player position and match stats."""
+        points = 2  # Base points for all players
+        position = getattr(self.player, "position", None)
+        if position == "Attacker":
+            points += self.goals * 4 + self.assists * 3
+        elif position == "Midfielder":
+            points += self.goals * 5 + self.assists * 3 + self.clean_sheets * 1
+        elif position == "Defender":
+            points += self.goals * 6 + self.assists * 4 + self.clean_sheets * 4
+        elif position == "Goalkeeper":
+            points += self.goals * 8 + self.assists * 5 + self.clean_sheets * 5
+        points -= self.yellow_cards * 1 + self.red_cards * 3
+        points += self.MOTM * 2 + self.Pen_Saves * 5
+        return points
+
     def save(self, *args, **kwargs):
         if self.pk:
             old_stats = PlayerGameStats.objects.get(pk=self.pk)
@@ -110,6 +126,13 @@ class PlayerGameStats(models.Model):
         else:
             old_points = 0
             old_player_id = self.player_id
+
+        # Always recalculate points so admin edits stay in sync
+        self.points = self.calculate_points()
+
+        super().save(*args, **kwargs)
+
+=======
         super().save(*args, **kwargs)
         if self.pk and old_player_id != self.player_id:
             Player.objects.filter(pk=old_player_id).update(points=F('points') - old_points)
