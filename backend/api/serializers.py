@@ -106,13 +106,6 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
         points += MOTM * 2 + Pen_Saves * 5
         return points
 
-    def update_player_total_points(self, player, points, action='add'):
-        if action == 'add':
-            player.points += points
-        elif action == 'subtract':
-            player.points -= points
-        player.save()
-
     def create(self, validated_data):
         # Calculate points before saving the player stats
         player = validated_data['player']
@@ -127,16 +120,12 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
             validated_data['Pen_Saves'],
         )
         validated_data['points'] = points
-        self.update_player_total_points(player, points, action='add')  # Add points to player total_points
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Subtract old points from player’s total before updating
-        self.update_player_total_points(instance.player, instance.points, action='subtract')
-
-        # Recalculate and set new points
+        player = validated_data.get('player', instance.player)
         new_points = self.calculate_points(
-            instance.player,
+            player,
             validated_data.get('goals', instance.goals),
             validated_data.get('assists', instance.assists),
             validated_data.get('yellow_cards', instance.yellow_cards),
@@ -146,11 +135,7 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
             validated_data.get('Pen_Saves', instance.Pen_Saves),
         )
         validated_data['points'] = new_points
-        updated_instance = super().update(instance, validated_data)
-
-        # Add the updated points back to player’s total
-        self.update_player_total_points(updated_instance.player, new_points, action='add')
-        return updated_instance
+        return super().update(instance, validated_data)
 
     def to_representation(self, instance):
         """

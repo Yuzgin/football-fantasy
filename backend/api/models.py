@@ -1,5 +1,6 @@
 from django.utils import timezone  # Make sure this import is there
 from django.db import models
+from django.db.models import F
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Group
 from api.managers import CustomUserManager
 
@@ -100,6 +101,27 @@ class PlayerGameStats(models.Model):
 
     def __str__(self):
         return f"{self.player.name} - {self.match}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_stats = PlayerGameStats.objects.get(pk=self.pk)
+            old_points = old_stats.points
+            old_player_id = old_stats.player_id
+        else:
+            old_points = 0
+            old_player_id = self.player_id
+        super().save(*args, **kwargs)
+        if self.pk and old_player_id != self.player_id:
+            Player.objects.filter(pk=old_player_id).update(points=F('points') - old_points)
+            Player.objects.filter(pk=self.player_id).update(points=F('points') + self.points)
+        else:
+            delta = self.points - old_points
+            if delta:
+                Player.objects.filter(pk=self.player_id).update(points=F('points') + delta)
+
+    def delete(self, *args, **kwargs):
+        Player.objects.filter(pk=self.player_id).update(points=F('points') - self.points)
+        super().delete(*args, **kwargs)
 
 
 class TeamSnapshot(models.Model):
