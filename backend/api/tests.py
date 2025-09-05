@@ -78,3 +78,35 @@ class PlayerGameStatsPointsTests(TestCase):
         self.assertEqual(self.player.goals, 0)
         self.assertEqual(self.player.assists, 0)
         self.assertEqual(self.player.yellow_cards, 0)
+
+    def test_signals_work_with_direct_save(self):
+        """Test that signals work when PlayerGameStats are saved directly (like in admin)"""
+        # Create initial stats
+        stats = PlayerGameStats.objects.create(
+            player=self.player,
+            match=self.match,
+            goals=1,
+            assists=1,
+            yellow_cards=0,
+            red_cards=0,
+            clean_sheets=0,
+            MOTM=0,
+            Pen_Saves=0,
+        )
+        
+        # Verify initial totals
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.points, 8)
+        self.assertEqual(self.player.goals, 1)
+        self.assertEqual(self.player.assists, 1)
+        
+        # Simulate admin edit by modifying and saving directly
+        stats.goals = 3
+        stats.assists = 2
+        stats.save()  # This should trigger the signal
+        
+        # Verify that signals triggered recalculation
+        self.player.refresh_from_db()
+        self.assertEqual(self.player.points, 20)  # 2 base + 3*4 + 2*3 = 20
+        self.assertEqual(self.player.goals, 3)
+        self.assertEqual(self.player.assists, 2)
