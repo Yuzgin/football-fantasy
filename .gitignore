@@ -1,1 +1,5 @@
 backend/db.sqlite3.env
+
+# Ignore Python cache
+__pycache__/
+*.pyc

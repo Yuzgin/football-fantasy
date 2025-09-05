@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 env/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
