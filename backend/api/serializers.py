@@ -92,6 +92,52 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
     def get_game_week(self, obj):
         return obj.match.game_week.id if obj.match and obj.match.game_week else None
 
+    def calculate_points(self, player, goals, assists, yellow_cards, red_cards, clean_sheets, MOTM, Pen_Saves):
+        # Custom points calculation logic
+        points = 2  # Base points for all players
+        if player.position == "Attacker":
+            points += goals * 4 + assists * 3
+        elif player.position == "Midfielder":
+            points += goals * 5 + assists * 3 + clean_sheets * 1
+        elif player.position == "Defender":
+            points += goals * 6 + assists * 4 + clean_sheets * 4
+        elif player.position == "Goalkeeper":
+            points += goals * 8 + assists * 5 + clean_sheets * 5
+        points -= yellow_cards * 1 + red_cards * 3
+        points += MOTM * 2 + Pen_Saves * 5
+        return points
+
+    def create(self, validated_data):
+        # Calculate points before saving the player stats
+        player = validated_data['player']
+        points = self.calculate_points(
+            player,
+            validated_data['goals'],
+            validated_data['assists'],
+            validated_data['yellow_cards'],
+            validated_data['red_cards'],
+            validated_data['clean_sheets'],
+            validated_data['MOTM'],
+            validated_data['Pen_Saves'],
+        )
+        validated_data['points'] = points
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        player = validated_data.get('player', instance.player)
+        new_points = self.calculate_points(
+            player,
+            validated_data.get('goals', instance.goals),
+            validated_data.get('assists', instance.assists),
+            validated_data.get('yellow_cards', instance.yellow_cards),
+            validated_data.get('red_cards', instance.red_cards),
+            validated_data.get('clean_sheets', instance.clean_sheets),
+            validated_data.get('MOTM', instance.MOTM),
+            validated_data.get('Pen_Saves', instance.Pen_Saves),
+        )
+        validated_data['points'] = new_points
+        return super().update(instance, validated_data)
+
     def to_representation(self, instance):
         """
         Customize the GET and POST response to return full match details.

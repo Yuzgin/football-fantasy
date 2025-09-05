@@ -132,6 +132,8 @@ class PlayerGameStats(models.Model):
 
         super().save(*args, **kwargs)
 
+=======
+        super().save(*args, **kwargs)
         if self.pk and old_player_id != self.player_id:
             Player.objects.filter(pk=old_player_id).update(points=F('points') - old_points)
             Player.objects.filter(pk=self.player_id).update(points=F('points') + self.points)
