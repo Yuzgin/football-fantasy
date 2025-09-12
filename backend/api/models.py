@@ -188,6 +188,11 @@ class TeamSnapshot(models.Model):
     snapshot_date = models.DateField(auto_now_add=True)
     weekly_points = models.IntegerField(default=0)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['game_week', 'weekly_points']),
+        ]
+
     def __str__(self):
         return f"{self.team.name} - {self.game_week.start_date} to {self.game_week.end_date}"
 

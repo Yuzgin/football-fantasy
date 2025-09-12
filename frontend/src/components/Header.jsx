@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/YellowBadge.png';
 import { jwtDecode } from "jwt-decode";
 import { ACCESS_TOKEN } from "../constants";
+import { checkIsStaff } from '../utils/auth';
 
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -17,14 +19,24 @@ const Header = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const checkAuthStatus = () => {
+  const checkAuthStatus = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       const decoded = jwtDecode(token);
       const now = Date.now() / 1000;
-      setIsLoggedIn(now < decoded.exp);
+      const loggedIn = now < decoded.exp;
+      setIsLoggedIn(loggedIn);
+      
+      // Check if user is staff only if logged in
+      if (loggedIn) {
+        const staffStatus = await checkIsStaff();
+        setIsStaff(staffStatus);
+      } else {
+        setIsStaff(false);
+      }
     } else {
       setIsLoggedIn(false);
+      setIsStaff(false);
     }
   };
 
@@ -155,6 +167,11 @@ const Header = () => {
         <Link to="/LMS" style={linkStyle}>
           <button style={buttonStyle}>LMS</button>
         </Link>
+        {isStaff && (
+          <Link to="/admin" style={linkStyle}>
+            <button style={buttonStyle}>Admin</button>
+          </Link>
+        )}
         {isLoggedIn ? (
           <button style={buttonStyle} onClick={handleLogout}>
             Logout
@@ -194,6 +211,11 @@ const Header = () => {
           <Link to="/LMS" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>LMS</div>
           </Link>
+          {isStaff && (
+            <Link to="/admin" style={linkStyle} onClick={closeDropdown}>
+              <div style={dropdownItemStyle}>Admin</div>
+            </Link>
+          )}
         </div>
       )}
     </header>

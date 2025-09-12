@@ -16,7 +16,7 @@ from django.db.models import Q
 from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
-from django.db.models import Sum
+from django.db.models import Sum, Avg, Max
 
 
 
@@ -407,6 +407,49 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
         if not snapshot:
             return Response({"detail": "TeamSnapshot not found for the current GameWeek."}, status=404)
         
+        serializer = self.get_serializer(snapshot)
+        return Response(serializer.data, status=200)
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):
+        """Return average and max weekly_points for a given game_week_id."""
+        game_week_id = request.query_params.get('game_week_id')
+        if not game_week_id:
+            return Response({"detail": "game_week_id query parameter is required."}, status=400)
+
+        qs = TeamSnapshot.objects.filter(game_week_id=game_week_id)
+        if not qs.exists():
+            return Response({"detail": "No snapshots found for this game week."}, status=404)
+
+        agg = qs.aggregate(avg_points=Avg('weekly_points'), max_points=Max('weekly_points'))
+
+        # Identify the team with highest points (first by max, then earliest snapshot)
+        top_snapshot = qs.order_by('-weekly_points', 'id').select_related('team', 'game_week').first()
+
+        return Response({
+            "game_week_id": int(game_week_id),
+            "average_weekly_points": agg.get('avg_points') or 0,
+            "max_weekly_points": agg.get('max_points') or 0,
+            "top_team_id": top_snapshot.team_id if top_snapshot else None,
+            "top_snapshot_id": top_snapshot.id if top_snapshot else None,
+        }, status=200)
+
+    @action(detail=False, methods=['get'], url_path='top')
+    def top(self, request):
+        """Return the top TeamSnapshot for a given game_week_id."""
+        game_week_id = request.query_params.get('game_week_id')
+        if not game_week_id:
+            return Response({"detail": "game_week_id query parameter is required."}, status=400)
+
+        snapshot = (TeamSnapshot.objects
+                    .filter(game_week_id=game_week_id)
+                    .select_related('team', 'game_week')
+                    .order_by('-weekly_points', 'id')
+                    .first())
+
+        if not snapshot:
+            return Response({"detail": "No snapshots found for this game week."}, status=404)
+
         serializer = self.get_serializer(snapshot)
         return Response(serializer.data, status=200)
 

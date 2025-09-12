@@ -36,6 +36,7 @@ function App() {
             <Route path="/results" element={<Pages.Results />} />
             <Route path="/womens" element={<Pages.Womens />} />
             <Route path="/LMS" element={<Pages.LMS />} />
+            <Route path="/admin" element={<StaffRoute><Pages.Admin /></StaffRoute>} />
             <Route path="/forgot-password" element={<Pages.ForgotPassword />} />
             <Route path="/reset-password/:uid/:token" element={<Pages.ResetPassword />} />
             <Route path="*" element={<Pages.NotFound />} />

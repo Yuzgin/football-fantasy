@@ -21,7 +21,6 @@ const CreateTeam = () => {
   const [hasTeam, setHasTeam] = useState(false);
   const [loading, setLoading] = useState(true);
   const [budget, setBudget] = useState(100);
-  const [selectedFormation, setSelectedFormation] = useState("4-4-2");
   const [currentPosition, setCurrentPosition] = useState(null);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
 
