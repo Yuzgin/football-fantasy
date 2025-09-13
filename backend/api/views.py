@@ -414,8 +414,13 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
     def summary(self, request):
         """Return average and max weekly_points for a given game_week_id."""
         game_week_id = request.query_params.get('game_week_id')
+        week_number = request.query_params.get('week')
+        if not game_week_id and week_number:
+            gw = GameWeek.objects.filter(week=week_number).first()
+            if gw:
+                game_week_id = gw.id
         if not game_week_id:
-            return Response({"detail": "game_week_id query parameter is required."}, status=400)
+            return Response({"detail": "Provide game_week_id or week query parameter."}, status=400)
 
         qs = TeamSnapshot.objects.filter(game_week_id=game_week_id)
         if not qs.exists():
@@ -438,8 +443,13 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
     def top(self, request):
         """Return the top TeamSnapshot for a given game_week_id."""
         game_week_id = request.query_params.get('game_week_id')
+        week_number = request.query_params.get('week')
+        if not game_week_id and week_number:
+            gw = GameWeek.objects.filter(week=week_number).first()
+            if gw:
+                game_week_id = gw.id
         if not game_week_id:
-            return Response({"detail": "game_week_id query parameter is required."}, status=400)
+            return Response({"detail": "Provide game_week_id or week query parameter."}, status=400)
 
         snapshot = (TeamSnapshot.objects
                     .filter(game_week_id=game_week_id)
