@@ -42,8 +42,9 @@ ALLOWED_HOSTS = [
     'ec2-18-170-162-224.eu-west-2.compute.amazonaws.com',
     'http://fantasy-frontend.s3-website.eu-west-2.amazonaws.com',
     'd257m9yf5awtwy.cloudfront.net', 
-    'http://127.0.0.1:8000/'
-    '144.21.51.162']
+    'http://127.0.0.1:8000/',
+    '144.21.51.162'
+]
 
 
 REST_FRAMEWORK = {
@@ -193,9 +194,17 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost",
 ]
 
-# NEVER SET False IN PRODUCTION
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# Security settings - different for development vs production
+if DEBUG:
+    # Development settings
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
+else:
+    # Production settings
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

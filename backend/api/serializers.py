@@ -187,10 +187,11 @@ class PlayerGoalsSerializer(serializers.ModelSerializer):
 
 class TeamSerializer(serializers.ModelSerializer):
     players = PlayerSerializer(many=True, read_only=True)
+    captain = PlayerSerializer(read_only=True)
 
     class Meta:
         model = Team
-        fields = ['id', 'name', 'players', 'total_points', 'created_at']
+        fields = ['id', 'name', 'players', 'captain', 'total_points', 'created_at']
 
 
 class GameWeekSerializer(serializers.ModelSerializer):
@@ -201,12 +202,13 @@ class GameWeekSerializer(serializers.ModelSerializer):
 
 class TeamSnapshotSerializer(serializers.ModelSerializer):
     players = serializers.SerializerMethodField()
+    captain = PlayerSerializer(read_only=True)
     game_week = serializers.SerializerMethodField()
     team = TeamSerializer()
 
     class Meta:
         model = TeamSnapshot
-        fields = ['team', 'game_week', 'snapshot_date', 'players', 'weekly_points']
+        fields = ['team', 'game_week', 'snapshot_date', 'players', 'captain', 'weekly_points']
 
     def get_players(self, obj):
         player_serializer = PlayerSerializer(obj.players.all(), many=True, context={'game_week': obj.game_week})
@@ -221,7 +223,8 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
-        instance.weekly_points = sum(stat.points for stat in instance.players.all())
+        # Use the new calculate_weekly_points method that accounts for captain double points
+        instance.weekly_points = instance.calculate_weekly_points()
         instance.save()
 
         # Update total team points

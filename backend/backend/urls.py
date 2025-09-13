@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from api.views import CreateUserView, PasswordResetRequestView, PasswordResetConfirmView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -13,3 +15,8 @@ urlpatterns = [
     path("api/reset-password/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("api/", include("api.urls")),
 ]
+
+# Serve static files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

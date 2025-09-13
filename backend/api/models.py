@@ -78,12 +78,23 @@ class Player(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
     players = models.ManyToManyField(Player, related_name='team_players')
+    captain = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, blank=True, related_name='captain_teams')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='team_user')
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     total_points = models.IntegerField(default=0, db_index=True)
 
     def __str__(self):
         return self.name
+    
+    def clean(self):
+        """Validate that captain is one of the team's players"""
+        from django.core.exceptions import ValidationError
+        if self.captain and self.captain not in self.players.all():
+            raise ValidationError({'captain': 'Captain must be one of the team\'s players.'})
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
     
 
 class GameWeek(models.Model):
@@ -184,6 +195,7 @@ class PlayerGameStats(models.Model):
 class TeamSnapshot(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='snapshots')
     players = models.ManyToManyField(Player, related_name='snapshot_players')
+    captain = models.ForeignKey(Player, on_delete=models.SET_NULL, null=True, blank=True, related_name='captain_snapshots')
     game_week = models.ForeignKey(GameWeek, on_delete=models.CASCADE, related_name='team_snapshots')
     snapshot_date = models.DateField(auto_now_add=True)
     weekly_points = models.IntegerField(default=0)
@@ -195,6 +207,36 @@ class TeamSnapshot(models.Model):
 
     def __str__(self):
         return f"{self.team.name} - {self.game_week.start_date} to {self.game_week.end_date}"
+    
+    def clean(self):
+        """Validate that captain is one of the snapshot's players"""
+        from django.core.exceptions import ValidationError
+        # Only validate if the object has been saved (has an ID) and has a captain
+        if self.pk and self.captain and self.captain not in self.players.all():
+            raise ValidationError({'captain': 'Captain must be one of the snapshot\'s players.'})
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+    
+    def calculate_weekly_points(self):
+        """Calculate weekly points for this snapshot, doubling captain's points"""
+        total_points = 0
+        
+        # Get all player game stats for this game week
+        player_stats = PlayerGameStats.objects.filter(
+            player__in=self.players.all(),
+            match__game_week=self.game_week
+        )
+        
+        for stat in player_stats:
+            points = stat.points
+            # Double points if this player is the captain
+            if self.captain and stat.player == self.captain:
+                points *= 2
+            total_points += points
+            
+        return total_points
 
 
 class Fixture(models.Model):

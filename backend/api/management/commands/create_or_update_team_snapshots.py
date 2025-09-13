@@ -23,11 +23,12 @@ class Command(BaseCommand):
                 snapshot, created = TeamSnapshot.objects.get_or_create(
                     team=team,
                     game_week=current_game_week,
-                    defaults={'weekly_points': 0}  # Default points if the snapshot is created
+                    defaults={'weekly_points': 0}  # Only set default points, not captain
                 )
 
-                # Add players to the snapshot
+                # Add players to the snapshot and update captain
                 snapshot.players.set(team.players.all())  # Link players from the team to the snapshot
+                snapshot.captain = team.captain  # Update captain from team
                 snapshot.save()
 
                 # Calculate the total points for the team

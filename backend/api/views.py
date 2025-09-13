@@ -106,6 +106,7 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         user = request.user
         name = request.data.get('name')
         player_ids = request.data.get('players', [])
+        captain_id = request.data.get('captain')
 
         if not player_ids or len(player_ids) != 11:
             return Response({'error': 'You must select exactly 11 players.'}, status=400)
@@ -115,7 +116,17 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if players.count() != 11:
             return Response({'error': 'Invalid player selection.'}, status=400)
 
-        team = Team.objects.create(name=name, user=user)
+        # Validate captain is in the selected players
+        captain = None
+        if captain_id:
+            try:
+                captain = Player.objects.get(id=captain_id)
+                if captain not in players:
+                    return Response({'error': 'Captain must be one of the selected players.'}, status=400)
+            except Player.DoesNotExist:
+                return Response({'error': 'Invalid captain selection.'}, status=400)
+
+        team = Team.objects.create(name=name, user=user, captain=captain)
         team.players.set(players)
         team.save()
 
@@ -130,6 +141,7 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
             snapshot = TeamSnapshot.objects.create(
                 team=team,
                 game_week=current_game_week,
+                captain=captain,  # Include captain in snapshot
                 weekly_points=0  # Initialize weekly points to 0
             )
             snapshot.players.set(players)  # Add players to the snapshot
@@ -150,6 +162,7 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         # OLD CODE: Validate and update the team details
         name = request.data.get('name', team.name)  # Use the current name if not provided
         player_ids = request.data.get('players', [])
+        captain_id = request.data.get('captain')
 
         if not player_ids or len(player_ids) != 11:
             return Response({'error': 'You must select exactly 11 players.'}, status=400)
@@ -159,8 +172,19 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if players.count() != 11:
             return Response({'error': 'Invalid player selection.'}, status=400)
 
+        # Validate captain is in the selected players
+        captain = None
+        if captain_id:
+            try:
+                captain = Player.objects.get(id=captain_id)
+                if captain not in players:
+                    return Response({'error': 'Captain must be one of the selected players.'}, status=400)
+            except Player.DoesNotExist:
+                return Response({'error': 'Invalid captain selection.'}, status=400)
+
         # OLD CODE: Update the team in the database
         team.name = name
+        team.captain = captain
         team.players.set(players)
         team.save()
 
@@ -224,8 +248,7 @@ class MatchListCreateView(generics.ListCreateAPIView):
             # Update TeamSnapshot points for each player in the stat
             self.update_team_snapshot_points(stat_instance.player, match.game_week, stat_instance.points)
 
-            # Update the Player model's fields
-            self.update_player_totals(stat_instance)
+            # Note: Player totals are automatically updated by PlayerGameStats.save() -> player.recalculate_totals()
 
         headers = self.get_success_headers(match_serializer.data)
         return Response(match_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -235,29 +258,19 @@ class MatchListCreateView(generics.ListCreateAPIView):
         team_snapshots = TeamSnapshot.objects.filter(players=player, game_week=game_week)
 
         for snapshot in team_snapshots:
+            # Check if this player is the captain (double points)
+            actual_points = points
+            if snapshot.captain and snapshot.captain == player:
+                actual_points = points * 2
+            
             # Add the player's points to this snapshot's weekly points
-            snapshot.weekly_points += points
+            snapshot.weekly_points += actual_points
             snapshot.save()
 
             # Recalculate and update the team's total points based on all snapshots
             team = snapshot.team
             team.total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
             team.save()
-
-    def update_player_totals(self, stat_instance):
-        """
-        Update the Player model's total fields (goals, assists, games played, etc.).
-        """
-        player = stat_instance.player
-        player.goals += stat_instance.goals
-        player.assists += stat_instance.assists
-        player.yellow_cards += stat_instance.yellow_cards
-        player.red_cards += stat_instance.red_cards
-        player.clean_sheets += stat_instance.clean_sheets
-        player.MOTM += stat_instance.MOTM
-        player.Pen_Saves += stat_instance.Pen_Saves
-        player.games_played += 1  # Increment games played
-        player.save()
 
 
 class MatchDeleteView(generics.DestroyAPIView):
@@ -289,8 +302,13 @@ class MatchDeleteView(generics.DestroyAPIView):
         team_snapshots = TeamSnapshot.objects.filter(players=player, game_week=game_week)
 
         for snapshot in team_snapshots:
+            # Check if this player is the captain (double points)
+            actual_points = points
+            if snapshot.captain and snapshot.captain == player:
+                actual_points = points * 2
+            
             # Subtract the player's points from this snapshot's weekly points
-            snapshot.weekly_points -= points
+            snapshot.weekly_points -= actual_points
             if snapshot.weekly_points < 0:
                 snapshot.weekly_points = 0  # Ensure points don't go negative
             snapshot.save()
