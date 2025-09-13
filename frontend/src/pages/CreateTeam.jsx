@@ -23,6 +23,7 @@ const CreateTeam = () => {
   const [budget, setBudget] = useState(100);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [selectedFormation, setSelectedFormation] = useState("4-4-2");
 
   useEffect(() => {
     fetchPlayers();
