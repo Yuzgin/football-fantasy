@@ -26,14 +26,13 @@ const OtherTeam = () => {
 
   const fetchMostRecentTeamSnapshot = async () => {
     try {
-      const [playersResponse, response] = await Promise.all([
-        api.get('/api/players/'),
-        api.get(`/api/team-snapshots/most_recent/?team_id=${teamId}`),
-      ]);
-
+      // Only fetch team snapshot - no need for separate players call
+      const response = await api.get(`/api/team-snapshots/most_recent/?team_id=${teamId}`);
       const teamSnapshotData = response.data;
+      
       setTeamSnapshot(teamSnapshotData);
-      setPlayers(playersResponse.data);
+      // Use players from team snapshot instead of separate API call
+      setPlayers(teamSnapshotData.players);
 
       setCurrentWeek(teamSnapshotData.game_week.week);
       setMaxWeek(teamSnapshotData.game_week.week);
@@ -70,6 +69,8 @@ const OtherTeam = () => {
 
       const teamSnapshotData = teamSnapshotDataArray[0];
       setTeamSnapshot(teamSnapshotData);
+      // Use players from team snapshot instead of separate API call
+      setPlayers(teamSnapshotData.players);
       setCurrentWeek(week);
 
       const selectedPlayers = mapPlayersToPositions(teamSnapshotData.players);
@@ -139,7 +140,7 @@ const OtherTeam = () => {
               <div className="position-group">
                 <PlayerViewPoints
                   position="Goalkeeper"
-                  selectedPlayer={players.find((p) => p.id === selectedPlayers.Goalkeeper[0])}
+                  selectedPlayer={teamSnapshot.players.find((p) => p.id === selectedPlayers.Goalkeeper[0])}
                   gameWeekId={teamSnapshot.game_week.id}
                   openPlayerStats={openPlayerStats}
                 />
@@ -152,7 +153,7 @@ const OtherTeam = () => {
                 {selectedPlayers.Defender.map((defenderId) => (
                   <PlayerViewPoints
                     key={defenderId}
-                    selectedPlayer={players.find(p => p.id === defenderId)}
+                    selectedPlayer={teamSnapshot.players.find(p => p.id === defenderId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
                   />
@@ -166,7 +167,7 @@ const OtherTeam = () => {
                 {selectedPlayers.Midfielder.map((midfielderId) => (
                   <PlayerViewPoints
                     key={midfielderId}
-                    selectedPlayer={players.find(p => p.id === midfielderId)}
+                    selectedPlayer={teamSnapshot.players.find(p => p.id === midfielderId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
                   />
@@ -180,7 +181,7 @@ const OtherTeam = () => {
                 {selectedPlayers.Attacker.map((attackerId) => (
                   <PlayerViewPoints
                     key={attackerId}
-                    selectedPlayer={players.find(p => p.id === attackerId)}
+                    selectedPlayer={teamSnapshot.players.find(p => p.id === attackerId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
                   />

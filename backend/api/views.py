@@ -386,7 +386,12 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
         team_id = self.request.query_params.get('team_id')
         game_week_id = self.request.query_params.get('game_week_id')
 
-        queryset = TeamSnapshot.objects.all()
+        # Optimize queries with select_related and prefetch_related
+        queryset = TeamSnapshot.objects.select_related(
+            'team', 'game_week', 'captain'
+        ).prefetch_related(
+            'players__game_stats__match__game_week'
+        )
 
         if team_id:
             queryset = queryset.filter(team_id=team_id)
@@ -420,8 +425,13 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
         if not current_gameweek:
             return Response({"detail": "No current GameWeek found."}, status=404)
         
-        # Retrieve the TeamSnapshot for the team and current GameWeek
-        snapshot = TeamSnapshot.objects.filter(team_id=team_id, game_week=current_gameweek).first()
+        # Retrieve the TeamSnapshot for the team and current GameWeek with optimized queries
+        snapshot = TeamSnapshot.objects.select_related(
+            'team', 'game_week', 'captain'
+        ).prefetch_related(
+            'players__game_stats__match__game_week'
+        ).filter(team_id=team_id, game_week=current_gameweek).first()
+        
         if not snapshot:
             return Response({"detail": "TeamSnapshot not found for the current GameWeek."}, status=404)
         

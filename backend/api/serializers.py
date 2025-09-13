@@ -202,17 +202,61 @@ class GameWeekSerializer(serializers.ModelSerializer):
 
 class TeamSnapshotSerializer(serializers.ModelSerializer):
     players = serializers.SerializerMethodField()
-    captain = PlayerSerializer(read_only=True)
+    captain = serializers.SerializerMethodField()
     game_week = serializers.SerializerMethodField()
-    team = TeamSerializer()
+    team = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamSnapshot
         fields = ['team', 'game_week', 'snapshot_date', 'players', 'captain', 'weekly_points']
 
     def get_players(self, obj):
-        player_serializer = PlayerSerializer(obj.players.all(), many=True, context={'game_week': obj.game_week})
-        return player_serializer.data
+        # Use optimized player data with pre-calculated points
+        players_data = []
+        for player in obj.players.all():
+            # Calculate points for this specific game week using prefetched data
+            game_week_points = self._calculate_player_game_week_points(player, obj.game_week)
+            
+            player_data = {
+                'id': player.id,
+                'name': player.name,
+                'position': player.position,
+                'price': player.price,
+                'team': player.team,
+                'points': game_week_points,  # Pre-calculated points for this game week
+                'goals': player.goals,
+                'assists': player.assists,
+                'clean_sheets': player.clean_sheets,
+                'games_played': player.games_played,
+                'yellow_cards': player.yellow_cards,
+                'red_cards': player.red_cards,
+                'MOTM': player.MOTM,
+                'Pen_Saves': player.Pen_Saves,
+                'game_stats': []  # Empty since we don't need all game stats
+            }
+            players_data.append(player_data)
+        return players_data
+
+    def get_captain(self, obj):
+        if obj.captain:
+            return {
+                'id': obj.captain.id,
+                'name': obj.captain.name,
+                'position': obj.captain.position,
+                'price': obj.captain.price,
+                'team': obj.captain.team,
+                'points': self._calculate_player_game_week_points(obj.captain, obj.game_week),
+                'goals': obj.captain.goals,
+                'assists': obj.captain.assists,
+                'clean_sheets': obj.captain.clean_sheets,
+                'games_played': obj.captain.games_played,
+                'yellow_cards': obj.captain.yellow_cards,
+                'red_cards': obj.captain.red_cards,
+                'MOTM': obj.captain.MOTM,
+                'Pen_Saves': obj.captain.Pen_Saves,
+                'game_stats': []
+            }
+        return None
 
     def get_game_week(self, obj):
         return {
@@ -221,6 +265,25 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
             "start_date": obj.game_week.start_date,
             "end_date": obj.game_week.end_date,
         }
+
+    def get_team(self, obj):
+        return {
+            'id': obj.team.id,
+            'name': obj.team.name,
+            'total_points': obj.team.total_points,
+            'created_at': obj.team.created_at
+        }
+
+    def _calculate_player_game_week_points(self, player, game_week):
+        """Calculate points for a player in a specific game week using prefetched data"""
+        # This will use the prefetched game_stats data, no additional queries
+        total_points = 0
+        for stat in player.game_stats.all():
+            if (stat.match and 
+                stat.match.game_week and 
+                stat.match.game_week.id == game_week.id):
+                total_points += stat.points
+        return total_points
 
     def update(self, instance, validated_data):
         # Use the new calculate_weekly_points method that accounts for captain double points
