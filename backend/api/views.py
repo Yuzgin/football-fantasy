@@ -126,8 +126,11 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
             except Player.DoesNotExist:
                 return Response({'error': 'Invalid captain selection.'}, status=400)
 
-        team = Team.objects.create(name=name, user=user, captain=captain)
+        # Create team first without captain so M2M exists before captain validation at model level
+        team = Team.objects.create(name=name, user=user)
         team.players.set(players)
+        if captain:
+            team.captain = captain
         team.save()
 
         # NEW TEMPORARY CODE: Create a snapshot in the current game week
