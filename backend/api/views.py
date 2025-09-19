@@ -147,7 +147,7 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
                 weekly_points=0  # Initialize weekly points to 0
             )
             snapshot.players.set(players)  # Add players to the snapshot first
-            snapshot.captain = captain  # Set captain after players are set
+            snapshot.captain = team.captain  # Use the captain from the team object
             snapshot.save()  # Save after both players and captain are set
 
         # PREVIOUS CODE CONTINUES
