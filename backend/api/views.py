@@ -144,11 +144,11 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
             snapshot = TeamSnapshot.objects.create(
                 team=team,
                 game_week=current_game_week,
-                captain=captain,  # Include captain in snapshot
                 weekly_points=0  # Initialize weekly points to 0
             )
-            snapshot.players.set(players)  # Add players to the snapshot
-            snapshot.save()
+            snapshot.players.set(players)  # Add players to the snapshot first
+            snapshot.captain = captain  # Set captain after players are set
+            snapshot.save()  # Save after both players and captain are set
 
         # PREVIOUS CODE CONTINUES
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
