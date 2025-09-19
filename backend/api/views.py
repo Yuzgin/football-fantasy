@@ -132,25 +132,6 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if captain:
             team.captain = captain
         team.save()
-
-        # NEW TEMPORARY CODE: Create a snapshot in the current game week
-        current_game_week = GameWeek.objects.filter(
-            start_date__lte=timezone.now().date(),
-            end_date__gte=timezone.now().date()
-        ).first()
-
-        if current_game_week:
-            # Create a snapshot for the team
-            snapshot = TeamSnapshot.objects.create(
-                team=team,
-                game_week=current_game_week,
-                weekly_points=0  # Initialize weekly points to 0
-            )
-            snapshot.players.set(players)  # Add players to the snapshot first
-            snapshot.captain = team.captain  # Use the captain from the team object
-            snapshot.save()  # Save after both players and captain are set
-
-        # PREVIOUS CODE CONTINUES
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
