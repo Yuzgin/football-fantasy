@@ -2,7 +2,6 @@ from django.core.management.base import BaseCommand
 from api.models import Player
 
 class Command(BaseCommand):
-    help = 'Updates player names to full names'1
 
     def handle(self, *args, **kwargs):
         # Fetch all players with abbreviated names
