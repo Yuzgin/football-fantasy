@@ -15,6 +15,7 @@ from api.models import (
 class PlayerAdmin(admin.ModelAdmin):
     list_display = (
         'name',
+        'full_name',
         'price',
         'points',
         'goals',
