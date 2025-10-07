@@ -30,6 +30,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Player(models.Model):
     name = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
     position = models.CharField(max_length=20, null=True, blank=True)
     team = models.CharField(max_length=255, null=True, blank=True)
     goals = models.IntegerField(default=0, null=True, blank=True)
