@@ -12,17 +12,17 @@ const PlayerView = ({
 
   return (
     <div className="team-player">
-      <img
-        src={selectedImage}
-        onClick={handleClick}
-        style={{ 
-          cursor: 'pointer',
-          maxWidth: '50px',  // Limit the width to 50px, scaling the image proportionally
-          height: 'auto',     // Maintain the aspect ratio
-        }} 
-      />
-      <div className="player-name-or-position">
-        {selectedPlayer.name}
+      <div className="player-card">
+        <img
+          className="player-card-image"
+          src={selectedImage}
+          onClick={handleClick}
+        />
+        <div className="player-card-info">
+          <div className="player-card-name">
+            {selectedPlayer.name}
+          </div>
+        </div>
       </div>
     </div>
   );

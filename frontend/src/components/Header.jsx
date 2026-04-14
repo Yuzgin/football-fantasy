@@ -26,7 +26,7 @@ const Header = () => {
       const now = Date.now() / 1000;
       const loggedIn = now < decoded.exp;
       setIsLoggedIn(loggedIn);
-      
+
       // Check if user is staff only if logged in
       if (loggedIn) {
         const staffStatus = await checkIsStaff();
@@ -164,6 +164,9 @@ const Header = () => {
         <Link to="/results" style={linkStyle}>
           <button style={buttonStyle}>Results</button>
         </Link>
+        <Link to="/compare" style={linkStyle}>
+          <button style={buttonStyle}>Compare</button>
+        </Link>
         <Link to="/LMS" style={linkStyle}>
           <button style={buttonStyle}>LMS</button>
         </Link>
@@ -207,6 +210,9 @@ const Header = () => {
           </Link>
           <Link to="/results" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Results</div>
+          </Link>
+          <Link to="/compare" style={linkStyle} onClick={closeDropdown}>
+            <div style={dropdownItemStyle}>Compare</div>
           </Link>
           <Link to="/LMS" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>LMS</div>

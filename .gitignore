@@ -160,3 +160,4 @@ backup.json
 
 # Local development
 *.local
+.github

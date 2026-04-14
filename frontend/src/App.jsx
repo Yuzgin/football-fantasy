@@ -39,6 +39,7 @@ function App() {
             <Route path="/admin" element={<StaffRoute><Pages.Admin /></StaffRoute>} />
             <Route path="/forgot-password" element={<Pages.ForgotPassword />} />
             <Route path="/reset-password/:uid/:token" element={<Pages.ResetPassword />} />
+            <Route path="/compare" element={<Pages.ComparePlayers />} />
             <Route path="*" element={<Pages.NotFound />} />
           </Routes>
         </div>

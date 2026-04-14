@@ -35,18 +35,18 @@ const TeamPlayer = ({
 
   return (
     <div className="team-player">
-      <img
-        src={selectedPlayer ? selectedImage : unselectedImage}
-        alt={selectedPlayer ? selectedPlayer.name : "Select Player"}
-        onClick={handleClick}
-        style={{ 
-          cursor: 'pointer',
-          maxWidth: '50px',  // Limit the width to 50px, scaling the image proportionally
-          height: 'auto',     // Maintain the aspect ratio
-        }} 
-      />
-      <div className="player-name-or-position">
-        {selectedPlayer ? selectedPlayer.name : positionAbbreviations[positionType]}
+      <div className="player-card">
+        <img
+          className="player-card-image"
+          src={selectedPlayer ? selectedImage : unselectedImage}
+          alt={selectedPlayer ? selectedPlayer.name : "Select Player"}
+          onClick={handleClick}
+        />
+        <div className="player-card-info">
+          <div className="player-card-name">
+            {selectedPlayer ? selectedPlayer.name : positionAbbreviations[positionType]}
+          </div>
+        </div>
       </div>
     </div>
   );

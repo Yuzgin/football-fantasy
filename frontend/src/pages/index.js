@@ -15,3 +15,4 @@ export { default as Results } from './Results';
 export { default as ForgotPassword } from './ForgotPassword';
 export { default as ResetPassword } from './ResetPassword';
 export { default as Admin } from './Admin';
+export { default as ComparePlayers } from './ComparePlayers';
