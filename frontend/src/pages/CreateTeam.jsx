@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../api';
 import { Navigate } from 'react-router-dom';
 import TeamPlayer from '../components/TeamForm';
 import PlayerModal from '../components/PlayerModal';
 import SelectedPlayerDetailModal from '../components/SelectedPlayerDetailModal';
+import BeastGifOverlay from '../components/BeastGifOverlay';
 import Header from '../components/Header';
+import { isBeastPlayer } from '../utils/beastPlayer';
 import '../styles/CreateTeam.css'; // Import the CSS file
 
 const formations = {
@@ -28,6 +30,12 @@ const CreateTeam = () => {
   const [selectedFormation] = useState("4-4-2");
   const [captainPlayerId, setCaptainPlayerId] = useState(null);
   const [submitError, setSubmitError] = useState('');
+  const [showBeastGif, setShowBeastGif] = useState(false);
+  const [beastGifKey, setBeastGifKey] = useState(0);
+
+  const closeBeastGif = useCallback(() => {
+    setShowBeastGif(false);
+  }, []);
 
   useEffect(() => {
     fetchPlayers();
@@ -100,6 +108,10 @@ const CreateTeam = () => {
       setBudget((prev) => prev - playerPrice);
       setShowPlayerModal(false);
       setCurrentPosition(null);
+      if (isBeastPlayer(player)) {
+        setBeastGifKey((k) => k + 1);
+        setShowBeastGif(true);
+      }
     }
   };
 
@@ -322,6 +334,8 @@ const CreateTeam = () => {
             onSetCaptain={() => setCaptainPlayerId(detailPlayer.id)}
           />
         )}
+
+        <BeastGifOverlay open={showBeastGif} gifKey={beastGifKey} onClose={closeBeastGif} />
       </div>
     </div>
   );

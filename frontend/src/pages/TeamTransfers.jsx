@@ -3,8 +3,10 @@ import api from '../api';
 import TeamPlayer from '../components/TeamForm';
 import PlayerModal from '../components/PlayerModal';
 import SelectedPlayerDetailModal from '../components/SelectedPlayerDetailModal';
+import BeastGifOverlay from '../components/BeastGifOverlay';
 import '../styles/CreateTeam.css'; // Reuse the CSS file from CreateTeam
 import Header from '../components/Header';
+import { isBeastPlayer } from '../utils/beastPlayer';
 
 const formations = {
     "4-4-2": ["Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
@@ -22,6 +24,12 @@ const TeamTransfers = () => {
     const [captainPlayerId, setCaptainPlayerId] = useState(null);
     const [playerDetailPosition, setPlayerDetailPosition] = useState(null);
     const [submitError, setSubmitError] = useState('');
+    const [showBeastGif, setShowBeastGif] = useState(false);
+    const [beastGifKey, setBeastGifKey] = useState(0);
+
+    const closeBeastGif = useCallback(() => {
+        setShowBeastGif(false);
+    }, []);
 
     const fetchTeamAndPlayers = useCallback(async () => {
         try {
@@ -139,6 +147,10 @@ const TeamTransfers = () => {
             setBudget((prevBudget) => prevBudget - Number(player.price));
             setShowPlayerModal(false);
             setCurrentPosition(null);
+            if (isBeastPlayer(player)) {
+                setBeastGifKey((k) => k + 1);
+                setShowBeastGif(true);
+            }
         }
     };
 
@@ -349,6 +361,8 @@ const TeamTransfers = () => {
                     onSetCaptain={() => setCaptainPlayerId(detailPlayer.id)}
                 />
             )}
+
+            <BeastGifOverlay open={showBeastGif} gifKey={beastGifKey} onClose={closeBeastGif} />
         </div>
         </div>
     );
