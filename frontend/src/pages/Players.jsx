@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '../api';
 import PlayerDirectoryDetailModal from '../components/PlayerDirectoryDetailModal';
 import { compareTeams } from '../utils/playerSort';
+import { playerMatchesNameSearch } from '../utils/playerNameSearch';
 import '../styles/Players.css';
 
 const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker'];
@@ -20,12 +21,6 @@ function alphabeticalCompare(a, b) {
   const primary = keyA.localeCompare(keyB, undefined, { sensitivity: 'base' });
   if (primary !== 0) return primary;
   return knownA.localeCompare(knownB, undefined, { sensitivity: 'base' });
-}
-
-function matchesSearch(player, q) {
-  const name = (player.name || '').toLowerCase();
-  const fullName = (player.full_name || '').toLowerCase();
-  return name.includes(q) || fullName.includes(q);
 }
 
 /** Label for team filter only; values stay as stored (e.g. "1s") so filtering still matches. */
@@ -83,11 +78,11 @@ export default function Players() {
   }, [players]);
 
   const filteredPlayers = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
     return players.filter((p) => {
       if (positionFilter && p.position !== positionFilter) return false;
       if (teamFilter && (p.team || '').trim() !== teamFilter) return false;
-      if (q && !matchesSearch(p, q)) return false;
+      if (q && !playerMatchesNameSearch(p, q)) return false;
       return true;
     });
   }, [players, searchQuery, teamFilter, positionFilter]);

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { sortPlayersForModal } from '../utils/playerSort';
+import { playerMatchesNameSearch } from '../utils/playerNameSearch';
 import '../styles/Modal.css';
 
 const PlayerModal = ({ players, isPlayerSelected, handlePlayerSelect, closeModal, position }) => {
@@ -12,14 +13,10 @@ const PlayerModal = ({ players, isPlayerSelected, handlePlayerSelect, closeModal
 
   const filteredPlayers = useMemo(() => {
     const byPosition = players.filter((player) => player.position === role);
-    const q = searchQuery.trim().toLowerCase();
+    const q = searchQuery.trim();
     const matched = !q
       ? byPosition
-      : byPosition.filter((player) => {
-          const name = (player.name || '').toLowerCase();
-          const fullName = (player.full_name || '').toLowerCase();
-          return name.includes(q) || fullName.includes(q);
-        });
+      : byPosition.filter((player) => playerMatchesNameSearch(player, q));
 
     return sortPlayersForModal(matched);
   }, [players, role, searchQuery]);

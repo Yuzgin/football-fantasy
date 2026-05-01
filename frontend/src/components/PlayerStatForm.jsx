@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
+import { playerMatchesNameSearch } from '../utils/playerNameSearch';
 import '../styles/PlayerStatForm.css';
 
 const PlayerStatForm = ({ stat, index, players, handlePlayerStatChange }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter players based on the search query
-  const filteredPlayers = players.filter(player =>
-    player.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPlayers = players.filter((player) =>
+    playerMatchesNameSearch(player, searchQuery)
   );
 
   return (
