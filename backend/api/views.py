@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 import logging
 from django.utils import timezone
-from django.db.models import Q
 from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
@@ -399,18 +398,34 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
         if not team_id:
             return Response({"detail": "team_id query parameter is required."}, status=400)
         
-        # Fetch the current date
         today = timezone.now().date()
-        
-        # Get the GameWeek that includes today's date
-        current_gameweek = GameWeek.objects.filter(
-            Q(start_date=today) | (Q(start_date__lte=today) & Q(end_date__gte=today))
-            ).order_by('-start_date').first()
+
+        # Any calendar row for gameweek 0 that includes today = cup not started yet.
+        # (Do this before picking a "current" week so we never prefer a overlapping GW1+ via ordering.)
+        if GameWeek.objects.filter(
+            week=0,
+            start_date__lte=today,
+            end_date__gte=today,
+        ).exists():
+            return Response(
+                {
+                    "cup_not_started": True,
+                    "detail": "Check back once the cup has started.",
+                },
+                status=200,
+            )
+
+        # Gameweek that includes today; lowest week number wins if ranges overlap.
+        current_gameweek = (
+            GameWeek.objects.filter(start_date__lte=today, end_date__gte=today)
+            .order_by("week", "start_date")
+            .first()
+        )
 
         if not current_gameweek:
             return Response({"detail": "No current GameWeek found."}, status=404)
 
-        if current_gameweek.week == 0:
+        if int(current_gameweek.week) == 0:
             return Response(
                 {
                     "cup_not_started": True,
