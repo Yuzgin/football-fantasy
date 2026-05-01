@@ -116,21 +116,20 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if players.count() != 11:
             return Response({'error': 'Invalid player selection.'}, status=400)
 
-        # Validate captain is in the selected players
-        captain = None
-        if captain_id:
-            try:
-                captain = Player.objects.get(id=captain_id)
-                if captain not in players:
-                    return Response({'error': 'Captain must be one of the selected players.'}, status=400)
-            except Player.DoesNotExist:
-                return Response({'error': 'Invalid captain selection.'}, status=400)
+        if captain_id is None:
+            return Response({'error': 'You must select a captain from your squad.'}, status=400)
+
+        try:
+            captain = Player.objects.get(id=captain_id)
+        except Player.DoesNotExist:
+            return Response({'error': 'Invalid captain selection.'}, status=400)
+        if captain not in players:
+            return Response({'error': 'Captain must be one of the selected players.'}, status=400)
 
         # Create team first without captain so M2M exists before captain validation at model level
         team = Team.objects.create(name=name, user=user)
         team.players.set(players)
-        if captain:
-            team.captain = captain
+        team.captain = captain
         team.save()
         serializer = TeamSerializer(team, context={'team_creation_date': team.created_at})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -156,15 +155,17 @@ class TeamDetailOrCreateView(generics.GenericAPIView):
         if players.count() != 11:
             return Response({'error': 'Invalid player selection.'}, status=400)
 
-        # Validate captain is in the selected players
-        captain = None
-        if captain_id:
+        if captain_id is not None and captain_id != '':
             try:
                 captain = Player.objects.get(id=captain_id)
-                if captain not in players:
-                    return Response({'error': 'Captain must be one of the selected players.'}, status=400)
             except Player.DoesNotExist:
                 return Response({'error': 'Invalid captain selection.'}, status=400)
+            if captain not in players:
+                return Response({'error': 'Captain must be one of the selected players.'}, status=400)
+        elif team.captain_id and team.captain in players:
+            captain = team.captain
+        else:
+            return Response({'error': 'You must select a captain from your squad.'}, status=400)
 
         # OLD CODE: Update the team in the database
         team.name = name

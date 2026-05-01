@@ -214,16 +214,17 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
         # Use optimized player data with pre-calculated points
         players_data = []
         for player in obj.players.all():
-            # Calculate points for this specific game week using prefetched data
             game_week_points = self._calculate_player_game_week_points(player, obj.game_week)
-            
+            if obj.captain_id and player.id == obj.captain_id:
+                game_week_points *= 2
+
             player_data = {
                 'id': player.id,
                 'name': player.name,
                 'position': player.position,
                 'price': player.price,
                 'team': player.team,
-                'points': game_week_points,  # Pre-calculated points for this game week
+                'points': game_week_points,
                 'goals': player.goals,
                 'assists': player.assists,
                 'clean_sheets': player.clean_sheets,
@@ -239,13 +240,14 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
 
     def get_captain(self, obj):
         if obj.captain:
+            gw_points = self._calculate_player_game_week_points(obj.captain, obj.game_week)
             return {
                 'id': obj.captain.id,
                 'name': obj.captain.name,
                 'position': obj.captain.position,
                 'price': obj.captain.price,
                 'team': obj.captain.team,
-                'points': self._calculate_player_game_week_points(obj.captain, obj.game_week),
+                'points': gw_points * 2,
                 'goals': obj.captain.goals,
                 'assists': obj.captain.assists,
                 'clean_sheets': obj.captain.clean_sheets,

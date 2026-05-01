@@ -1,4 +1,3 @@
-import React from 'react';
 import unselectedImage from '../assets/UnselectedPlayer.png'; // Image when no player is selected
 import selectedImage from '../assets/SelectedPlayer.png'; // Image when a player is selected
 import '../styles/TeamPlayer.css'; // Import the CSS file
@@ -14,11 +13,17 @@ const TeamPlayer = ({
   position,
   selectedPlayer,
   openPlayerModal,
+  openOccupiedPlayerDetail,
   handlePlayerDeselect,
+  isCaptain = false,
 }) => {
   const handleClick = () => {
     if (selectedPlayer) {
-      handlePlayerDeselect(position);
+      if (openOccupiedPlayerDetail) {
+        openOccupiedPlayerDetail(position);
+      } else if (handlePlayerDeselect) {
+        handlePlayerDeselect(position);
+      }
     } else {
       openPlayerModal(position);
     }
@@ -36,6 +41,11 @@ const TeamPlayer = ({
   return (
     <div className="team-player">
       <div className="player-card">
+        {isCaptain && selectedPlayer ? (
+          <span className="player-card-captain-badge" title="Captain" aria-label="Captain">
+            C
+          </span>
+        ) : null}
         <img
           className="player-card-image"
           src={selectedPlayer ? selectedImage : unselectedImage}

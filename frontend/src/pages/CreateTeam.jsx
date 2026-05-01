@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
 import { Navigate } from 'react-router-dom';
 import TeamPlayer from '../components/TeamForm';
 import PlayerModal from '../components/PlayerModal';
+import SelectedPlayerDetailModal from '../components/SelectedPlayerDetailModal';
 import Header from '../components/Header';
 import '../styles/CreateTeam.css'; // Import the CSS file
 
@@ -23,7 +24,10 @@ const CreateTeam = () => {
   const [budget, setBudget] = useState(100);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [showPlayerModal, setShowPlayerModal] = useState(false);
-  const [selectedFormation, setSelectedFormation] = useState("4-4-2");
+  const [playerDetailPosition, setPlayerDetailPosition] = useState(null);
+  const [selectedFormation] = useState("4-4-2");
+  const [captainPlayerId, setCaptainPlayerId] = useState(null);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     fetchPlayers();
@@ -54,22 +58,41 @@ const CreateTeam = () => {
     }
   };
 
+  const squadPlayerIds = () =>
+    Object.values(selectedPlayers).filter((id) => id != null);
+
+  const isSquadComplete = () =>
+    getSelectedPlayerCount() === 10 && Boolean(selectedPlayers.Goalkeeper);
+
   const handleCreateTeam = async (event) => {
     event.preventDefault();
+    setSubmitError('');
+    if (!captainPlayerId || !squadPlayerIds().includes(captainPlayerId)) {
+      setSubmitError('Pick a Captain');
+      return;
+    }
     try {
-      const teamData = { name, players: Object.values(selectedPlayers) };
+      const teamData = {
+        name,
+        players: squadPlayerIds(),
+        captain: captainPlayerId,
+      };
       await api.post('/api/team/', teamData);
       window.location.href = '/team';
     } catch (error) {
       console.error('Error creating team:', error);
+      const msg = error.response?.data?.error;
+      setSubmitError(typeof msg === 'string' ? msg : 'Could not create team. Try again.');
     }
   };
 
   const handlePlayerSelect = (playerId) => {
     const player = players.find((p) => p.id === playerId);
     const playerPrice = Number(player.price); // Ensure it's a number
+    const oldId = selectedPlayers[currentPosition];
 
     if (budget - playerPrice >= 0) {
+      setCaptainPlayerId((c) => (c === oldId ? null : c));
       setSelectedPlayers((prev) => ({
         ...prev,
         [currentPosition]: playerId,
@@ -85,6 +108,7 @@ const CreateTeam = () => {
     const player = players.find((p) => p.id === playerId);
     const playerPrice = Number(player.price);
 
+    setCaptainPlayerId((c) => (c === playerId ? null : c));
     setSelectedPlayers((prev) => {
       const updated = { ...prev };
       delete updated[position];
@@ -99,6 +123,19 @@ const CreateTeam = () => {
   const openPlayerModal = (position) => {
     setCurrentPosition(position);
     setShowPlayerModal(true);
+  };
+
+  const openOccupiedPlayerDetail = (position) => {
+    setPlayerDetailPosition(position);
+  };
+
+  const closePlayerDetail = () => setPlayerDetailPosition(null);
+
+  const handleRemoveFromDetail = () => {
+    if (playerDetailPosition) {
+      handlePlayerDeselect(playerDetailPosition);
+    }
+    closePlayerDetail();
   };
 
   const getSelectedPlayerCount = () =>
@@ -140,7 +177,8 @@ const CreateTeam = () => {
           position={position}
           selectedPlayer={players.find((p) => p.id === assigned)}
           openPlayerModal={openPlayerModal}
-          handlePlayerDeselect={handlePlayerDeselect}
+          openOccupiedPlayerDetail={openOccupiedPlayerDetail}
+          isCaptain={assigned != null && captainPlayerId === assigned}
         />
       );
     }
@@ -168,6 +206,11 @@ const CreateTeam = () => {
   if (loading) return <div>Loading...</div>;
   if (hasTeam) return <Navigate to="/team" replace />;
 
+  const detailPlayer =
+    playerDetailPosition != null
+      ? players.find((p) => p.id === selectedPlayers[playerDetailPosition])
+      : null;
+
   return (
     <div>
       <Header />
@@ -180,7 +223,11 @@ const CreateTeam = () => {
                   position="Goalkeeper"
                   selectedPlayer={players.find((p) => p.id === selectedPlayers["Goalkeeper"])}
                   openPlayerModal={openPlayerModal}
-                  handlePlayerDeselect={handlePlayerDeselect}
+                  openOccupiedPlayerDetail={openOccupiedPlayerDetail}
+                  isCaptain={
+                    selectedPlayers.Goalkeeper != null &&
+                    captainPlayerId === selectedPlayers.Goalkeeper
+                  }
                 />
               </div>
 
@@ -225,9 +272,25 @@ const CreateTeam = () => {
 
               <div className="budget-display">Budget: £{budget.toFixed(1)}m</div>
 
+              {isSquadComplete() && captainPlayerId == null ? (
+                <p className="captain-hint">
+                  <strong>Pick a Captain</strong>
+                </p>
+              ) : null}
+
+              {submitError ? (
+                <p className="create-team-error" role="alert">
+                  <strong>{submitError}</strong>
+                </p>
+              ) : null}
+
               <button
                 type="submit"
-                disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}
+                disabled={
+                  !isSquadComplete() ||
+                  captainPlayerId == null ||
+                  !squadPlayerIds().includes(captainPlayerId)
+                }
               >
                 Create Team
               </button>
@@ -246,6 +309,17 @@ const CreateTeam = () => {
             handlePlayerSelect={handlePlayerSelect}
             closeModal={() => setShowPlayerModal(false)}
             position={currentPosition}
+          />
+        )}
+
+        {detailPlayer && playerDetailPosition && (
+          <SelectedPlayerDetailModal
+            player={detailPlayer}
+            formationPosition={playerDetailPosition}
+            onClose={closePlayerDetail}
+            onRemove={handleRemoveFromDetail}
+            isCaptain={captainPlayerId === detailPlayer.id}
+            onSetCaptain={() => setCaptainPlayerId(detailPlayer.id)}
           />
         )}
       </div>

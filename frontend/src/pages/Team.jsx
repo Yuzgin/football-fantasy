@@ -28,15 +28,6 @@ const TeamPage = () => {
       fetchTeamAndPlayers();
   }, []);
 
-  const handleDeleteTeam = async () => {
-    try {
-      await api.delete('/api/team/delete/');
-      setTeam(null);
-    } catch (error) {
-      console.error('Error deleting team:', error);
-    }
-  };
-
   const fetchTeamAndPlayers = async () => {
       try {
           const [playersResponse, teamResponse] = await Promise.all([
@@ -140,6 +131,8 @@ const TeamPage = () => {
       (getPositionCount('Defender') === 4 && getPositionCount('Midfielder') === 5) ||
       (getPositionCount('Defender') === 5 && getPositionCount('Midfielder') === 4);
 
+  const captainId = team?.captain?.id ?? null;
+
   const renderTeamPlayer = (position) => {
       const totalSelectedPlayers = getSelectedPlayerCount();
       const playerAssigned = selectedPlayers[position];
@@ -150,6 +143,7 @@ const TeamPage = () => {
                 key={position}
                 selectedPlayer={players.find((p) => p.id === playerAssigned)}
                 openPlayerStats={openPlayerStats}
+                isCaptain={playerAssigned != null && captainId === playerAssigned}
               />
           );
       }
@@ -175,6 +169,11 @@ const TeamPage = () => {
                           <PlayerView
                               position="Goalkeeper"
                               selectedPlayer={players.find((p) => p.id === selectedPlayers["Goalkeeper"])}
+                              openPlayerStats={openPlayerStats}
+                              isCaptain={
+                                selectedPlayers.Goalkeeper != null &&
+                                captainId === selectedPlayers.Goalkeeper
+                              }
                           />
                       </div>
 
@@ -207,7 +206,7 @@ const TeamPage = () => {
               </div>
 
               <div className="teamdetail-container">
-                <TeamInfo team={team} handleDeleteTeam={handleDeleteTeam} value={teamValue} />
+                <TeamInfo team={team} value={teamValue} />
                 <TransfersButton />
               </div>
           </div>

@@ -10,12 +10,12 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         # List of URLs to fetch fixtures from
         urls = [
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf0vzg3w00jyo301fztuxggp/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf155vyo00leo301skln6l5t/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf1574ml00lyo301xxb0wycg/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf15929d00mmo3017r1xlhva/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf15aqxa00n6o301og4g9k63/fixtures',
-            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmf15c4dc00nqo301av3tyodt/fixtures',
+            '://shttpsports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3dqlsigksls4019npnl8dd/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3droq4gksps40177pfv0bz/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3dsf7mgksts401vpkygm5c/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3dsu6egksxs401thw45bat/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3dtc3bgkt1s401ue10qn5x/fixtures',
+            'https://sports-admin.yorksu.org/api/clst1o9lv0001q5teb61pqfyy/leagues/cmh3dtrqlgkt5s401tzuwm3g0/fixtures',
         ]
 
         # Get today's date

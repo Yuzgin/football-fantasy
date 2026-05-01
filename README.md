@@ -44,6 +44,37 @@ And backend will be runnning at http://localhost:8000/
 
 
 
+# CI and automated checks
+
+This repo uses **GitHub Actions** CI (`.github/workflows/ci.yml`) to run:
+
+- Backend: Django test suite
+- Frontend: unit tests (Vitest) and build (lint runs too, but is currently non-blocking)
+
+## Run checks locally
+
+Frontend:
+
+```bash
+cd frontend
+npm ci
+npm test
+npm run lint
+npm run build
+```
+
+Backend:
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python manage.py test
+```
+
+Note: the backend email backend can be overridden via `EMAIL_BACKEND` (CI sets it to an in-memory backend so tests never hit real SMTP).
+
 # Improvements
 
 Improvements will continue to be made, starting with adapting the website to be easier to use and compatible with mobile web searchers. Hopefully even an app will follow soon...

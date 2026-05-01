@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../api';
 import TeamPlayer from '../components/TeamForm';
 import PlayerModal from '../components/PlayerModal';
+import SelectedPlayerDetailModal from '../components/SelectedPlayerDetailModal';
 import '../styles/CreateTeam.css'; // Reuse the CSS file from CreateTeam
 import Header from '../components/Header';
 
@@ -13,16 +14,16 @@ const TeamTransfers = () => {
     const [players, setPlayers] = useState([]);
     const [selectedPlayers, setSelectedPlayers] = useState({});
     const [budget, setBudget] = useState(100);
-    const [selectedFormation, setSelectedFormation] = useState("4-4-2");
+    const selectedFormation = "4-4-2";
     const [currentPosition, setCurrentPosition] = useState(null);
     const [showPlayerModal, setShowPlayerModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [teamName, setTeamName] = useState('');
+    const [captainPlayerId, setCaptainPlayerId] = useState(null);
+    const [playerDetailPosition, setPlayerDetailPosition] = useState(null);
+    const [submitError, setSubmitError] = useState('');
 
-    useEffect(() => {
-        fetchTeamAndPlayers();
-    }, []);
-
-    const fetchTeamAndPlayers = async () => {
+    const fetchTeamAndPlayers = useCallback(async () => {
         try {
             const [playersResponse, teamResponse] = await Promise.all([
                 api.get('/api/players/'),
@@ -32,6 +33,7 @@ const TeamTransfers = () => {
             setPlayers(playersResponse.data);
 
             const teamData = teamResponse.data;
+            setTeamName(teamData.name ?? '');
             const initialSelectedPlayers = {};
 
             let teamValue = 0;
@@ -65,7 +67,7 @@ const TeamTransfers = () => {
             // Populate any remaining players that don't fit the selected formation
             Object.keys(positionMapping).forEach(positionType => {
                 const remainingPositions = positionMapping[positionType];
-                remainingPositions.forEach((playerId, index) => {
+                remainingPositions.forEach((playerId) => {
                     // Find the next available position slot that hasn't been filled
                     const availablePosition = Object.keys(formations[selectedFormation])
                         .find(key => !initialSelectedPlayers[key] && key.startsWith(positionType));
@@ -82,27 +84,54 @@ const TeamTransfers = () => {
 
             setSelectedPlayers(initialSelectedPlayers);
             setBudget(100 - teamValue);
+
+            const capId = teamData.captain?.id ?? null;
+            const squadIds = Object.values(initialSelectedPlayers).filter((id) => id != null);
+            setCaptainPlayerId(capId != null && squadIds.includes(capId) ? capId : null);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchTeamAndPlayers();
+    }, [fetchTeamAndPlayers]);
+
+    const squadPlayerIds = () =>
+        Object.values(selectedPlayers).filter((id) => id != null);
+
+    const isSquadComplete = () =>
+        getSelectedPlayerCount() === 10 && Boolean(selectedPlayers.Goalkeeper);
 
     const handleUpdateTeam = async (event) => {
         event.preventDefault();
+        setSubmitError('');
+        if (!captainPlayerId || !squadPlayerIds().includes(captainPlayerId)) {
+            setSubmitError('Pick a Captain');
+            return;
+        }
         try {
-            const teamData = { players: Object.values(selectedPlayers), formation: selectedFormation };
-            await api.put('/api/team/', teamData);
+            const payload = {
+                name: teamName,
+                players: squadPlayerIds(),
+                captain: captainPlayerId,
+            };
+            await api.put('/api/team/', payload);
             window.location.href = '/team';
         } catch (error) {
             console.error('Error updating team:', error);
+            const msg = error.response?.data?.error;
+            setSubmitError(typeof msg === 'string' ? msg : 'Could not save team. Try again.');
         }
     };
 
     const handlePlayerSelect = (playerId) => {
         const player = players.find((p) => p.id === playerId);
+        const oldId = selectedPlayers[currentPosition];
         if (budget - Number(player.price) >= 0) {
+            setCaptainPlayerId((c) => (c === oldId ? null : c));
             setSelectedPlayers((prevSelectedPlayers) => ({
                 ...prevSelectedPlayers,
                 [currentPosition]: playerId,
@@ -116,12 +145,26 @@ const TeamTransfers = () => {
     const handlePlayerDeselect = (position) => {
         const playerId = selectedPlayers[position];
         const player = players.find((p) => p.id === playerId);
+        setCaptainPlayerId((c) => (c === playerId ? null : c));
         setSelectedPlayers((prevSelectedPlayers) => {
             const updatedPlayers = { ...prevSelectedPlayers };
             delete updatedPlayers[position];
             return updatedPlayers;
         });
         setBudget((prevBudget) => prevBudget + Number(player.price));
+    };
+
+    const openOccupiedPlayerDetail = (position) => {
+        setPlayerDetailPosition(position);
+    };
+
+    const closePlayerDetail = () => setPlayerDetailPosition(null);
+
+    const handleRemoveFromDetail = () => {
+        if (playerDetailPosition) {
+            handlePlayerDeselect(playerDetailPosition);
+        }
+        closePlayerDetail();
     };
 
     const isPlayerSelected = (playerId) => Object.values(selectedPlayers).includes(playerId);
@@ -165,7 +208,8 @@ const TeamTransfers = () => {
                     position={position}
                     selectedPlayer={players.find((p) => p.id === playerAssigned)}
                     openPlayerModal={openPlayerModal}
-                    handlePlayerDeselect={handlePlayerDeselect}
+                    openOccupiedPlayerDetail={openOccupiedPlayerDetail}
+                    isCaptain={playerAssigned != null && captainPlayerId === playerAssigned}
                 />
             );
         }
@@ -198,6 +242,11 @@ const TeamTransfers = () => {
         return <div>Loading...</div>;
     }
 
+    const detailPlayer =
+        playerDetailPosition != null
+            ? players.find((p) => p.id === selectedPlayers[playerDetailPosition])
+            : null;
+
     return (
         <div>
             <Header />
@@ -210,7 +259,11 @@ const TeamTransfers = () => {
                                 position="Goalkeeper"
                                 selectedPlayer={players.find((p) => p.id === selectedPlayers["Goalkeeper"])}
                                 openPlayerModal={openPlayerModal}
-                                handlePlayerDeselect={handlePlayerDeselect}
+                                openOccupiedPlayerDetail={openOccupiedPlayerDetail}
+                                isCaptain={
+                                    selectedPlayers.Goalkeeper != null &&
+                                    captainPlayerId === selectedPlayers.Goalkeeper
+                                }
                             />
                         </div>
 
@@ -246,11 +299,30 @@ const TeamTransfers = () => {
                     <form onSubmit={handleUpdateTeam}>
                     <div className="budget-display">Budget: £{Number(budget).toFixed(1)}m</div>
 
+                        {isSquadComplete() && captainPlayerId == null ? (
+                            <p className="captain-hint">
+                                <strong>Pick a Captain</strong>
+                            </p>
+                        ) : null}
+
+                        {submitError ? (
+                            <p className="create-team-error" role="alert">
+                                <strong>{submitError}</strong>
+                            </p>
+                        ) : null}
+
                         <div className="selected-players">
                             {renderSelectedPlayers()}
                         </div>
 
-                        <button type="submit" disabled={getSelectedPlayerCount() !== 10 || !selectedPlayers["Goalkeeper"]}>
+                        <button
+                            type="submit"
+                            disabled={
+                                !isSquadComplete() ||
+                                captainPlayerId == null ||
+                                !squadPlayerIds().includes(captainPlayerId)
+                            }
+                        >
                             Update Team
                         </button>
                     </form>
@@ -264,6 +336,17 @@ const TeamTransfers = () => {
                     handlePlayerSelect={handlePlayerSelect}
                     closeModal={() => setShowPlayerModal(false)}
                     position={currentPosition}
+                />
+            )}
+
+            {detailPlayer && playerDetailPosition && (
+                <SelectedPlayerDetailModal
+                    player={detailPlayer}
+                    formationPosition={playerDetailPosition}
+                    onClose={closePlayerDetail}
+                    onRemove={handleRemoveFromDetail}
+                    isCaptain={captainPlayerId === detailPlayer.id}
+                    onSetCaptain={() => setCaptainPlayerId(detailPlayer.id)}
                 />
             )}
         </div>

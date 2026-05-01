@@ -3,6 +3,42 @@
 .mens-page {
     padding: 20px;
   }
+
+  /* Fixtures / results schedule — matches app gold (#e0b507) used elsewhere */
+  .mens-page--schedule {
+    background-color: #e0b507;
+    min-height: calc(100vh - 80px);
+  }
+
+  .mens-page--schedule h1 {
+    color: #111;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .mens-page--schedule .schedule-panel h1 {
+    color: #111;
+  }
+
+  .mens-page--schedule > .content-container {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .mens-page--schedule p {
+    color: rgba(17, 17, 17, 0.85);
+  }
+
+  .mens-page--schedule .empty-state {
+    border: 1px solid rgba(17, 17, 17, 0.18);
+    background: rgba(255, 255, 255, 0.35);
+    color: #111;
+  }
+
+  .mens-page--schedule .schedule-panel .empty-state {
+    background: rgba(255, 255, 255, 0.28);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
   
   .mens-page h1 {
     font-size: 24px;

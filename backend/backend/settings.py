@@ -46,6 +46,13 @@ ALLOWED_HOSTS = [
     '144.21.51.162'
 ]
 
+# Admin (session/CSRF) when the browser origin is the Vite dev server (proxies /api to Django).
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -214,8 +221,13 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 ### RESET PASSWORD EMAIL SETTINGS
 
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # During development only
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # For production
+_EMAIL_BACKEND_ENV = os.getenv("EMAIL_BACKEND")
+if _EMAIL_BACKEND_ENV:
+    EMAIL_BACKEND = _EMAIL_BACKEND_ENV
+elif DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # IONOS SMTP Configuration
 EMAIL_HOST = "smtp.ionos.co.uk"

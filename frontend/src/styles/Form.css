@@ -18,6 +18,17 @@
   color: black; /* Set the "Login" text color to black */
 }
 
+.form-error {
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background-color: #ffebee;
+  color: #b71c1c;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
 .form-input {
   width: 100%;
   padding: 10px;

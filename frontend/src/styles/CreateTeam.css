@@ -77,6 +77,23 @@
     gap: 15px; /* Space between form elements */
 }
 
+.captain-hint {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.82);
+    max-width: 280px;
+    text-align: center;
+}
+
+.create-team-error {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #ff8a80;
+    max-width: 280px;
+    text-align: center;
+}
+
 /* Styling for the form labels */
 form label {
     font-weight: bold;
@@ -208,4 +225,122 @@ body {
         min-height: 120vh;
         padding-top: 5vh;
     }
+}
+
+/* Selected player detail (Create Team occupied slot) */
+.create-team-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.create-team-player-detail {
+    width: 100%;
+    max-width: 420px;
+    max-height: min(90vh, 640px);
+    overflow-y: auto;
+    background: #2b2b28;
+    color: #fff;
+    border-radius: 16px;
+    padding: 20px 22px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: left;
+}
+
+.create-team-player-detail h2 {
+    margin: 0 0 6px;
+    font-size: 1.25rem;
+    color: #fff;
+}
+
+.player-detail-meta {
+    margin: 0 0 14px;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.player-detail-meta-sep {
+    margin: 0 6px;
+}
+
+.player-detail-captain-label {
+    color: #e0b507;
+    font-weight: 700;
+}
+
+.player-detail-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.player-detail-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    font-size: 0.92rem;
+}
+
+.player-detail-stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.player-detail-stat-value {
+    font-weight: 700;
+    color: #e0b507;
+    text-align: right;
+}
+
+.player-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.player-detail-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.player-detail-btn-close {
+    background: #e3e3e3;
+    color: #111;
+}
+
+.player-detail-btn-close:hover {
+    background: #fff;
+}
+
+.player-detail-btn-remove {
+    background: #b71c1c;
+    color: #fff;
+}
+
+.player-detail-btn-remove:hover {
+    background: #d32f2f;
+}
+
+.player-detail-btn-captain {
+    background: #e0b507;
+    color: #1a1a18;
+}
+
+.player-detail-btn-captain:hover {
+    background: #f5c518;
 }

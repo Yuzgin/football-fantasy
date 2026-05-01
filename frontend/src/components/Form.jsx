@@ -7,14 +7,26 @@ import "../styles/Form.css";
 function Form({ route, method }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const name = method === "login" ? "Login" : "Register";
+    const isRegister = method === "register";
 
     const handleSubmit = async (e) => {
         setLoading(true);
+        setErrorMessage('');
         e.preventDefault();
+
+        if (isRegister) {
+            if (password !== confirmPassword) {
+                setErrorMessage("Passwords do not match.");
+                setLoading(false);
+                return;
+            }
+        }
 
         try {
             const res = await api.post(route, { email, password });
@@ -26,7 +38,17 @@ function Form({ route, method }) {
                 navigate('/login');
             }
         } catch (error) {
-            alert(error);
+            const status = error.response?.status;
+            if (method === "login" && status === 401) {
+                setErrorMessage("Email or Password is wrong");
+            } else {
+                const detail = error.response?.data?.detail;
+                setErrorMessage(
+                    typeof detail === "string"
+                        ? detail
+                        : "Something went wrong. Please try again."
+                );
+            }
         } finally {
             setLoading(false);
         }
@@ -35,12 +57,18 @@ function Form({ route, method }) {
     return (
         <form onSubmit={handleSubmit} className='form_container'>
             <h1>{name}</h1>
+            {errorMessage ? (
+                <p className="form-error" role="alert">
+                    {errorMessage}
+                </p>
+            ) : null}
             <input
                 className='form-input'
                 type='email'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder='Email'
+                autoComplete="email"
             />
             <input
                 className='form-input'
@@ -48,9 +76,23 @@ function Form({ route, method }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Password'
+                autoComplete={isRegister ? "new-password" : "current-password"}
             />
+            {isRegister ? (
+                <input
+                    className='form-input'
+                    type='password'
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder='Confirm password'
+                    autoComplete="new-password"
+                    aria-invalid={confirmPassword.length > 0 && password !== confirmPassword}
+                />
+            ) : null}
             <div className="button-container">
-                <button className='form-button' type='submit'>{name}</button>
+                <button className='form-button' type='submit' disabled={loading}>
+                    {loading ? "Please wait…" : name}
+                </button>
                 {method === "login" && (
                     <>
                         <Link to="/register" className="register-link">
