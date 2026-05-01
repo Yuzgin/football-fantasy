@@ -21,7 +21,8 @@
   width: 100%;
   padding-top: 8px;
   justify-content: center;
-  align-items: stretch;
+  /* Don’t stretch short top-5 tables to match a long league table */
+  align-items: flex-start;
 }
 
 .table-wrapper {
@@ -31,10 +32,6 @@
   max-width: 400px;
   min-width: min(100%, 300px);
   align-items: stretch;
-}
-
-.table-wrapper .team-table {
-  flex: 1;
 }
 
 @media (max-width: 768px) {
