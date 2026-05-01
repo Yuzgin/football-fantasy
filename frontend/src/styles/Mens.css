@@ -39,6 +39,12 @@
     background: rgba(255, 255, 255, 0.28);
     border-color: rgba(0, 0, 0, 0.12);
   }
+
+  @media (max-width: 540px) {
+    .mens-page.mens-page--schedule {
+      padding: 10px 4px 16px;
+    }
+  }
   
   .mens-page h1 {
     font-size: 24px;

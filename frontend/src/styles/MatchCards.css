@@ -593,6 +593,72 @@
     width: 100%;
     max-width: 100%;
   }
+
+  /* Narrow phones: smaller row type (not day headings), less horizontal inset */
+  .schedule-panel {
+    padding: 14px max(6px, env(safe-area-inset-left, 0px)) 16px
+      max(6px, env(safe-area-inset-right, 0px));
+    border-radius: 14px;
+  }
+
+  .schedule-panel .schedule-row__time {
+    font-size: 13px;
+    min-width: 2.4rem;
+    letter-spacing: 0.01em;
+  }
+
+  .schedule-panel .schedule-row__score {
+    font-size: 14px;
+    min-width: 3rem;
+  }
+
+  .schedule-panel .schedule-row__location,
+  .schedule-panel .schedule-row__kickoff {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .schedule-panel .team-badge-block--schedule .team-badge-block__img,
+  .schedule-panel .team-badge-block--schedule .team-badge-block__fallback {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+
+  .schedule-panel .team-badge-block--schedule .team-badge-block__fallback {
+    font-size: 11px;
+  }
+
+  .schedule-panel .team-badge-block--schedule .team-badge-block__name {
+    font-size: 12px;
+    line-height: 1.2;
+    word-break: normal;
+    overflow-wrap: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .schedule-panel .team-badge-block--schedule {
+    gap: 6px;
+  }
+
+  .schedule-panel .schedule-row__match-core {
+    column-gap: 4px;
+  }
+
+  .schedule-panel .schedule-row__match-core--result .schedule-row__score {
+    min-height: 28px;
+  }
+
+  .schedule-panel .schedule-row {
+    padding: 10px 0;
+  }
+
+  .schedule-panel .schedule-row__line {
+    gap: 8px 8px;
+  }
 }
 
 @media (max-width: 520px) {

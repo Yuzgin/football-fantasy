@@ -95,6 +95,13 @@ button:focus-visible {
   padding-right: 0;
 }
 
+@media (max-width: 540px) {
+  .main-content:has(.mens-page--schedule) {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
 /* Responsive styles for smaller screens */
 @media (max-width: 768px) {
   body {
