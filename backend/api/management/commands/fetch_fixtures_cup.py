@@ -6,8 +6,8 @@ from django.core.management.base import BaseCommand
 from api.models import Fixture
 
 CSV_URLS = [
-    "https://docs.google.com/spreadsheets/d/1h92VSktiH3CoD_z4SSpyXWNtCfIXV9NTUcqO8vvFt2g/export?format=csv&gid=1256406894",  # Cup
-    # "https://docs.google.com/spreadsheets/d/1h92VSktiH3CoD_z4SSpyXWNtCfIXV9NTUcqO8vvFt2g/export?format=csv&gid=307298730",   # Vase
+    "https://docs.google.com/spreadsheets/d/1d4yNS8J0K3TDINWoIw1RV5zJ7UqZnDcC4F3BrDlyDP8/export?format=csv&gid=1256406894",  # Cup
+    "https://docs.google.com/spreadsheets/d/1d4yNS8J0K3TDINWoIw1RV5zJ7UqZnDcC4F3BrDlyDP8/export?format=csv&gid=307298730",   # Vase
 ]
 
 class Command(BaseCommand):
