@@ -28,8 +28,8 @@
   }
 
   .player-card {
-    width: 65px;
-    height: 90px;
+    width: clamp(52px, 14vw, 65px);
+    height: clamp(78px, 20vw, 90px);
     position: relative;
     border-radius: 10px;
     background: rgba(0, 0, 0, 0.4); /* semi-transparent grey */
@@ -42,8 +42,8 @@
   }
 
   .player-card-image {
-    width: 55px;
-    height: 55px;
+    width: clamp(44px, 12vw, 55px);
+    height: clamp(44px, 12vw, 55px);
     object-fit: contain;
     border-radius: 50%;
     margin-top: 6px;
@@ -65,7 +65,7 @@
 
   .player-card-name {
     color: #000;
-    font-size: 10px;
+    font-size: clamp(9px, 2.4vw, 10px);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -87,18 +87,9 @@
     text-overflow: ellipsis; /* Add ellipsis if text is too long */
   }
 
-  /* Reduce player size for smaller screens */
+  /* Keep layout stable on small screens without transforms */
 @media screen and (max-width: 600px) {
-  .team-player {
-      transform: scale(0.9); /* Scale down the whole player component */
-  }
-
-  .player-card {
-      transform: scale(0.95);
-  }
-
-  .player-name-or-position {
-      font-size: 10px; /* Make the text slightly smaller */
-      padding: 1px 4px; /* Adjust padding */
+  .player-card-info {
+    padding: 2px 3px;
   }
 }

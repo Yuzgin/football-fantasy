@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/YellowBadge.png';
 import { jwtDecode } from "jwt-decode";
@@ -62,7 +62,7 @@ const Header = () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    padding: '10px 20px',
+    padding: isMobileView ? '8px 12px' : '10px 20px',
     backgroundColor: '#333',
     color: '#FFF',
     width: '100%',
@@ -87,17 +87,18 @@ const Header = () => {
   };
 
   const logoStyle = {
-    height: '70px',
+    height: isMobileView ? '46px' : '70px',
     cursor: 'pointer',
   };
 
   const buttonStyle = {
-    padding: '10px 20px',
+    padding: isMobileView ? '8px 10px' : '10px 20px',
     backgroundColor: 'transparent',
     color: '#FFF',
     border: 'none',
     cursor: 'pointer',
     textTransform: 'uppercase',
+    fontSize: isMobileView ? '0.85rem' : '1rem',
   };
 
   const linkStyle = {
@@ -112,9 +113,9 @@ const Header = () => {
     backgroundColor: '#444',
     borderRadius: '0.5em',
     padding: '1em',
-    width: '15%',
-    minWidth: '180px',
-    maxWidth: '300px',
+    width: isMobileView ? '88vw' : '15%',
+    minWidth: isMobileView ? 'auto' : '180px',
+    maxWidth: isMobileView ? '420px' : '300px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
     fontSize: '1.1em',
   };
@@ -156,10 +157,10 @@ const Header = () => {
           <button style={buttonStyle}>Fantasy</button>
         </Link>
         <Link to="/mens" style={linkStyle}>
-          <button style={buttonStyle}>Men's</button>
+          <button style={buttonStyle}>Men&apos;s</button>
         </Link>
         <Link to="/womens" style={linkStyle}>
-          <button style={buttonStyle}>Women's</button>
+          <button style={buttonStyle}>Women&apos;s</button>
         </Link>
         <Link to="/results" style={linkStyle}>
           <button style={buttonStyle}>Results</button>
@@ -203,10 +204,10 @@ const Header = () => {
             <div style={dropdownItemStyle}>Fantasy</div>
           </Link>
           <Link to="/mens" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Men's</div>
+            <div style={dropdownItemStyle}>Men&apos;s</div>
           </Link>
           <Link to="/womens" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Women's</div>
+            <div style={dropdownItemStyle}>Women&apos;s</div>
           </Link>
           <Link to="/results" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Results</div>

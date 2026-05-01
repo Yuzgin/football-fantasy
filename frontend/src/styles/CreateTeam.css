@@ -1,10 +1,11 @@
 /* Container for the football field background and player positions */
 .team-container {
     position: relative;
-    width: 500px; /* Fixed width for the container */
-    height: 600px; /* Fixed height for the container */
+    width: min(500px, 92vw);
+    aspect-ratio: 5 / 6;
+    height: auto;
     margin: 40px auto 0 auto; /* Center the container horizontally and add top margin for separation */
-    padding: 20px; /* Padding inside the container */
+    padding: clamp(10px, 2.8vw, 20px);
     background-image: url('../assets/FootballField.png');
     background-size: 100% 100%; /* Stretch the image to fit the container exactly */
     background-position: center;
@@ -22,14 +23,14 @@
     align-items: center;
     justify-content: center; /* Center content vertically within the container */
     height: 100%; /* Ensure it fills the entire height of the container */
-    gap: 60px; /* Space between rows */
+    gap: clamp(18px, 5vw, 60px); /* Space between rows */
 }
 
 /* Layout for each position group (e.g., defenders, midfielders) */
 .position-group {
     display: flex;
     justify-content: center; /* Center players within each group */
-    gap: 50px; /* Space between players */
+    gap: clamp(12px, 5vw, 50px); /* Space between players */
 }
 
 /* Layout for the team container and controls side by side */
@@ -37,7 +38,8 @@
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Align items to the top */
-    gap: 30px; /* Space between the team container and the controls */
+    gap: clamp(16px, 4vw, 30px); /* Space between the team container and the controls */
+    flex-wrap: wrap;
 }
 
 /* Styling for the controls container (team name form, budget, submit button) */
@@ -45,12 +47,13 @@
     display: flex;
     flex-direction: column;
     align-items: center; /* Align content to the left */
-    padding: 10px;
+    padding: clamp(8px, 2.5vw, 12px);
     background-color: #2b2b28; /* Light background for contrast */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     border: 2px solid transparent; /* Invisible border */
     margin-top: 42px; /* Add margin to separate from the header */
+    width: min(360px, 92vw);
 }
 
 .teamdetail-container {
@@ -64,7 +67,8 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     border: 2px solid transparent; /* Invisible border */
     margin-top: 42px; /* Add margin to separate from the header */
-    min-width: 250px;
+    width: min(360px, 92vw);
+    min-width: 0;
 }
 
 .teamdetail-container h2 {
@@ -103,7 +107,8 @@ form label {
 /* Styling for the input fields */
 form input[type="text"] {
     padding: 8px;
-    width: 250px; /* Set a consistent width for the input field */
+    width: 100%;
+    max-width: 320px;
     border: 2px solid #ccc;
     border-radius: 5px;
 }
@@ -144,12 +149,13 @@ body {
     display: flex;
     justify-content: center;
     border: 2px solid transparent;
-    padding: 20px;
+    padding: clamp(12px, 3vw, 20px);
     max-width: 100%;
     height: auto; /* Allow natural height */
     max-height: none; /* Remove restriction */
     overflow-y: visible; /* Allow full page scrolling */
     box-sizing: border-box;
+    padding-top: calc(clamp(12px, 3vw, 20px) + 78px); /* account for fixed header */
 }
 
 .position-group-5 {
@@ -161,38 +167,6 @@ body {
 
 /* Media query for smaller screens (e.g., iPhones) */
 @media screen and (max-width: 600px) {
-    .team-container {
-        width: 300px; /* Reduce pitch width */
-        height: 360px; /* Reduce pitch height */
-        padding: 10px; /* Adjust padding */
-    }
-
-    .team-formation {
-        gap: 5px; /* Reduce vertical spacing between rows */
-    }
-
-    .position-group {
-        gap: 15px; /* Reduce horizontal spacing between players */
-    }
-
-    .controls-container {
-        padding: 5px; /* Reduce padding for controls */
-        margin-top: 20px; /* Adjust spacing */
-    }
-
-    form input[type="text"] {
-        width: 180px; /* Make input fields smaller */
-    }
-
-    form button[type="submit"] {
-        padding: 8px 15px;
-        font-size: 14px; /* Reduce button size */
-    }
-
-    .budget-display {
-        font-size: 16px; /* Adjust budget text size */
-    }
-
     .team-and-controls {
         flex-direction: column; /* Stack elements vertically */
         align-items: center; /* Center align content */
@@ -201,29 +175,12 @@ body {
 
     .controls-container {
         order: 1; /* Moves controls to the top */
-        width: 90%; /* Make it take most of the screen width */
+        width: 92vw;
         text-align: center; /* Center align text */
     }
 
-    .team-container {
-        width: 300px; /* Reduce pitch width */
-        height: 360px; /* Reduce pitch height */
-        padding: 10px; /* Adjust padding */
-        flex-shrink: 0; /* Prevents shrinking */
-    }
-
-    /* This ensures the whole page, not just the container, scrolls */
-    .content-wrapper {
-        height: auto; /* Allow it to expand naturally */
-        max-height: none; /* Remove height restriction */
-        overflow-y: visible; /* Allow normal page scrolling */
-    }
-
-    /* Ensure body allows scrolling */
-    html, body {
-        overflow-y: auto; /* Allow the whole page to scroll */
-        min-height: 120vh;
-        padding-top: 5vh;
+    .teamdetail-container {
+        width: 92vw;
     }
 }
 
