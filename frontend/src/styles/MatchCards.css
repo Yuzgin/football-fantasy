@@ -539,16 +539,12 @@
     justify-content: center;
   }
 
+  /* Keep home | time | away on one row on phones; venue still stacks below (.schedule-row__line--fixture). */
   .schedule-row__match-core {
-    grid-template-columns: 1fr;
-    gap: 12px;
     width: 100%;
     max-width: 100%;
-  }
-
-  .schedule-row__match-core .schedule-row__time {
-    order: -1;
-    justify-self: center;
+    column-gap: clamp(4px, 1.5vw, 12px);
+    row-gap: 0;
   }
 
   .schedule-row__line--fixture .schedule-row__location {
@@ -580,13 +576,7 @@
     text-overflow: clip;
   }
 
-  .schedule-row__time {
-    order: -1;
-    justify-self: center;
-  }
-
   .schedule-row__line--result .schedule-row__score {
-    order: -1;
     align-self: center;
   }
 
@@ -597,16 +587,6 @@
     text-align: right;
     width: 100%;
     max-width: 100%;
-  }
-
-  .team-badge-block--schedule-home {
-    justify-content: flex-start;
-    text-align: left;
-  }
-
-  .team-badge-block--schedule-away {
-    justify-content: flex-start;
-    text-align: left;
   }
 }
 

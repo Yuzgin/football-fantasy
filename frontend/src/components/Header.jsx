@@ -159,17 +159,11 @@ const Header = () => {
         <Link to="/mens" style={linkStyle}>
           <button style={buttonStyle}>Men&apos;s</button>
         </Link>
-        <Link to="/womens" style={linkStyle}>
-          <button style={buttonStyle}>Women&apos;s</button>
-        </Link>
         <Link to="/results" style={linkStyle}>
           <button style={buttonStyle}>Results</button>
         </Link>
         <Link to="/compare" style={linkStyle}>
           <button style={buttonStyle}>Compare</button>
-        </Link>
-        <Link to="/LMS" style={linkStyle}>
-          <button style={buttonStyle}>LMS</button>
         </Link>
         {isStaff && (
           <Link to="/admin" style={linkStyle}>
@@ -206,17 +200,11 @@ const Header = () => {
           <Link to="/mens" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Men&apos;s</div>
           </Link>
-          <Link to="/womens" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Women&apos;s</div>
-          </Link>
           <Link to="/results" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Results</div>
           </Link>
           <Link to="/compare" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Compare</div>
-          </Link>
-          <Link to="/LMS" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>LMS</div>
           </Link>
           {isStaff && (
             <Link to="/admin" style={linkStyle} onClick={closeDropdown}>
