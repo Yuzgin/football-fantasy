@@ -4,9 +4,9 @@
     padding: 20px;
   }
 
-  /* Fixtures / results schedule — matches app gold (#e0b507) used elsewhere */
+  /* Fixtures / results: page uses global html gradient (index.css); no solid block behind panel */
   .mens-page--schedule {
-    background-color: #e0b507;
+    background: transparent;
     min-height: calc(100vh - 80px);
   }
 

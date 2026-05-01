@@ -1,19 +1,24 @@
 /* Premier League–style schedule rows + app yellow theme (see Mens.css .mens-page--schedule) */
 
-/* Rounded panel: slightly lighter than page (#e0b507); ~20% larger type inside */
+/* Rounded panel: frosted glass on global gold gradient (blends with page, not a separate flat colour) */
 .schedule-panel {
   --schedule-text-scale: 1.2;
-  background: color-mix(in srgb, #e0b507 68%, #fff 32%);
+  background: rgba(255, 255, 255, 0.26);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-radius: 18px;
   padding: clamp(18px, 3vw, 26px) clamp(16px, 3vw, 28px);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 8px 28px rgba(0, 0, 0, 0.09);
   margin-top: 6px;
 }
 
-@supports not (background: color-mix(in srgb, white, black)) {
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .schedule-panel {
-    background: #e8c83a;
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: none;
   }
 }
 
@@ -448,12 +453,12 @@
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #fff959;
+  color: var(--app-highlight-yellow, #b89818);
   text-transform: lowercase;
   padding: 4px 8px;
   border-radius: 8px;
-  background: rgba(255, 249, 89, 0.12);
-  border: 1px solid rgba(255, 249, 89, 0.35);
+  background: rgba(var(--app-highlight-rgb), 0.14);
+  border: 1px solid rgba(var(--app-highlight-rgb), 0.38);
   flex-shrink: 0;
 }
 
@@ -493,7 +498,7 @@
 
 .match-card .team-badge-block__fallback {
   background: #3d3d3d;
-  color: #fff959;
+  color: var(--app-highlight-yellow, #b89818);
 }
 
 @media (max-width: 540px) {

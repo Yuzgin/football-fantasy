@@ -4,10 +4,6 @@ import '../styles/Table.css';
 const StatsTablePoints = ({ players, point, title }) => {
     const pointLow = point.toLowerCase();
 
-    // Debugging the props passed to the component
-    console.log('Players Data:', players);
-    console.log('Point Field:', pointLow);
-    
     // Sort players and slice to get the top 5
     const top5Players = [...players]
         .sort((a, b) => b[pointLow] - a[pointLow])

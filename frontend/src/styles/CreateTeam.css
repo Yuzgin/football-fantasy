@@ -42,103 +42,206 @@
     flex-wrap: wrap;
 }
 
-/* Styling for the controls container (team name form, budget, submit button) */
+/* Create team / transfers sidebar + team detail card — frosted panel (matches fixtures / auth) */
 .controls-container {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Align content to the left */
-    padding: clamp(8px, 2.5vw, 12px);
-    background-color: #2b2b28; /* Light background for contrast */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border: 2px solid transparent; /* Invisible border */
-    margin-top: 42px; /* Add margin to separate from the header */
+    align-items: stretch;
+    padding: clamp(18px, 3vw, 24px);
+    background: rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 42px;
     width: min(360px, 92vw);
+    box-sizing: border-box;
 }
 
 .teamdetail-container {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    align-items: center; /* Align content to the left */
-    padding: 10px;
-    background-color: #2b2b28; /* Light background for contrast */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    border: 2px solid transparent; /* Invisible border */
-    margin-top: 42px; /* Add margin to separate from the header */
+    align-items: center;
+    padding: clamp(18px, 3vw, 24px);
+    background: rgba(255, 255, 255, 0.32);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 42px;
     width: min(360px, 92vw);
     min-width: 0;
+    box-sizing: border-box;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .controls-container,
+    .teamdetail-container {
+        background: rgba(255, 255, 255, 0.55);
+    }
 }
 
 .teamdetail-container h2 {
-    color: white; /* White text color */
+    color: #1a1a1a;
 }
 
 .controls-container form {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between form elements */
+    gap: 14px;
+    width: 100%;
+    align-items: stretch;
+}
+
+.controls-container label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.55);
+    letter-spacing: 0.02em;
+    margin-bottom: 0;
+}
+
+.controls-container input[type="text"] {
+    padding: 10px 12px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.controls-container input[type="text"]:focus {
+    outline: none;
+    border-color: var(--app-accent-gold, #8a6405);
+    box-shadow: 0 0 0 3px rgba(var(--app-accent-rgb), 0.22);
+}
+
+.controls-container input[type="text"]::placeholder {
+    color: #9ca3af;
+}
+
+.budget-display {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    text-align: center;
 }
 
 .captain-hint {
     margin: 0;
     font-size: 0.88rem;
     line-height: 1.35;
-    color: rgba(255, 255, 255, 0.82);
-    max-width: 280px;
+    color: rgba(0, 0, 0, 0.65);
+    max-width: none;
     text-align: center;
 }
 
 .create-team-error {
     margin: 0;
     font-size: 0.9rem;
-    color: #ff8a80;
-    max-width: 280px;
+    color: #b71c1c;
+    background: rgba(183, 28, 28, 0.08);
+    border: 1px solid rgba(183, 28, 28, 0.2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    max-width: none;
     text-align: center;
 }
 
-/* Styling for the form labels */
-form label {
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-/* Styling for the input fields */
-form input[type="text"] {
-    padding: 8px;
-    width: 100%;
-    max-width: 320px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-}
-
-/* Styling for the budget display */
-.budget-display {
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* Styling for the submit button */
-form button[type="submit"] {
-    padding: 10px 20px;
-    background-color: #4CAF50; /* Green background */
-    color: white; /* White text */
-    border: none;
-    border-radius: 5px;
+.controls-container form button[type="submit"] {
+    padding: 12px 20px;
+    background: linear-gradient(
+        180deg,
+        var(--app-accent-gold-light, #9f7506) 0%,
+        var(--app-accent-gold, #8a6405) 100%
+    );
+    color: #141414;
+    border: 1px solid rgba(140, 105, 0, 0.5);
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 5px; /* Add space above the submit button */
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    margin-top: 4px;
+    transition: filter 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-form button[type="submit"]:disabled {
-    background-color: grey; /* Grey background when disabled */
-    cursor: not-allowed; /* Show not-allowed cursor when disabled */
+.controls-container form button[type="submit"]:hover:not(:disabled) {
+    filter: brightness(1.05);
+    box-shadow: 0 4px 14px rgba(var(--app-accent-rgb), 0.35);
 }
 
-/* Set the background color of the entire page to yellow */
+.controls-container form button[type="submit"]:disabled {
+    background: #e8e8e8;
+    color: #757575;
+    border-color: #cfcfcf;
+    cursor: not-allowed;
+    filter: none;
+    box-shadow: none;
+}
+
+.selected-players {
+    margin-top: 4px;
+    padding: 12px 14px;
+    max-height: 220px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 0.9rem;
+    color: #1a1a1a;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.selected-players > div {
+    margin-top: 10px;
+}
+
+.selected-players > div:first-child {
+    margin-top: 0;
+}
+
+.selected-players strong {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(0, 0, 0, 0.45);
+    margin-bottom: 6px;
+}
+
+.selected-players div div {
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    font-weight: 500;
+}
+
+.selected-players div div:last-child {
+    border-bottom: none;
+}
+
+/* Page background comes from html (index.css); keep body transparent */
 body {
-    background-color: #e0b507;
+    background-color: transparent;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif; /* Optional: Set a consistent font for the page */
@@ -228,7 +331,7 @@ body {
 }
 
 .player-detail-captain-label {
-    color: #e0b507;
+    color: var(--app-accent-gold, #8a6405);
     font-weight: 700;
 }
 
@@ -255,7 +358,7 @@ body {
 
 .player-detail-stat-value {
     font-weight: 700;
-    color: #e0b507;
+    color: var(--app-accent-gold, #8a6405);
     text-align: right;
 }
 
@@ -294,10 +397,10 @@ body {
 }
 
 .player-detail-btn-captain {
-    background: #e0b507;
+    background: var(--app-accent-gold, #8a6405);
     color: #1a1a18;
 }
 
 .player-detail-btn-captain:hover {
-    background: #f5c518;
+    background: var(--app-accent-gold-hover, #ad8208);
 }

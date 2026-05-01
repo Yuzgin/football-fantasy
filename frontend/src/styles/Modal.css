@@ -137,7 +137,7 @@
 }
 
 .modal button:hover {
-  background: #e0b507;
+  background: var(--app-accent-gold, #8a6405);
 }
 
 .modal-divider {

@@ -2,7 +2,7 @@
   max-width: 1100px;
   margin: 0 auto;
   padding: 36px 12px 48px;
-  color: rgba(255, 255, 255, 0.92);
+  color: #1a1a1a;
 }
 
 .players-page h1 {
@@ -12,7 +12,7 @@
 
 .players-page-intro {
   margin: 0 0 20px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(0, 0, 0, 0.58);
   font-size: 0.95rem;
   max-width: 42rem;
 }
@@ -42,7 +42,7 @@
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.5);
   margin-bottom: 6px;
 }
 
@@ -52,23 +52,24 @@
   box-sizing: border-box;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: #1a1a1a;
-  color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  color: #1a1a1a;
   font-size: 1rem;
 }
 
 .players-count {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.5);
   margin-bottom: 10px;
 }
 
 .players-table-wrap {
   overflow-x: auto;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .players-table {
@@ -81,15 +82,15 @@
 .players-table td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .players-table th {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(0, 0, 0, 0.35);
+  color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .players-table tbody tr {
@@ -98,11 +99,11 @@
 }
 
 .players-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .players-table tbody tr:focus-visible {
-  outline: 2px solid #e0b507;
+  outline: 2px solid var(--app-accent-gold, #8a6405);
   outline-offset: -2px;
 }
 
@@ -126,14 +127,15 @@
 .players-empty {
   padding: 28px 16px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .players-error {
   padding: 16px;
-  background: rgba(231, 76, 60, 0.15);
+  background: rgba(231, 76, 60, 0.12);
   border-radius: 8px;
-  color: #ff8a80;
+  color: #b71c1c;
+  border: 1px solid rgba(183, 28, 28, 0.2);
 }
 
 /* Detail modal extensions */

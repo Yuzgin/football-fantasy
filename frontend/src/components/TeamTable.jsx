@@ -10,7 +10,7 @@ const TeamTable = ({ teams }) => {
     };
 
     return (
-        <table className="team-table">
+        <table className="team-table team-table--interactive">
             <thead>
                 <tr>
                     <th style={{ width: '200px' }}>Fantasy League Table</th>
@@ -23,8 +23,7 @@ const TeamTable = ({ teams }) => {
                         key={team.id}
                         onClick={() => handleRowClick(team.id)}
                         style={{
-                            cursor: 'pointer',
-                            ...(index === 0 && { fontWeight: 'bold', fontSize: '18px' }), // Highlight the first row
+                            ...(index === 0 && { fontWeight: 700, fontSize: '1.05rem' }),
                         }}
                     >
                         <td style={index === 0 ? { width: '200px' } : {}}>{team.name}</td>

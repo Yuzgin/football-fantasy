@@ -6,7 +6,7 @@
     gap: 15px;
     background-color: #fff;
     padding: 15px;
-    border: 1px solid #e0b507;
+    border: 1px solid var(--app-accent-gold, #8a6405);
     border-radius: 8px;
     margin-bottom: 20px;
   }
@@ -29,7 +29,7 @@
   }
   
   .player-stat-form select {
-    background-color: #e0b507;
+    background-color: var(--app-accent-gold, #8a6405);
   }
   
   .player-stat-form input::placeholder {

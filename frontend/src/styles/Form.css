@@ -1,77 +1,273 @@
-/* Form.css */
-.form_container {
+/* Auth pages — shared login, register, forgot / reset password */
+
+.auth-page {
+  width: 100%;
+  min-height: calc(100vh - 70px);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: min(420px, 92vw);
-  max-width: 420px;
-  margin: 0 auto; /* use padding-top so fixed header never overlaps */
-  padding: 20px;
+  padding: 32px 20px 48px;
   box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #e3e3e3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Page gradient comes from html (index.css); keep transparent to avoid double layer */
+  background: transparent;
 }
 
-/* Ensure the card is never hidden under the fixed header */
-@supports (padding: max(0px)) {
-  .form_container {
-    margin-top: calc(78px + max(16px, env(safe-area-inset-top)));
-    margin-bottom: 20px;
-  }
+.auth-card,
+.form_container {
+  width: min(420px, 100%);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem 1.75rem 1.75rem;
+  box-sizing: border-box;
+  min-width: 0;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.08);
+  overflow-x: hidden;
 }
 
+.auth-card-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.auth-card h1,
 .form_container h1 {
-  color: black; /* Set the "Login" text color to black */
+  margin: 0 0 0.35rem;
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.auth-card-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #5c5c5c;
+  line-height: 1.45;
 }
 
 .form-error {
   width: 100%;
-  margin: 0 0 8px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  background-color: #ffebee;
-  color: #b71c1c;
-  font-size: 0.95rem;
-  text-align: center;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.form-success {
+  width: 100%;
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.auth-field {
+  margin-bottom: 1.1rem;
+}
+
+.auth-field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #404040;
+  letter-spacing: 0.01em;
 }
 
 .form-input {
   width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.75rem 0.9rem;
+  margin: 0;
+  box-sizing: border-box;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #1a1a1a;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-input:hover {
+  border-color: #cfcfcf;
+  background: #fff;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--app-accent-gold, #8a6405);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(var(--app-accent-rgb), 0.28);
+}
+
+.form-input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .form-button {
   width: 100%;
-  padding: 10px;
-  margin-top: 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #141414;
+  background: linear-gradient(
+    180deg,
+    var(--app-accent-gold-light, #9f7506) 0%,
+    var(--app-accent-gold, #8a6405) 100%
+  );
+  border: 1px solid rgba(140, 105, 0, 0.5);
+  border-radius: 10px;
   cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.register-button {
-  background-color: #008CBA;
+.form-button:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 4px 14px rgba(var(--app-accent-rgb), 0.38);
 }
 
-.form-button:hover {
-  background-color: #66bb6a;
+.form-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.form-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.form-button-secondary {
+  background: #fff;
+  color: #333;
+  border: 1px solid #d4d4d4;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.form-button-secondary:hover:not(:disabled) {
+  filter: none;
+  background: #fafafa;
+  border-color: #b3b3b3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.auth-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eee;
+}
+
+.auth-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  text-decoration: none;
+  padding: 0.35rem 0.25rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.auth-link:hover {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.auth-link-emphasis {
+  font-weight: 600;
+  color: #92400e;
+}
+
+.auth-link-emphasis:hover {
+  color: #78350f;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+a.form-button {
+  line-height: 1.25;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  border-radius: 10px;
+}
+
+a.form-button-secondary {
+  color: #333;
 }
 
 @media (max-width: 768px) {
-  .form_container {
-    width: 92vw;
-    padding: 16px;
+  .auth-page {
+    padding: 24px 12px 40px;
+    align-items: flex-start;
+    padding-top: max(24px, env(safe-area-inset-top));
   }
 
-  .form-input, .form-button {
-    font-size: 0.9em; /* Adjust font size for smaller screens */
+  .auth-card,
+  .form_container {
+    padding: 1.5rem 1.25rem;
+    border-radius: 14px;
+  }
+
+  .auth-card h1,
+  .form_container h1 {
+    font-size: 1.45rem;
+  }
+
+  .form-input,
+  .form-button {
+    font-size: 16px; /* avoid iOS zoom on focus */
   }
 }

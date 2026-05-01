@@ -26,23 +26,17 @@ const Home = () => {
 
   const getPlayersGoals = () => {
     api.get('/api/player-goals/')
-      .then((res) => {
-        console.log("Full players response:", res.data); // Log the entire response
-        return res.data;
-      })
+      .then((res) => res.data)
       .then((data) => setPlayersGoals(data))
       .catch((err) => alert(`Error fetching players: ${err.message}`));
   };
 
   const getPlayersPoints = () => {
     api.get('/api/player-points/')
-      .then((res) => {
-        console.log("Full players response:", res.data); // Log the entire response
-        return res.data;
-      })
+      .then((res) => res.data)
       .then((data) => setPlayersPoints(data))
       .catch((err) => alert(`Error fetching players: ${err.message}`));
-  }
+  };
 
   return (
     <div className="page-container">

@@ -15,7 +15,7 @@
     align-items: center;
     padding: 15px;
     margin-bottom: 10px;
-    background-color: #e0b507;
+    background-color: var(--app-accent-gold, #8a6405);
     border-radius: 8px;
     color: black;
     transition: background-color 0.3s ease;
@@ -42,7 +42,7 @@
   
   .delete-button {
     background-color: black;
-    color: #e0b507;
+    color: var(--app-accent-gold, #8a6405);
     border: none;
     padding: 8px 15px;
     border-radius: 5px;
