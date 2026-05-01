@@ -1,38 +1,78 @@
-import React from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import '../styles/Modal.css';
 
 const PlayerModal = ({ players, isPlayerSelected, handlePlayerSelect, closeModal, position }) => {
-  // Debugging: Log players and position
+  const [searchQuery, setSearchQuery] = useState('');
   const role = position.split('-')[0];
-  console.log("Players:", players);
-  console.log("Position", role);
 
-  // Filter players by the given position
-  const filteredPlayers = players.filter(player => player.position === role);
+  useEffect(() => {
+    setSearchQuery('');
+  }, [position]);
+
+  const filteredPlayers = useMemo(() => {
+    const byPosition = players.filter((player) => player.position === role);
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return byPosition;
+
+    return byPosition.filter((player) => {
+      const name = (player.name || '').toLowerCase();
+      const fullName = (player.full_name || '').toLowerCase();
+      return name.includes(q) || fullName.includes(q);
+    });
+  }, [players, role, searchQuery]);
 
   return (
     <div className="modal">
-      <div className="modal-content">
+      <div className="modal-content player-modal">
         <h2>Select a {role}</h2>
-        <button onClick={closeModal}>Close</button>
-        
-        {/* Divider line below the button */}
-        <div className="modal-divider"></div>
+        <button type="button" onClick={closeModal}>Close</button>
 
-        <div className="player-list">
-          {filteredPlayers.length > 0 ? (
-            filteredPlayers.map((player) => (
-              <div
-                key={player.id}
-                className={`player-item ${isPlayerSelected(player.id) ? 'faded' : ''}`}
-                onClick={() => !isPlayerSelected(player.id) && handlePlayerSelect(player.id)}
-              >
-                {player.name} - £{Number(player.price).toFixed(1)}m
-              </div>
-            ))
-          ) : (
-            <p>No players available for this position</p>
-          )}
+        <div className="modal-divider" />
+
+        <label className="player-modal-search-label" htmlFor="player-modal-search">
+          Search players
+        </label>
+        <input
+          id="player-modal-search"
+          type="search"
+          className="player-modal-search-input"
+          placeholder="Type to filter by display or full name…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoComplete="off"
+        />
+
+        <div className="player-modal-table-wrap">
+          <div className="player-modal-row player-modal-header">
+            <span className="player-modal-col-name">Name</span>
+            <span className="player-modal-col-team">Team</span>
+            <span className="player-modal-col-price">Price</span>
+          </div>
+          <div className="player-modal-body">
+            {filteredPlayers.length > 0 ? (
+              filteredPlayers.map((player) => (
+                <div
+                  key={player.id}
+                  role="button"
+                  tabIndex={0}
+                  className={`player-modal-row player-modal-data-row ${isPlayerSelected(player.id) ? 'faded' : ''}`}
+                  onClick={() => !isPlayerSelected(player.id) && handlePlayerSelect(player.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      if (!isPlayerSelected(player.id)) handlePlayerSelect(player.id);
+                    }
+                  }}
+                >
+                  <span className="player-modal-col-name">{player.name || '—'}</span>
+                  <span className="player-modal-col-team">{player.team || '—'}</span>
+                  <span className="player-modal-col-price">£{Number(player.price ?? 0).toFixed(1)}m</span>
+                </div>
+              ))
+            ) : (
+              <p className="player-modal-empty">No players match this position and search.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

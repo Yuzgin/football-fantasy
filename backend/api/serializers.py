@@ -158,7 +158,7 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = [
-            "id", "name", "position", "points", "price", "team",
+            "id", "name", "full_name", "position", "points", "price", "team",
             "game_stats", "goals", "assists", "clean_sheets", "games_played",
             "points", "yellow_cards", "red_cards", "MOTM", "Pen_Saves"
         ]

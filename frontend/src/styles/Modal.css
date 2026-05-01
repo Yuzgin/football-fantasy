@@ -40,6 +40,80 @@
   pointer-events: none;
 }
 
+/* Player pick modal: search + 3-column table */
+.modal-content.player-modal {
+  text-align: left;
+  min-width: min(520px, 92vw);
+}
+
+.player-modal-search-label {
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.player-modal-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: none;
+  margin-bottom: 12px;
+  font-weight: normal;
+}
+
+.player-modal-table-wrap {
+  width: 100%;
+}
+
+.player-modal-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.player-modal-header {
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+.player-modal-col-price {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.player-modal-body {
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.player-modal-data-row {
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.player-modal-data-row:hover:not(.faded) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.player-modal-data-row.faded {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.player-modal-empty {
+  padding: 16px 10px;
+  margin: 0;
+  font-weight: normal;
+  text-align: center;
+}
+
 .close {
   background : white;
   color: black;
