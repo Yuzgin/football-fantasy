@@ -25,8 +25,12 @@ export function normalizeTeamName(name) {
 export function getTeamBadgeUrl(teamName) {
   const n = normalizeTeamName(teamName);
   if (!n) return null;
+  // In production builds the app may be served from a sub-path. Use BASE_URL (or an override)
+  // so badge URLs resolve correctly across dev + deployment.
+  const rawBase = import.meta?.env?.VITE_BADGE_BASE_URL ?? import.meta?.env?.BASE_URL ?? "/";
+  const base = typeof rawBase === "string" ? rawBase.replace(/\/?$/, "/") : "/";
   for (const { test, file } of RULES) {
-    if (test(n)) return `/badges/${file}`;
+    if (test(n)) return `${base}badges/${file}`;
   }
   return null;
 }
