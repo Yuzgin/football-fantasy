@@ -162,8 +162,8 @@ const Header = () => {
         <Link to="/results" style={linkStyle}>
           <button style={buttonStyle}>Results</button>
         </Link>
-        <Link to="/compare" style={linkStyle}>
-          <button style={buttonStyle}>Compare</button>
+        <Link to="/players" style={linkStyle}>
+          <button style={buttonStyle}>Players</button>
         </Link>
         {isStaff && (
           <Link to="/admin" style={linkStyle}>
@@ -203,8 +203,8 @@ const Header = () => {
           <Link to="/results" style={linkStyle} onClick={closeDropdown}>
             <div style={dropdownItemStyle}>Results</div>
           </Link>
-          <Link to="/compare" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Compare</div>
+          <Link to="/players" style={linkStyle} onClick={closeDropdown}>
+            <div style={dropdownItemStyle}>Players</div>
           </Link>
           {isStaff && (
             <Link to="/admin" style={linkStyle} onClick={closeDropdown}>

@@ -28,7 +28,8 @@ function App() {
             <Route path="/Match" element={<StaffRoute><Pages.Match /></StaffRoute>} />
             <Route path="/TeamTransfers" element={<ProtectedRoute><Pages.TeamTransfers /></ProtectedRoute>} />
             <Route path="/team/:teamId" element={<Pages.OtherTeam />} />
-            <Route path="/Players" element={<StaffRoute><Pages.Players /></StaffRoute>} />
+            <Route path="/players" element={<Pages.Players />} />
+            <Route path="/Players" element={<Navigate to="/players" replace />} />
             <Route path="/login" element={<Pages.Login />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/register" element={<RegisterAndLogout />} />
@@ -39,7 +40,7 @@ function App() {
             <Route path="/admin" element={<StaffRoute><Pages.Admin /></StaffRoute>} />
             <Route path="/forgot-password" element={<Pages.ForgotPassword />} />
             <Route path="/reset-password/:uid/:token" element={<Pages.ResetPassword />} />
-            <Route path="/compare" element={<Pages.ComparePlayers />} />
+            <Route path="/compare" element={<Navigate to="/players" replace />} />
             <Route path="*" element={<Pages.NotFound />} />
           </Routes>
         </div>

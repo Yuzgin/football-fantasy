@@ -1,108 +1,238 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '../api';
-import ViewPlayerList from '../components/ViewPlayerList';
-import CreatePlayerForm from '../components/CreatePlayerForm';
+import PlayerDirectoryDetailModal from '../components/PlayerDirectoryDetailModal';
+import { compareTeams } from '../utils/playerSort';
+import '../styles/Players.css';
 
-const Players = () => {
+const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker'];
+
+const SORT_ALPHABETICAL = 'alphabetical';
+const SORT_TEAM = 'team';
+const SORT_PRICE = 'price';
+
+function alphabeticalCompare(a, b) {
+  const fullA = (a.full_name || '').trim();
+  const fullB = (b.full_name || '').trim();
+  const knownA = (a.name || '').trim();
+  const knownB = (b.name || '').trim();
+  const keyA = fullA || knownA;
+  const keyB = fullB || knownB;
+  const primary = keyA.localeCompare(keyB, undefined, { sensitivity: 'base' });
+  if (primary !== 0) return primary;
+  return knownA.localeCompare(knownB, undefined, { sensitivity: 'base' });
+}
+
+function matchesSearch(player, q) {
+  const name = (player.name || '').toLowerCase();
+  const fullName = (player.full_name || '').toLowerCase();
+  return name.includes(q) || fullName.includes(q);
+}
+
+/** Label for team filter only; values stay as stored (e.g. "1s") so filtering still matches. */
+function langwithTeamFilterLabel(team) {
+  const t = (team || '').trim();
+  if (!t) return '';
+  if (/^langwith\s+/i.test(t)) return t;
+  return `Langwith ${t}`;
+}
+
+export default function Players() {
   const [players, setPlayers] = useState([]);
-  const [position, setPosition] = useState('');
-  const [name, setName] = useState('');
-  const [team, setTeam] = useState('');
-  const [price, setPrice] = useState('');
-  const [playerGameStats, setPlayerGameStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [teamFilter, setTeamFilter] = useState('');
+  const [positionFilter, setPositionFilter] = useState('');
+  const [sortBy, setSortBy] = useState(SORT_ALPHABETICAL);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
 
   useEffect(() => {
-    getPlayers();
-    getPlayerGameStats();
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get('/api/players/');
+        if (cancelled) return;
+        if (Array.isArray(response.data)) {
+          setPlayers(response.data);
+        } else {
+          setPlayers([]);
+          setError('Unexpected response from server.');
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setPlayers([]);
+          setError(e?.message || 'Failed to load players.');
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const getPlayers = () => {
-    api.get('/api/players/')
-      .then((res) => res.data)
-      .then((data) => {
-        setPlayers(data);
-      })
-      .catch((err) => alert(`Error fetching players: ${err.message}`));
-  };
+  const teamOptions = useMemo(() => {
+    const set = new Set();
+    players.forEach((p) => {
+      if (p.team && String(p.team).trim()) set.add(p.team.trim());
+    });
+    return [...set].sort((a, b) => compareTeams(a, b) || a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  }, [players]);
 
-  const getPlayerGameStats = () => {
-    api.get('/api/player-game-stats/')
-      .then((res) => res.data)
-      .then((data) => {
-        setPlayerGameStats(data);
-      })
-      .catch((err) => alert(`Error fetching player game stats: ${err.message}`));
-  };
+  const filteredPlayers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return players.filter((p) => {
+      if (positionFilter && p.position !== positionFilter) return false;
+      if (teamFilter && (p.team || '').trim() !== teamFilter) return false;
+      if (q && !matchesSearch(p, q)) return false;
+      return true;
+    });
+  }, [players, searchQuery, teamFilter, positionFilter]);
 
-  const deletePlayer = (id) => {
-    api.delete(`/api/players/delete/${id}/`)
-      .then((res) => {
-        if (res.status === 204) {
-          alert('Player deleted!');
-          getPlayers();
-        } else {
-          alert('Error deleting player');
-        }
-      })
-      .catch((error) => alert(`Error deleting player: ${error.message}`));
-  };
+  const sortedRows = useMemo(() => {
+    const list = [...filteredPlayers];
+    if (sortBy === SORT_TEAM) {
+      list.sort((a, b) => {
+        const tc = compareTeams(a.team, b.team);
+        if (tc !== 0) return tc;
+        return alphabeticalCompare(a, b);
+      });
+    } else if (sortBy === SORT_PRICE) {
+      list.sort((a, b) => {
+        const pa = Number(a.price ?? 0);
+        const pb = Number(b.price ?? 0);
+        if (pb !== pa) return pb - pa;
+        return alphabeticalCompare(a, b);
+      });
+    } else {
+      list.sort(alphabeticalCompare);
+    }
+    return list;
+  }, [filteredPlayers, sortBy]);
 
-  const createPlayer = (e) => {
-    e.preventDefault();
-    api.post('/api/players/', { position, name, team, price })
-      .then((res) => {
-        if (res.status === 201) {
-          alert('Player created!');
-          getPlayers();
-        } else {
-          alert('Failed to create player.');
-        }
-      })
-      .catch((err) => alert(`Error creating player: ${err.message}`));
-  };
+  const openDetail = useCallback((player) => {
+    setSelectedPlayer(player);
+  }, []);
 
-  const getTotalStats = (playerId) => {
-    const stats = playerGameStats.filter((stat) => stat.player === playerId);
-    const totalStats = stats.reduce(
-      (acc, stat) => {
-        acc.goals += stat.goals;
-        acc.assists += stat.assists;
-        acc.yellow_cards += stat.yellow_cards;
-        acc.red_cards += stat.red_cards;
-        acc.clean_sheets += stat.clean_sheets;
-        acc.points += stat.points;
-        return acc;
-      },
-      { goals: 0, assists: 0, yellow_cards: 0, red_cards: 0, clean_sheets: 0, points: 0 }
-    );
-    return totalStats;
-  };
+  const closeDetail = useCallback(() => {
+    setSelectedPlayer(null);
+  }, []);
 
   return (
-    <div style={{ display: 'flex', gap: '20px', height: '100vh', overflow: 'hidden' }}>
-      <div style={{ flex: 2, overflowY: 'auto' }}>
-        <ViewPlayerList
-          players={players}
-          playerGameStats={playerGameStats}
-          getTotalStats={getTotalStats}
-          deletePlayer={deletePlayer}
-        />
+    <div className="players-page">
+
+      <div className="players-toolbar">
+        <div className="players-field">
+          <label htmlFor="players-search">Search</label>
+          <input
+            id="players-search"
+            type="search"
+            placeholder="Name or full name…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
+          />
+        </div>
+        <div className="players-field">
+          <label htmlFor="players-team">Team</label>
+          <select
+            id="players-team"
+            value={teamFilter}
+            onChange={(e) => setTeamFilter(e.target.value)}
+          >
+            <option value="">All teams</option>
+            {teamOptions.map((t) => (
+              <option key={t} value={t}>
+                {langwithTeamFilterLabel(t)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="players-field">
+          <label htmlFor="players-position">Position</label>
+          <select
+            id="players-position"
+            value={positionFilter}
+            onChange={(e) => setPositionFilter(e.target.value)}
+          >
+            <option value="">All positions</option>
+            {POSITIONS.map((pos) => (
+              <option key={pos} value={pos}>
+                {pos}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="players-field">
+          <label htmlFor="players-sort">Sort by</label>
+          <select
+            id="players-sort"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value={SORT_ALPHABETICAL}>Alphabetical (full name)</option>
+            <option value={SORT_TEAM}>Team</option>
+            <option value={SORT_PRICE}>Price (high to low)</option>
+          </select>
+        </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
-        <CreatePlayerForm
-          name={name}
-          setName={setName}
-          position={position}
-          setPosition={setPosition}
-          team={team}
-          setTeam={setTeam}
-          price={price}
-          setPrice={setPrice}
-          createPlayer={createPlayer}
-        />
-      </div>
+
+      {error ? <p className="players-error">{error}</p> : null}
+
+      {loading ? (
+        <p className="players-empty">Loading players…</p>
+      ) : (
+        <>
+          <p className="players-count">
+            Showing {sortedRows.length} of {players.length} players
+          </p>
+          {sortedRows.length === 0 ? (
+            <p className="players-empty">No players match your filters.</p>
+          ) : (
+            <div className="players-table-wrap">
+              <table className="players-table">
+                <thead>
+                  <tr>
+                    <th className="players-col-full-name">Full name</th>
+                    <th className="players-col-known-as">Known as</th>
+                    <th>Team</th>
+                    <th className="players-col-position">Position</th>
+                    <th className="players-col-price">Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedRows.map((p) => (
+                    <tr
+                      key={p.id}
+                      tabIndex={0}
+                      onClick={() => openDetail(p)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          openDetail(p);
+                        }
+                      }}
+                    >
+                      <td className="players-col-full-name">{p.full_name?.trim() || '—'}</td>
+                      <td className="players-col-known-as">{p.name?.trim() || '—'}</td>
+                      <td>{p.team || '—'}</td>
+                      <td className="players-col-position">{p.position || '—'}</td>
+                      <td className="players-col-price">£{Number(p.price ?? 0).toFixed(1)}m</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+
+      {selectedPlayer ? (
+        <PlayerDirectoryDetailModal player={selectedPlayer} onClose={closeDetail} />
+      ) : null}
     </div>
   );
-};
-
-export default Players;
+}

@@ -35,7 +35,7 @@ class PlayerListView(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Player.objects.all()
+        return Player.objects.all().prefetch_related('game_stats__match')
 
 
 class PlayerPointsListView(generics.ListAPIView):
