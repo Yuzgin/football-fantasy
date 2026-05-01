@@ -1,0 +1,24 @@
+.other-team--cup-not-started {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.other-team-cup-message {
+  margin: 0;
+  max-width: 28rem;
+  padding: 20px 22px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #111;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}

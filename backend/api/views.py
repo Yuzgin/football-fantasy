@@ -409,7 +409,16 @@ class TeamSnapshotViewSet(viewsets.ReadOnlyModelViewSet):
 
         if not current_gameweek:
             return Response({"detail": "No current GameWeek found."}, status=404)
-        
+
+        if current_gameweek.week == 0:
+            return Response(
+                {
+                    "cup_not_started": True,
+                    "detail": "Check back once the cup has started.",
+                },
+                status=200,
+            )
+
         # Retrieve the TeamSnapshot for the team and current GameWeek with optimized queries
         snapshot = TeamSnapshot.objects.select_related(
             'team', 'game_week', 'captain'

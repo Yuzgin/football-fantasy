@@ -19,6 +19,7 @@ const OtherTeam = () => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [currentWeek, setCurrentWeek] = useState(null);
   const [maxWeek, setMaxWeek] = useState(null);
+  const [cupNotStarted, setCupNotStarted] = useState(false);
 
   useEffect(() => {
     fetchMostRecentTeamSnapshot();
@@ -26,10 +27,24 @@ const OtherTeam = () => {
 
   const fetchMostRecentTeamSnapshot = async () => {
     try {
+      setCupNotStarted(false);
       // Only fetch team snapshot - no need for separate players call
       const response = await api.get(`/api/team-snapshots/most_recent/?team_id=${teamId}`);
-      const teamSnapshotData = response.data;
-      
+      const data = response.data;
+
+      if (data.cup_not_started) {
+        setCupNotStarted(true);
+        setTeamSnapshot(null);
+        setPlayers([]);
+        setSelectedPlayers({});
+        setTeamValue(0);
+        setCurrentWeek(null);
+        setMaxWeek(null);
+        return;
+      }
+
+      const teamSnapshotData = data;
+
       setTeamSnapshot(teamSnapshotData);
       // Use players from team snapshot instead of separate API call
       setPlayers(teamSnapshotData.players);
@@ -42,6 +57,7 @@ const OtherTeam = () => {
       setTeamValue(teamSnapshotData.players.reduce((total, player) => total + Number(player.price), 0));
     } catch (error) {
       console.error('Error fetching team snapshot:', error);
+      setCupNotStarted(false);
       setTeamSnapshot(null);
     } finally {
       setLoading(false);
@@ -122,6 +138,17 @@ const OtherTeam = () => {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (cupNotStarted) {
+    return (
+      <div>
+        <Header />
+        <div className="content-wrapper other-team--cup-not-started">
+          <p className="other-team-cup-message">Check back once the cup has started</p>
+        </div>
+      </div>
+    );
   }
 
   if (!teamSnapshot) {
