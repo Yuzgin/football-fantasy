@@ -1,9 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/YellowBadge.png';
-import { jwtDecode } from "jwt-decode";
-import { ACCESS_TOKEN } from "../constants";
+import { jwtDecode } from 'jwt-decode';
+import { ACCESS_TOKEN } from '../constants';
 import { checkIsStaff } from '../utils/auth';
+import '../styles/Header.css';
+
+const NAV_ROUTES = [
+  { to: '/', label: 'Home' },
+  { to: '/team', label: 'Fantasy' },
+  { to: '/mens', label: "Men's" },
+  { to: '/results', label: 'Results' },
+  { to: '/players', label: 'Players' },
+];
 
 const Header = () => {
   const navigate = useNavigate();
@@ -19,6 +28,20 @@ const Header = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (!showDropdown) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setShowDropdown(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [showDropdown]);
+
   const checkAuthStatus = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
@@ -27,7 +50,6 @@ const Header = () => {
       const loggedIn = now < decoded.exp;
       setIsLoggedIn(loggedIn);
 
-      // Check if user is staff only if logged in
       if (loggedIn) {
         const staffStatus = await checkIsStaff();
         setIsStaff(staffStatus);
@@ -42,10 +64,9 @@ const Header = () => {
 
   const handleResize = () => {
     setIsMobileView(window.innerWidth < 768);
-  };
-
-  const toggleDropdown = () => {
-    setShowDropdown((prev) => !prev);
+    if (window.innerWidth >= 768) {
+      setShowDropdown(false);
+    }
   };
 
   const closeDropdown = () => {
@@ -54,165 +75,91 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem(ACCESS_TOKEN);
-    closeDropdown(); // Close dropdown when logging out
+    closeDropdown();
     navigate('/login');
   };
 
-  const headerStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    padding: isMobileView ? '8px 12px' : '10px 20px',
-    backgroundColor: '#333',
-    color: '#FFF',
-    width: '100%',
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    zIndex: '1000',
-    boxSizing: 'border-box',
-  };
+  const desktopAuth = isLoggedIn ? (
+    <button type="button" className="app-header__nav-item" onClick={handleLogout}>
+      Logout
+    </button>
+  ) : (
+    <Link to="/login" className="app-header__link">
+      <span className="app-header__nav-item">Login</span>
+    </Link>
+  );
 
-  const leftSectionStyle = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  };
-
-  const navStyle = {
-    display: isMobileView ? 'none' : 'flex',
-    alignItems: 'center',
-    gap: '15px',
-    marginLeft: '10px',
-  };
-
-  const logoStyle = {
-    height: isMobileView ? '46px' : '70px',
-    cursor: 'pointer',
-  };
-
-  const buttonStyle = {
-    padding: isMobileView ? '8px 10px' : '10px 20px',
-    backgroundColor: 'transparent',
-    color: '#FFF',
-    border: 'none',
-    cursor: 'pointer',
-    textTransform: 'uppercase',
-    fontSize: isMobileView ? '0.85rem' : '1rem',
-  };
-
-  const linkStyle = {
-    textDecoration: 'none',
-    color: 'inherit',
-  };
-
-  const dropdownMenuStyle = {
-    position: 'absolute',
-    top: '100%',
-    left: '1.5em',
-    backgroundColor: '#444',
-    borderRadius: '0.5em',
-    padding: '1em',
-    width: isMobileView ? '88vw' : '15%',
-    minWidth: isMobileView ? 'auto' : '180px',
-    maxWidth: isMobileView ? '420px' : '300px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
-    fontSize: '1.1em',
-  };
-
-  const dropdownItemStyle = {
-    padding: '0.8em 1em',
-    textAlign: 'left',
-    textDecoration: 'none',
-    color: '#FFF',
-    backgroundColor: '#333',
-    borderBottom: '1px solid #555',
-    cursor: 'pointer',
-  };
-
-  const mobileToggleStyle = {
-    display: isMobileView ? 'block' : 'none',
-    padding: '10px',
-    backgroundColor: 'transparent',
-    color: '#FFF',
-    border: 'none',
-    cursor: 'pointer',
-  };
+  const mobileAuth = isLoggedIn ? (
+    <button type="button" className="app-header__mobile-row" onClick={handleLogout}>
+      Logout
+    </button>
+  ) : (
+    <Link to="/login" className="app-header__mobile-link" onClick={closeDropdown}>
+      <div className="app-header__mobile-row">Login</div>
+    </Link>
+  );
 
   return (
-    <header style={headerStyle}>
-      <div style={leftSectionStyle}>
-        <Link to="/">
-          <img src={logo} alt="Logo" style={logoStyle} />
+    <header className="app-header">
+      <div className="app-header__inner">
+        <Link to="/" className="app-header__logo-link">
+          <img src={logo} alt="Home" className="app-header__logo" width={120} height={60} />
         </Link>
-        <button style={mobileToggleStyle} onClick={toggleDropdown}>
-          ☰
+
+        <nav className="app-header__nav-desktop" aria-label="Main navigation">
+          {NAV_ROUTES.map(({ to, label }) => (
+            <Link key={to} to={to} className="app-header__link">
+              <span className="app-header__nav-item">{label}</span>
+            </Link>
+          ))}
+          {isStaff ? (
+            <Link to="/admin" className="app-header__link">
+              <span className="app-header__nav-item">Admin</span>
+            </Link>
+          ) : null}
+          {desktopAuth}
+        </nav>
+
+        <button
+          type="button"
+          className="app-header__menu-toggle"
+          onClick={() => setShowDropdown((v) => !v)}
+          aria-expanded={showDropdown}
+          aria-controls="app-header-mobile-menu"
+          aria-label={showDropdown ? 'Close menu' : 'Open menu'}
+        >
+          {showDropdown ? '×' : '☰'}
         </button>
       </div>
-      <nav style={navStyle}>
-        <Link to="/" style={linkStyle}>
-          <button style={buttonStyle}>Home</button>
-        </Link>
-        <Link to="/team" style={linkStyle}>
-          <button style={buttonStyle}>Fantasy</button>
-        </Link>
-        <Link to="/mens" style={linkStyle}>
-          <button style={buttonStyle}>Men&apos;s</button>
-        </Link>
-        <Link to="/results" style={linkStyle}>
-          <button style={buttonStyle}>Results</button>
-        </Link>
-        <Link to="/players" style={linkStyle}>
-          <button style={buttonStyle}>Players</button>
-        </Link>
-        {isStaff && (
-          <Link to="/admin" style={linkStyle}>
-            <button style={buttonStyle}>Admin</button>
-          </Link>
-        )}
-        {isLoggedIn ? (
-          <button style={buttonStyle} onClick={handleLogout}>
-            Logout
-          </button>
-        ) : (
-          <Link to="/login" style={linkStyle}>
-            <button style={buttonStyle}>Login</button>
-          </Link>
-        )}
-      </nav>
-      {showDropdown && (
-        <div style={dropdownMenuStyle}>
-          <Link to="/" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Home</div>
-          </Link>
-          {isLoggedIn ? (
-            <div style={dropdownItemStyle} onClick={handleLogout}>
-              Logout
-            </div>
-          ) : (
-            <Link to="/login" style={linkStyle} onClick={closeDropdown}>
-              <div style={dropdownItemStyle}>Login</div>
-            </Link>
-          )}
-          <Link to="/team" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Fantasy</div>
-          </Link>
-          <Link to="/mens" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Men&apos;s</div>
-          </Link>
-          <Link to="/results" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Results</div>
-          </Link>
-          <Link to="/players" style={linkStyle} onClick={closeDropdown}>
-            <div style={dropdownItemStyle}>Players</div>
-          </Link>
-          {isStaff && (
-            <Link to="/admin" style={linkStyle} onClick={closeDropdown}>
-              <div style={dropdownItemStyle}>Admin</div>
-            </Link>
-          )}
+
+      {showDropdown && isMobileView ? (
+        <div
+          className="app-header__mobile-root app-header__mobile-root--open"
+          id="app-header-mobile-menu"
+        >
+          <button
+            type="button"
+            className="app-header__scrim"
+            onClick={closeDropdown}
+            aria-label="Close menu"
+          />
+          <div className="app-header__sheet" role="dialog" aria-modal="true" aria-label="Site menu">
+            <nav className="app-header__nav-mobile" aria-label="Main navigation">
+              {NAV_ROUTES.map(({ to, label }) => (
+                <Link key={to} to={to} className="app-header__mobile-link" onClick={closeDropdown}>
+                  <div className="app-header__mobile-row">{label}</div>
+                </Link>
+              ))}
+              {isStaff ? (
+                <Link to="/admin" className="app-header__mobile-link" onClick={closeDropdown}>
+                  <div className="app-header__mobile-row">Admin</div>
+                </Link>
+              ) : null}
+              {mobileAuth}
+            </nav>
+          </div>
         </div>
-      )}
+      ) : null}
     </header>
   );
 };
