@@ -155,6 +155,8 @@ const OtherTeam = () => {
     return <div>Team snapshot not found for the most recent game week.</div>;
   }
 
+  const captainId = teamSnapshot.captain?.id ?? null;
+
   return (
     <div>
       <Header />
@@ -170,6 +172,7 @@ const OtherTeam = () => {
                   selectedPlayer={teamSnapshot.players.find((p) => p.id === selectedPlayers.Goalkeeper[0])}
                   gameWeekId={teamSnapshot.game_week.id}
                   openPlayerStats={openPlayerStats}
+                  isCaptain={captainId != null && selectedPlayers.Goalkeeper[0] === captainId}
                 />
               </div>
             )}
@@ -183,6 +186,7 @@ const OtherTeam = () => {
                     selectedPlayer={teamSnapshot.players.find(p => p.id === defenderId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
+                    isCaptain={captainId != null && defenderId === captainId}
                   />
                 ))}
               </div>
@@ -197,6 +201,7 @@ const OtherTeam = () => {
                     selectedPlayer={teamSnapshot.players.find(p => p.id === midfielderId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
+                    isCaptain={captainId != null && midfielderId === captainId}
                   />
                 ))}
               </div>
@@ -211,6 +216,7 @@ const OtherTeam = () => {
                     selectedPlayer={teamSnapshot.players.find(p => p.id === attackerId)}
                     gameWeekId={teamSnapshot.game_week.id}
                     openPlayerStats={openPlayerStats}
+                    isCaptain={captainId != null && attackerId === captainId}
                   />
                 ))}
               </div>

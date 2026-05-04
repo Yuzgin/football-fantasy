@@ -6,6 +6,7 @@ const PlayerViewPoints = ({
   selectedPlayer,
   openPlayerStats,
   gameWeekId, // We now pass the gameWeekId instead of start and end dates
+  isCaptain = false,
 }) => {
   const handleClick = () => {
     openPlayerStats(selectedPlayer);
@@ -20,6 +21,11 @@ const PlayerViewPoints = ({
   return (
     <div className="team-player">
       <div className="player-card">
+        {isCaptain && selectedPlayer ? (
+          <span className="player-card-captain-badge" title="Captain" aria-label="Captain">
+            C
+          </span>
+        ) : null}
         <img
           className="player-card-image"
           src={selectedImage}
