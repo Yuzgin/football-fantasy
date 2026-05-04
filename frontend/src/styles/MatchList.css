@@ -3,6 +3,13 @@
 .match-list-container {
     margin: 20px 0;
   }
+
+  .match-list-container__title {
+    margin: 0 0 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #141414;
+  }
   
   .match-list {
     list-style: none;

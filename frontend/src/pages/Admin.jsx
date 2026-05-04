@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../api';
 import ViewPlayerList from '../components/ViewPlayerList';
 import CreatePlayerForm from '../components/CreatePlayerForm';
 import MatchList from '../components/MatchList';
 import CreateMatchForm from '../components/CreateMatchForm';
-import PlayerStatForm from '../components/PlayerStatForm';
+import { validateMatchBeforeCreate } from '../utils/matchLangwithValidation';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('players');
@@ -32,6 +32,15 @@ const Admin = () => {
   const [playersStats, setPlayersStats] = useState([
     { player: '', goals: 0, assists: 0, yellow_cards: 0, red_cards: 0, clean_sheets: 0, points: 0, MOTM: 0, Pen_Saves: 0 }
   ]);
+
+  const recentTeamNames = useMemo(() => {
+    const names = new Set();
+    for (const m of matches.slice(0, 40)) {
+      if (m.team1) names.add(m.team1);
+      if (m.team2) names.add(m.team2);
+    }
+    return [...names];
+  }, [matches]);
 
   useEffect(() => {
     fetchAllData();
@@ -92,18 +101,32 @@ const Admin = () => {
   const createMatch = (e) => {
     e.preventDefault();
     const matchData = { ...matchForm };
-    const formattedPlayerStats = playersStats.map(stat => ({
-      ...stat,
-      goals: parseInt(stat.goals),
-      assists: parseInt(stat.assists),
-      yellow_cards: parseInt(stat.yellow_cards),
-      red_cards: parseInt(stat.red_cards),
-      clean_sheets: parseInt(stat.clean_sheets),
-      MOTM: parseInt(stat.MOTM),
-      Pen_Saves: parseInt(stat.Pen_Saves),
-      points: parseInt(stat.points),
-      player: parseInt(stat.player)
-    }));
+    const preCheck = validateMatchBeforeCreate({
+      team1: matchForm.team1,
+      team2: matchForm.team2,
+      team1_score: matchForm.team1_score,
+      team2_score: matchForm.team2_score,
+      playersStats,
+    });
+    if (!preCheck.ok) {
+      alert(preCheck.error);
+      return;
+    }
+
+    const formattedPlayerStats = playersStats
+      .filter((stat) => stat.player !== '' && stat.player != null)
+      .map((stat) => ({
+        ...stat,
+        goals: parseInt(stat.goals, 10) || 0,
+        assists: parseInt(stat.assists, 10) || 0,
+        yellow_cards: parseInt(stat.yellow_cards, 10) || 0,
+        red_cards: parseInt(stat.red_cards, 10) || 0,
+        clean_sheets: parseInt(stat.clean_sheets, 10) || 0,
+        MOTM: parseInt(stat.MOTM, 10) || 0,
+        Pen_Saves: parseInt(stat.Pen_Saves, 10) || 0,
+        points: parseInt(stat.points, 10) || 0,
+        player: parseInt(stat.player, 10),
+      }));
 
     api.post('/api/matches/', { ...matchData, players_stats: formattedPlayerStats })
       .then(() => {
@@ -313,7 +336,9 @@ const Admin = () => {
                     players={players}
                     handlePlayerStatChange={handlePlayerStatChange}
                     addPlayerStat={addPlayerStat}
+                    removePlayerStat={removePlayerStat}
                     createMatch={createMatch}
+                    recentTeamNames={recentTeamNames}
                   />
                 </div>
               </div>

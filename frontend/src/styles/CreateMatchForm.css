@@ -1,41 +1,140 @@
-.create-match-form {
-  padding: 20px;
-  background-color: var(--app-accent-gold, #8a6405);
-  border-radius: 10px;
-  max-width: 90%; /* Adjust width for responsiveness */
-  margin: 20px auto;
-  color: black;
+.create-match-card {
+  max-width: min(960px, 100%);
+  margin: 0 auto 2rem;
+  padding: 1.5rem 1.35rem 1.65rem;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 12px 40px rgba(0, 0, 0, 0.08);
 }
 
-.create-match-form input {
-  display: block;
-  margin-bottom: 10px;
-  padding: 8px;
-  width: 100%; /* Use 100% width */
-  background-color: #fff;
-  border: 1px solid black;
+.create-match-card__title {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
 }
 
-.create-match-form h3 {
-  color: black;
+.create-match-card__banner {
+  margin: 0 0 1rem;
 }
 
-button {
-  margin-top: 10px;
-  background-color: black;
-  color: var(--app-accent-gold, #8a6405);
-  border: none;
-  padding: 10px;
+.create-match-form__grid {
+  display: grid;
+  gap: 1rem 1.25rem;
+}
+
+.create-match-form__grid--teams {
+  grid-template-columns: 1fr 1fr;
+}
+
+.create-match-form__grid--scores {
+  grid-template-columns: 1fr 1fr;
+}
+
+.create-match-form__scores-block {
+  margin-top: 0.25rem;
+}
+
+.create-match-form__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.create-match-form__chip {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #333;
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  border-radius: 999px;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
-button:hover {
-  background-color: white;
-  color: black;
+.create-match-form__chip:hover {
+  background: #fff;
+  border-color: rgba(var(--app-accent-rgb), 0.45);
 }
 
-@media (max-width: 768px) {
-  .create-match-form {
-    padding: 10px;
+.create-match-form__datetime-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.create-match-form__datetime-field {
+  flex: 1 1 220px;
+  margin-bottom: 0;
+  min-width: 0;
+}
+
+.create-match-form__now-btn {
+  flex: 0 0 auto;
+  width: auto;
+  padding: 0.75rem 1.1rem;
+  margin-bottom: 0.05rem;
+}
+
+.create-match-form__stats-head {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eee;
+}
+
+.create-match-form__stats-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.create-match-form__stats-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #5c5c5c;
+  line-height: 1.45;
+}
+
+.create-match-form__stat-rows {
+  margin-top: 1rem;
+}
+
+.create-match-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.35rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eee;
+}
+
+.create-match-form__actions .form-button,
+.create-match-form__actions .form-button-secondary {
+  width: auto;
+  min-width: min(160px, 100%);
+}
+
+@media (max-width: 640px) {
+  .create-match-form__grid--teams,
+  .create-match-form__grid--scores {
+    grid-template-columns: 1fr;
+  }
+
+  .create-match-card {
+    padding: 1.25rem 1rem 1.4rem;
+    border-radius: 14px;
   }
 }

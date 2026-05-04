@@ -1,48 +1,180 @@
-/* PlayerStatForm.css */
-
 .player-stat-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    background-color: #fff;
-    padding: 15px;
-    border: 1px solid var(--app-accent-gold, #8a6405);
-    border-radius: 8px;
-    margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.65rem;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.player-stat-form__player {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.player-stat-form__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #404040;
+}
+
+.player-stat-form__combobox {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.player-stat-form__search {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.player-stat-form__dropdown {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  max-height: min(280px, 45vh);
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.06),
+    0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.player-stat-form__dropdown-item {
+  margin: 0;
+  padding: 0;
+}
+
+.player-stat-form__dropdown-item--action {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.player-stat-form__dropdown-btn {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  font-size: 0.9375rem;
+  color: #1a1a1a;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.player-stat-form__dropdown-btn:hover,
+.player-stat-form__dropdown-btn:focus-visible {
+  background: rgba(var(--app-accent-rgb), 0.12);
+  outline: none;
+}
+
+.player-stat-form__dropdown-item--action .player-stat-form__dropdown-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #57534e;
+}
+
+.player-stat-form__dropdown-empty {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  color: #71717a;
+}
+
+.player-stat-form__nums {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.65rem;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.player-stat-form__mini {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.player-stat-form__mini-key {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #71717a;
+  letter-spacing: 0.04em;
+}
+
+.player-stat-form__num {
+  width: 3.25rem;
+  min-width: 3rem;
+  padding: 0.5rem 0.35rem;
+  text-align: center;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.player-stat-form__num::-webkit-outer-spin-button,
+.player-stat-form__num::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.player-stat-form__num[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.player-stat-form__remove {
+  justify-self: start;
+  width: auto;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.player-stat-form__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 720px) {
+  .player-stat-form {
+    grid-template-columns: minmax(200px, 1.2fr) minmax(0, 2fr) minmax(0, 300px) auto;
+    gap: 0.75rem 1rem;
+    align-items: end;
   }
-  
-  .player-stat-form label {
-    display: flex;
-    flex-direction: column;
-    font-weight: bold;
-    color: black;
+
+  .player-stat-form__player {
+    grid-column: 1 / 3;
   }
-  
-  .player-stat-form select, 
-  .player-stat-form input {
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-    background-color: #fff;
-    color: black;
+
+  .player-stat-form__nums {
+    grid-column: 3;
   }
-  
-  .player-stat-form select {
-    background-color: var(--app-accent-gold, #8a6405);
+
+  .player-stat-form__remove {
+    grid-column: 4;
+    align-self: end;
+    justify-self: end;
   }
-  
-  .player-stat-form input::placeholder {
-    color: #888;
-  }
-  
-  .player-stat-form input[type="number"] {
-    -moz-appearance: textfield;
-  }
-  
-  .player-stat-form input[type="number"]::-webkit-outer-spin-button,
-  .player-stat-form input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  
+}

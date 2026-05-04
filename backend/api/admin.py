@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from api.models import (
     CustomUser,
     Player,
@@ -21,10 +22,38 @@ class PlayerAdmin(admin.ModelAdmin):
         'goals',
         'assists',
         'games_played',
+        'pick_percentage',
     )
     ordering = ('-points',)            # sort by points descending
     search_fields = ['name']   # handy for finding specific players
+    readonly_fields = ('pick_percentage',)
     actions = ['recalculate_player_totals_action']
+
+    def get_queryset(self, request):
+        """Annotate pick counts so the changelist does not N+1 on Team M2M."""
+        self._fantasy_team_total = Team.objects.count()
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(_fantasy_teams_with_player=Count('team_players', distinct=True))
+        )
+
+    def pick_percentage(self, obj):
+        """Share of fantasy teams (Team rows) whose squad includes this player."""
+        total = getattr(self, '_fantasy_team_total', None)
+        if total is None:
+            total = Team.objects.count()
+        picked = getattr(obj, '_fantasy_teams_with_player', None)
+        if picked is None and getattr(obj, 'pk', None):
+            picked = obj.team_players.count()
+        picked = picked or 0
+        if total == 0:
+            return '— (no teams yet)'
+        pct = 100.0 * picked / total
+        return f'{pct:.1f}% ({picked} of {total} teams)'
+
+    pick_percentage.short_description = '% of teams picked'
+    pick_percentage.admin_order_by = '_fantasy_teams_with_player'
     
     def recalculate_player_totals_action(self, request, queryset):
         """Admin action to recalculate player totals"""

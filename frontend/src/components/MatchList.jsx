@@ -1,10 +1,9 @@
-import React from 'react';
 import '../styles/MatchList.css';
 
-const MatchList = ({ matches, deleteMatch }) => {
+const MatchList = ({ matches, deleteMatch, showHeading = true }) => {
   return (
     <div className="match-list-container">
-      <h2>Matches</h2>
+      {showHeading ? <h2 className="match-list-container__title">Matches</h2> : null}
       <ul className="match-list">
         {matches.map((match) => (
           <li key={match.id} className="match-item">
