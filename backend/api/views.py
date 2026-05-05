@@ -16,6 +16,9 @@ from django.utils.timezone import now
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
 from django.db.models import Sum, Avg, Max
+from django.db import transaction
+from rest_framework.views import APIView
+from .permissions import IsStaffUser
 
 
 
@@ -549,4 +552,121 @@ class ResultsListView(generics.ListAPIView):
         if past_only:
             return Match.objects.filter(date__lt=today).order_by('-date')[:8]  # Most recent past matches
         return Match.objects.all().order_by('-date')  # Most recent matches first
+
+
+def _get_current_started_gameweek():
+    """
+    Current gameweek that includes today; lowest week number wins if ranges overlap.
+    Excludes week=0 (cup not started).
+    """
+    today = timezone.now().date()
+
+    gw = (
+        GameWeek.objects.filter(start_date__lte=today, end_date__gte=today)
+        .exclude(week=0)
+        .order_by("week", "start_date")
+        .first()
+    )
+    return gw
+
+
+class AdminMissingSnapshotsPreview(APIView):
+    permission_classes = [IsStaffUser]
+
+    def get(self, request):
+        current_gw = _get_current_started_gameweek()
+        if not current_gw:
+            return Response({"detail": "No current GameWeek found."}, status=404)
+
+        missing = (
+            Team.objects.exclude(snapshots__game_week=current_gw)
+            .select_related("user")
+            .order_by("id")
+        )
+
+        affected = [
+            {
+                "team_id": t.id,
+                "team_name": t.name,
+                "user_email": getattr(t.user, "email", None),
+            }
+            for t in missing
+        ]
+
+        return Response(
+            {
+                "game_week_id": current_gw.id,
+                "game_week": int(current_gw.week),
+                "affected_count": len(affected),
+                "affected_teams": affected,
+            },
+            status=200,
+        )
+
+
+class AdminBackfillMissingSnapshots(APIView):
+    permission_classes = [IsStaffUser]
+
+    def post(self, request):
+        current_gw = _get_current_started_gameweek()
+        if not current_gw:
+            return Response({"detail": "No current GameWeek found."}, status=404)
+
+        teams_missing = (
+            Team.objects.exclude(snapshots__game_week=current_gw)
+            .select_related("user")
+            .prefetch_related("players")
+            .order_by("id")
+        )
+
+        if not teams_missing.exists():
+            return Response(
+                {
+                    "game_week_id": current_gw.id,
+                    "game_week": int(current_gw.week),
+                    "created_count": 0,
+                    "created": [],
+                    "detail": "No teams missing a snapshot for the current gameweek.",
+                },
+                status=200,
+            )
+
+        created = []
+        with transaction.atomic():
+            for team in teams_missing:
+                snapshot = TeamSnapshot.objects.create(
+                    team=team,
+                    game_week=current_gw,
+                    captain=team.captain,
+                )
+                snapshot.players.set(team.players.all())
+
+                weekly_points = snapshot.calculate_weekly_points()
+                snapshot.weekly_points = weekly_points
+                snapshot.save(update_fields=["weekly_points"])
+
+                # Recalculate team total points across all snapshots (including the new one)
+                team.total_points = sum(s.weekly_points for s in team.snapshots.all())
+                team.save(update_fields=["total_points"])
+
+                created.append(
+                    {
+                        "team_id": team.id,
+                        "team_name": team.name,
+                        "user_email": getattr(team.user, "email", None),
+                        "snapshot_id": snapshot.id,
+                        "weekly_points": weekly_points,
+                        "new_total_points": team.total_points,
+                    }
+                )
+
+        return Response(
+            {
+                "game_week_id": current_gw.id,
+                "game_week": int(current_gw.week),
+                "created_count": len(created),
+                "created": created,
+            },
+            status=201,
+        )
 

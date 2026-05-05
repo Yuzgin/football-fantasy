@@ -5,12 +5,14 @@ import CreatePlayerForm from '../components/CreatePlayerForm';
 import MatchList from '../components/MatchList';
 import CreateMatchForm from '../components/CreateMatchForm';
 import { validateMatchBeforeCreate } from '../utils/matchLangwithValidation';
+import '../styles/Admin.css';
 
 const Admin = () => {
   const [activeTab, setActiveTab] = useState('players');
   const [players, setPlayers] = useState([]);
   const [matches, setMatches] = useState([]);
   const [playerGameStats, setPlayerGameStats] = useState([]);
+  const [backfillBusy, setBackfillBusy] = useState(false);
   
   // Player form states
   const [playerForm, setPlayerForm] = useState({
@@ -50,6 +52,57 @@ const Admin = () => {
     getPlayers();
     getMatches();
     getPlayerGameStats();
+  };
+
+  const previewMissingSnapshots = async () => {
+    const res = await api.get('/api/admin/missing-snapshots/preview/');
+    return res.data;
+  };
+
+  const backfillMissingSnapshots = async () => {
+    const res = await api.post('/api/admin/missing-snapshots/backfill/');
+    return res.data;
+  };
+
+  const runSnapshotBackfillWithWarning = async () => {
+    if (backfillBusy) return;
+    setBackfillBusy(true);
+    try {
+      const preview = await previewMissingSnapshots();
+      const affected = Array.isArray(preview?.affected_teams) ? preview.affected_teams : [];
+
+      if (affected.length === 0) {
+        alert(`No teams are missing a snapshot for gameweek ${preview?.game_week ?? ''}.`);
+        return;
+      }
+
+      const labelList = affected
+        .slice(0, 20)
+        .map((t) => `- ${t.team_name || `Team #${t.team_id}`}${t.user_email ? ` (${t.user_email})` : ''}`)
+        .join('\n');
+      const moreCount = affected.length > 20 ? `\n… and ${affected.length - 20} more.` : '';
+
+      const confirmMsg =
+        `WARNING: This will create a TeamSnapshot for the CURRENT gameweek (${preview?.game_week}) ` +
+        `for teams that do not currently have one, then recompute their weekly points from existing match stats.\n\n` +
+        `Teams affected (${affected.length}):\n` +
+        `${labelList}${moreCount}\n\n` +
+        `Proceed?`;
+
+      if (!window.confirm(confirmMsg)) return;
+
+      const result = await backfillMissingSnapshots();
+      alert(
+        `Created ${result?.created_count ?? 0} snapshot(s) for gameweek ${result?.game_week ?? ''}.`
+      );
+
+      // Keep the page data fresh after a backfill.
+      fetchAllData();
+    } catch (e) {
+      alert(e?.response?.data?.detail || e?.message || 'Failed to backfill snapshots.');
+    } finally {
+      setBackfillBusy(false);
+    }
   };
 
   const getPlayers = () => {
@@ -213,124 +266,102 @@ const Admin = () => {
     }
   };
 
-  const tabStyle = (tabName) => ({
-    padding: '10px 20px',
-    margin: '0 5px',
-    border: 'none',
-    backgroundColor: activeTab === tabName ? '#007bff' : '#f8f9fa',
-    color: activeTab === tabName ? 'white' : '#333',
-    cursor: 'pointer',
-    borderRadius: '5px 5px 0 0',
-    fontSize: '16px',
-    fontWeight: '500'
-  });
-
-  const contentStyle = {
-    padding: '20px',
-    backgroundColor: 'white',
-    borderRadius: '0 5px 5px 5px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    minHeight: '500px'
-  };
-
   return (
-    <div style={{ 
-      padding: '100px 20px 20px 20px', 
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        backgroundColor: 'white',
-        borderRadius: '10px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-      }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-          <h1 style={{ 
-            color: '#333', 
-            marginBottom: '10px',
-            fontSize: '2rem'
-          }}>
-            Admin Dashboard
-          </h1>
-          <p style={{ 
-            color: '#666', 
-            fontSize: '1rem',
-            margin: 0
-          }}>
-            Manage players, matches, and player game stats
-          </p>
-        </div>
+    <div className="admin-page">
+      <div className="admin-shell">
+        <header className="admin-header">
+          <h1 className="admin-title">Admin Dashboard</h1>
+          <p className="admin-subtitle">Manage players, matches, and player game stats</p>
+          <div style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="admin-tab admin-tab--active"
+              onClick={runSnapshotBackfillWithWarning}
+              disabled={backfillBusy}
+              title="Create missing snapshots for current gameweek and recompute points"
+            >
+              {backfillBusy ? 'Backfilling…' : 'Backfill missing snapshots (current GW)'}
+            </button>
+          </div>
+        </header>
 
-        {/* Tab Navigation */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #eee' }}>
-          <button 
-            style={tabStyle('players')} 
+        <nav className="admin-tabs" aria-label="Admin sections">
+          <button
+            type="button"
+            className={`admin-tab ${activeTab === 'players' ? 'admin-tab--active' : ''}`}
             onClick={() => setActiveTab('players')}
           >
-            Players Management
+            Players
           </button>
-          <button 
-            style={tabStyle('matches')} 
+          <button
+            type="button"
+            className={`admin-tab ${activeTab === 'matches' ? 'admin-tab--active' : ''}`}
             onClick={() => setActiveTab('matches')}
           >
-            Matches Management
+            Matches
           </button>
-          <button 
-            style={tabStyle('stats')} 
+          <button
+            type="button"
+            className={`admin-tab ${activeTab === 'stats' ? 'admin-tab--active' : ''}`}
             onClick={() => setActiveTab('stats')}
           >
-            Player Game Stats
+            Player stats
           </button>
-        </div>
+        </nav>
 
-        {/* Tab Content */}
-        <div style={contentStyle}>
+        <div className="admin-content">
           {activeTab === 'players' && (
-            <div style={{ display: 'flex', gap: '20px', height: '500px', overflow: 'hidden' }}>
-              <div style={{ flex: 2, overflowY: 'auto' }}>
-                <ViewPlayerList
-                  players={players}
-                  playerGameStats={playerGameStats}
-                  getTotalStats={getTotalStats}
-                  deletePlayer={deletePlayer}
-                />
-              </div>
-              <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
-                <CreatePlayerForm
-                  name={playerForm.name}
-                  setName={(value) => setPlayerForm({...playerForm, name: value})}
-                  position={playerForm.position}
-                  setPosition={(value) => setPlayerForm({...playerForm, position: value})}
-                  team={playerForm.team}
-                  setTeam={(value) => setPlayerForm({...playerForm, team: value})}
-                  price={playerForm.price}
-                  setPrice={(value) => setPlayerForm({...playerForm, price: value})}
-                  createPlayer={createPlayer}
-                />
-              </div>
+            <div className="admin-two-col">
+              <section className="admin-panel">
+                <div className="admin-panel__body">
+                  <ViewPlayerList
+                    players={players}
+                    playerGameStats={playerGameStats}
+                    getTotalStats={getTotalStats}
+                    deletePlayer={deletePlayer}
+                  />
+                </div>
+              </section>
+
+              <aside className="admin-panel">
+                <div className="admin-panel__body admin-panel__body--tight">
+                  <CreatePlayerForm
+                    name={playerForm.name}
+                    setName={(value) => setPlayerForm({ ...playerForm, name: value })}
+                    position={playerForm.position}
+                    setPosition={(value) => setPlayerForm({ ...playerForm, position: value })}
+                    team={playerForm.team}
+                    setTeam={(value) => setPlayerForm({ ...playerForm, team: value })}
+                    price={playerForm.price}
+                    setPrice={(value) => setPlayerForm({ ...playerForm, price: value })}
+                    createPlayer={createPlayer}
+                  />
+                </div>
+              </aside>
             </div>
           )}
 
           {activeTab === 'matches' && (
-            <div>
-              <div style={{ display: 'flex', gap: '20px', height: '500px', overflow: 'hidden' }}>
-                <div style={{ flex: 2, overflowY: 'auto' }}>
+            <div className="admin-two-col">
+              <section className="admin-panel">
+                <div className="admin-panel__body">
                   <MatchList matches={matches} deleteMatch={deleteMatch} />
                 </div>
-                <div style={{ flex: 1, overflowY: 'auto', padding: '0 10px' }}>
+              </section>
+
+              <aside className="admin-panel">
+                <div className="admin-panel__body admin-panel__body--tight">
                   <CreateMatchForm
                     team1={matchForm.team1}
-                    setTeam1={(value) => setMatchForm({...matchForm, team1: value})}
+                    setTeam1={(value) => setMatchForm({ ...matchForm, team1: value })}
                     team2={matchForm.team2}
-                    setTeam2={(value) => setMatchForm({...matchForm, team2: value})}
+                    setTeam2={(value) => setMatchForm({ ...matchForm, team2: value })}
                     team1_score={matchForm.team1_score}
-                    setTeam1_score={(value) => setMatchForm({...matchForm, team1_score: value})}
+                    setTeam1_score={(value) => setMatchForm({ ...matchForm, team1_score: value })}
                     team2_score={matchForm.team2_score}
-                    setTeam2_score={(value) => setMatchForm({...matchForm, team2_score: value})}
+                    setTeam2_score={(value) => setMatchForm({ ...matchForm, team2_score: value })}
                     date={matchForm.date}
-                    setDate={(value) => setMatchForm({...matchForm, date: value})}
+                    setDate={(value) => setMatchForm({ ...matchForm, date: value })}
                     playersStats={playersStats}
                     setPlayersStats={setPlayersStats}
                     players={players}
@@ -341,47 +372,52 @@ const Admin = () => {
                     recentTeamNames={recentTeamNames}
                   />
                 </div>
-              </div>
+              </aside>
             </div>
           )}
 
           {activeTab === 'stats' && (
-            <div>
-              <h2>Player Game Stats Management</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {playerGameStats.map((stat) => (
-                  <div key={stat.id} style={{
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    backgroundColor: '#f9f9f9'
-                  }}>
-                    <h4>{players.find(p => p.id === stat.player)?.name || 'Unknown Player'}</h4>
-                    <p><strong>Match:</strong> {matches.find(m => m.id === stat.match)?.team1} vs {matches.find(m => m.id === stat.match)?.team2}</p>
-                    <p><strong>Goals:</strong> {stat.goals} | <strong>Assists:</strong> {stat.assists}</p>
-                    <p><strong>Cards:</strong> {stat.yellow_cards}Y {stat.red_cards}R | <strong>Clean Sheets:</strong> {stat.clean_sheets}</p>
-                    <p><strong>MOTM:</strong> {stat.MOTM} | <strong>Pen Saves:</strong> {stat.Pen_Saves}</p>
-                    <p><strong>Points:</strong> {stat.points}</p>
-                    <div style={{ marginTop: '10px' }}>
-                      <button 
-                        onClick={() => deletePlayerGameStat(stat.id)}
-                        style={{
-                          backgroundColor: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          padding: '5px 10px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          marginRight: '10px'
-                        }}
-                      >
-                        Delete
-                      </button>
+            <section>
+              <h2 className="admin-section-title">Player Game Stats</h2>
+              <div className="admin-stats-grid">
+                {playerGameStats.map((stat) => {
+                  const playerName = players.find((p) => p.id === stat.player)?.name || 'Unknown Player';
+                  const match = matches.find((m) => m.id === stat.match);
+                  const matchLabel = match ? `${match.team1} vs ${match.team2}` : 'Unknown match';
+
+                  return (
+                    <div key={stat.id} className="admin-stat-card">
+                      <h4>{playerName}</h4>
+                      <p>
+                        <strong>Match:</strong> {matchLabel}
+                      </p>
+                      <p>
+                        <strong>Goals:</strong> {stat.goals} | <strong>Assists:</strong> {stat.assists}
+                      </p>
+                      <p>
+                        <strong>Cards:</strong> {stat.yellow_cards}Y {stat.red_cards}R |{' '}
+                        <strong>Clean Sheets:</strong> {stat.clean_sheets}
+                      </p>
+                      <p>
+                        <strong>MOTM:</strong> {stat.MOTM} | <strong>Pen Saves:</strong> {stat.Pen_Saves}
+                      </p>
+                      <p>
+                        <strong>Points:</strong> {stat.points}
+                      </p>
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          type="button"
+                          onClick={() => deletePlayerGameStat(stat.id)}
+                          className="admin-danger-button"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </div>
+            </section>
           )}
         </div>
       </div>

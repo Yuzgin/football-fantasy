@@ -23,5 +23,7 @@ urlpatterns = [
     path('player-points/', views.PlayerPointsListView.as_view(), name='player-points'),
     path('player-goals/', views.PlayerGoalsListView.as_view(), name='player-goals'),
     path('results/', views.ResultsListView.as_view(), name='results'),
+    path('admin/missing-snapshots/preview/', views.AdminMissingSnapshotsPreview.as_view(), name='admin-missing-snapshots-preview'),
+    path('admin/missing-snapshots/backfill/', views.AdminBackfillMissingSnapshots.as_view(), name='admin-missing-snapshots-backfill'),
     path('', include(router.urls)),  # Include the router for team snapshots
 ]
