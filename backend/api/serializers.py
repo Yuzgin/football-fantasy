@@ -52,10 +52,11 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             raise RuntimeError("Email sender address is not configured (DEFAULT_FROM_EMAIL).")
 
         logger.info(
-            "Password reset email: attempting send (to=%s, from=%s, backend=%s)",
+            "Password reset email: attempting send (to=%s, from=%s, backend=%s, has_password=%s)",
             email,
             from_email,
             getattr(settings, "EMAIL_BACKEND", None),
+            bool(getattr(settings, "EMAIL_HOST_PASSWORD", None)),
         )
 
         sent_count = send_mail(
