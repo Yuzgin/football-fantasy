@@ -277,6 +277,10 @@ body {
         padding-top: clamp(6px, calc((1.6vw + 20px) * 0.3), 10px);
     }
 
+    .team-formation {
+        gap: clamp(12.6px, 3.6vw, 40.5px); /* ~10% tighter row spacing than default */
+    }
+
     .team-and-controls {
         flex-direction: column; /* Stack elements vertically */
         align-items: center; /* Center align content */
