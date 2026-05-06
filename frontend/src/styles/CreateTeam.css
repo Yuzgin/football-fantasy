@@ -272,6 +272,11 @@ body {
 
 /* Media query for smaller screens (e.g., iPhones) */
 @media screen and (max-width: 600px) {
+    .team-container {
+        /* ~30% of the usual top inset so GK matches monitor-like placement (full rule is too tall on narrow cards) */
+        padding-top: clamp(6px, calc((1.6vw + 20px) * 0.3), 10px);
+    }
+
     .team-and-controls {
         flex-direction: column; /* Stack elements vertically */
         align-items: center; /* Center align content */
