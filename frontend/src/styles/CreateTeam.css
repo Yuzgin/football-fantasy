@@ -261,10 +261,11 @@ body {
     padding-top: calc(clamp(12px, 3vw, 20px) + 78px); /* account for fixed header */
 }
 
+/* Same fluid gap as .position-group on phones; cap at 30px on wide screens so five slots stay tighter than four */
 .position-group-5 {
     display: flex;
     justify-content: center;
-    gap: 30px; /* Reduced gap for 5 players (half of the normal 60px) */
+    gap: max(12px, min(5vw, 30px));
 }
 
 

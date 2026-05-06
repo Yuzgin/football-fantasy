@@ -179,7 +179,7 @@ const OtherTeam = () => {
 
             {/* Render defenders */}
             {selectedPlayers.Defender.length > 0 && (
-              <div className="position-group">
+              <div className={`position-group ${getPositionCount('Defender') === 5 ? 'position-group-5' : ''}`}>
                 {selectedPlayers.Defender.map((defenderId) => (
                   <PlayerViewPoints
                     key={defenderId}

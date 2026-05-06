@@ -243,14 +243,14 @@ const CreateTeam = () => {
                 />
               </div>
 
-              <div className="position-group">
+              <div className={`position-group ${getPositionCount('Defender') === 5 ? 'position-group-5' : ''}`}>
                 {formations[selectedFormation]
                   .filter((pos) => pos.startsWith("Defender"))
                   .map((pos) => renderTeamPlayer(pos))}
                 {(additionalDefenderAllowed || selectedPlayers["Defender-5"]) && renderTeamPlayer("Defender-5")}
               </div>
 
-              <div className="position-group">
+              <div className={`position-group ${getPositionCount('Midfielder') === 5 ? 'position-group-5' : ''}`}>
                 {formations[selectedFormation]
                   .filter((pos) => pos.startsWith("Midfielder"))
                   .map((pos) => renderTeamPlayer(pos))}
