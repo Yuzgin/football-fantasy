@@ -20,6 +20,10 @@ function installLocalStorageMock() {
 }
 
 describe("api axios instance", () => {
+  it("uses empty baseURL so /api calls are same-origin (vite dev relies on proxy; static deploy needs API on same host or a configured base URL)", () => {
+    expect(api.defaults.baseURL).toBe("");
+  });
+
   it("adds Authorization header when token exists", () => {
     installLocalStorageMock();
     localStorage.setItem(ACCESS_TOKEN, "test-token");

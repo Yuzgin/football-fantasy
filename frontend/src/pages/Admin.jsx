@@ -55,12 +55,12 @@ const Admin = () => {
   };
 
   const previewMissingSnapshots = async () => {
-    const res = await api.get('/api/admin/missing-snapshots/preview/');
+    const res = await api.get('/api/staff/missing-snapshots/preview/');
     return res.data;
   };
 
   const backfillMissingSnapshots = async () => {
-    const res = await api.post('/api/admin/missing-snapshots/backfill/');
+    const res = await api.post('/api/staff/missing-snapshots/backfill/');
     return res.data;
   };
 

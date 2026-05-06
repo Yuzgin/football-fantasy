@@ -213,7 +213,11 @@ else:
     # Production settings
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
+    # Default on when DEBUG is False. Set DJANGO_SECURE_SSL_REDIRECT=false for local
+    # runs against `runserver` (HTTP-only): otherwise POSTs get 301→https and the
+    # next hop sends TLS bytes to plain HTTP → "Bad request version" in the server log.
+    _ssl_redirect_env = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "true").strip().lower()
+    SECURE_SSL_REDIRECT = _ssl_redirect_env in ("1", "true", "yes", "y", "on")
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

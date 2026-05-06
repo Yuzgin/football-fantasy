@@ -23,7 +23,8 @@ urlpatterns = [
     path('player-points/', views.PlayerPointsListView.as_view(), name='player-points'),
     path('player-goals/', views.PlayerGoalsListView.as_view(), name='player-goals'),
     path('results/', views.ResultsListView.as_view(), name='results'),
-    path('admin/missing-snapshots/preview/', views.AdminMissingSnapshotsPreview.as_view(), name='admin-missing-snapshots-preview'),
-    path('admin/missing-snapshots/backfill/', views.AdminBackfillMissingSnapshots.as_view(), name='admin-missing-snapshots-backfill'),
+    # Must not live under /api/admin/ — that path is owned by django.contrib.admin.
+    path('staff/missing-snapshots/preview/', views.AdminMissingSnapshotsPreview.as_view(), name='staff-missing-snapshots-preview'),
+    path('staff/missing-snapshots/backfill/', views.AdminBackfillMissingSnapshots.as_view(), name='staff-missing-snapshots-backfill'),
     path('', include(router.urls)),  # Include the router for team snapshots
 ]
