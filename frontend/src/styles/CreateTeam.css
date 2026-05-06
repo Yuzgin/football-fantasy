@@ -273,6 +273,8 @@ body {
 /* Media query for smaller screens (e.g., iPhones) */
 @media screen and (max-width: 600px) {
     .team-container {
+        /* +5% height only (width unchanged): was 5/6 → 5/6.3 */
+        aspect-ratio: 5 / 6.3;
         /* ~30% of the usual top inset so GK matches monitor-like placement (full rule is too tall on narrow cards) */
         padding-top: clamp(6px, calc((1.6vw + 20px) * 0.3), 10px);
     }
