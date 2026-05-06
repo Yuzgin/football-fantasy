@@ -72,16 +72,27 @@ class CreateUserView(generics.CreateAPIView):
 
 class PasswordResetRequestView(generics.GenericAPIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
     serializer_class = PasswordResetRequestSerializer
 
     def post(self, request, *args, **kwargs):
+        logger = logging.getLogger(__name__)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.send_reset_email()
+        try:
+            serializer.send_reset_email()
+        except Exception:
+            logger.exception("Password reset email send failed")
+            return Response(
+                {"message": "Password reset email failed to send."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         return Response({"message": "Password reset link sent."}, status=status.HTTP_200_OK)
 
 class PasswordResetConfirmView(generics.GenericAPIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
     serializer_class = PasswordResetConfirmSerializer
 
     def post(self, request, *args, **kwargs):

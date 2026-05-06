@@ -26,10 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-p%%)pvvu6h#ynb63ch&jvgplt=4xv(+-7e*$&7g-h4u(g9-9s)"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("DJANGO_SECRET_KEY is not set")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False").strip().lower() in ("1", "true", "yes", "y", "on")
 
 # ALLOWED_HOSTS = ["*"]
 ALLOWED_HOSTS = [
@@ -238,6 +240,6 @@ EMAIL_USE_SSL = True   # SSL is required for port 465
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-# EMAIL_HOST_USER = "EMAIL"  # Your IONOS email
-# EMAIL_HOST_PASSWORD = "Paasword"  # Replace with your actual password
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Ensures consistency in email sending
+# Email "From" address used by Django helpers (unless explicitly overridden).
+# Prefer the authenticated SMTP user if provided; otherwise fall back to a stable no-reply.
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL") or EMAIL_HOST_USER or "no-reply@langwithfootball.com"

@@ -7,8 +7,10 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.conf import settings
+import logging
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,16 +44,33 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         token = default_token_generator.make_token(user)
         reset_url = f"https://langwithfootball.com/reset-password/{uid}/{token}/"
 
-        # 🔹 Debug: Print email credentials before sending
-        # print("EMAIL_HOST_USER:", settings.EMAIL_HOST_USER)
-        # print("EMAIL_HOST_PASSWORD:", settings.EMAIL_HOST_PASSWORD)  # ⚠️ Be careful in production
+        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(settings, "EMAIL_HOST_USER", None)
+        if not from_email:
+            logger.error(
+                "Password reset email: missing from_email (DEFAULT_FROM_EMAIL/EMAIL_HOST_USER not set)"
+            )
+            raise RuntimeError("Email sender address is not configured (DEFAULT_FROM_EMAIL).")
 
-        send_mail(
+        logger.info(
+            "Password reset email: attempting send (to=%s, from=%s, backend=%s)",
+            email,
+            from_email,
+            getattr(settings, "EMAIL_BACKEND", None),
+        )
+
+        sent_count = send_mail(
             "Password Reset Request",
             f"Click the link below to reset your password:\n\n{reset_url}",
-            "no-reply@langwithfootball.com",
+            from_email,
             [email],
             fail_silently=False,
+        )
+
+        logger.info(
+            "Password reset email: send_mail returned %s (to=%s, from=%s)",
+            sent_count,
+            email,
+            from_email,
         )
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
