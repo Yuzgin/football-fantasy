@@ -9,31 +9,31 @@
   /* Card container around the player icon */
   .player-card-captain-badge {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: 4.8px;
+    right: 4.8px;
     z-index: 2;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    border-radius: 4px;
+    min-width: 21.6px;
+    height: 21.6px;
+    padding: 0 4.8px;
+    border-radius: 4.8px;
     background:
       linear-gradient(to bottom left, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%),
       linear-gradient(145deg, #2a2a2a 0%, #0d0d0d 100%);
     color: #fff;
     font-size: 11px;
     font-weight: 800;
-    line-height: 18px;
+    line-height: 21.6px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
 
   .player-card {
-    width: clamp(52px, 14vw, 65px);
-    height: clamp(78px, 20vw, 90px);
+    width: clamp(62.4px, 16.8vw, 78px);
+    height: clamp(93.6px, 24vw, 108px);
     position: relative;
-    border-radius: 10px;
+    border-radius: 12px;
     background: rgba(0, 0, 0, 0.4); /* semi-transparent grey */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2.4px 7.2px rgba(0, 0, 0, 0.18);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -42,30 +42,31 @@
   }
 
   .player-card-image {
-    width: clamp(44px, 12vw, 55px);
-    height: clamp(44px, 12vw, 55px);
+    width: clamp(52.8px, 14.4vw, 66px);
+    height: clamp(52.8px, 14.4vw, 66px);
     object-fit: contain;
     border-radius: 50%;
-    margin-top: 6px;
+    margin-top: 7.2px;
     cursor: pointer;
   }
 
   /* Bottom info area inside the card */
   .player-card-info {
     position: absolute;
-    left: 3px;
-    right: 3px;
-    bottom: 3px;
+    left: 3.6px;
+    right: 3.6px;
+    bottom: 3.6px;
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    padding: 3px 4px;
+    border-radius: 9.6px;
+    padding: 3.6px 4.8px;
     text-align: center;
     line-height: 1.1;
   }
 
   .player-card-name {
     color: #000;
-    font-size: clamp(9px, 2.4vw, 10px);
+    /* Small on narrow viewports; scales up to 12px on typical desktop widths */
+    font-size: clamp(7.5px, 2vw, 10px);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -90,6 +91,6 @@
   /* Keep layout stable on small screens without transforms */
 @media screen and (max-width: 600px) {
   .player-card-info {
-    padding: 2px 3px;
+    padding: 2.4px 3.6px;
   }
 }

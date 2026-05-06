@@ -5,7 +5,8 @@
     aspect-ratio: 5 / 6;
     height: auto;
     margin: 40px auto 0 auto; /* Center the container horizontally and add top margin for separation */
-    padding: clamp(10px, 2.8vw, 20px);
+    /* Less top padding so the goalkeeper sits nearer the top of the pitch */
+    padding: clamp(26px, calc(1.6vw + 20px), 32px) clamp(10px, 2.8vw, 20px) clamp(10px, 2.8vw, 20px);
     background-image: url('../assets/FootballField.png');
     background-size: 100% 100%; /* Stretch the image to fit the container exactly */
     background-position: center;
@@ -21,16 +22,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Center content vertically within the container */
+    justify-content: flex-start; /* Anchor rows to top so GK isn’t floated down by vertical centering */
     height: 100%; /* Ensure it fills the entire height of the container */
-    gap: clamp(18px, 5vw, 60px); /* Space between rows */
+    gap: clamp(14px, 4vw, 45px); /* Space between rows */
 }
 
 /* Layout for each position group (e.g., defenders, midfielders) */
 .position-group {
     display: flex;
     justify-content: center; /* Center players within each group */
-    gap: clamp(12px, 5vw, 50px); /* Space between players */
+    gap: clamp(9.6px, 4vw, 40px); /* Space between players */
 }
 
 /* Layout for the team container and controls side by side */
@@ -265,7 +266,7 @@ body {
 .position-group-5 {
     display: flex;
     justify-content: center;
-    gap: max(12px, min(5vw, 30px));
+    gap: max(9.6px, min(4vw, 24px));
 }
 
 
