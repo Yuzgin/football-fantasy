@@ -278,7 +278,11 @@ body {
     }
 
     .team-formation {
-        gap: clamp(12.6px, 3.6vw, 40.5px); /* ~10% tighter row spacing than default */
+        gap: clamp(11.34px, 3.24vw, 36.45px); /* ~20% tighter row spacing than desktop default */
+    }
+
+    .position-group-5 {
+        gap: max(8.64px, min(3.2vw, 21.6px)); /* ~10% tighter than non-mobile five-slot row */
     }
 
     .team-and-controls {
