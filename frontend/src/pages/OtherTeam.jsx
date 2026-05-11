@@ -1,31 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../api';
 import Header from '../components/Header';
 import PlayerViewPoints from '../components/PlayerViewPoints';
-import PlayerStats from '../components/PlayerStats';
-import '../styles/Modal.css';
+import PlayerDirectoryDetailModal from '../components/PlayerDirectoryDetailModal';
 import '../styles/OtherTeam.css';
 import '../styles/TeamInfo.css';
 
+const mapPlayersToPositions = (players) => {
+  const positionMapping = { Goalkeeper: [], Defender: [], Midfielder: [], Attacker: [] };
+
+  players.forEach((player) => {
+    if (positionMapping[player.position]) {
+      positionMapping[player.position].push(player.id);
+    }
+  });
+
+  return positionMapping;
+};
+
 const OtherTeam = () => {
-  const [players, setPlayers] = useState([]);
   const { teamId } = useParams();
   const [teamSnapshot, setTeamSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [teamValue, setTeamValue] = useState(0);
   const [selectedPlayers, setSelectedPlayers] = useState({});
-  const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [currentWeek, setCurrentWeek] = useState(null);
   const [maxWeek, setMaxWeek] = useState(null);
   const [cupNotStarted, setCupNotStarted] = useState(false);
 
-  useEffect(() => {
-    fetchMostRecentTeamSnapshot();
-  }, [teamId]);
-
-  const fetchMostRecentTeamSnapshot = async () => {
+  const fetchMostRecentTeamSnapshot = useCallback(async () => {
     try {
       setCupNotStarted(false);
       // Only fetch team snapshot - no need for separate players call
@@ -35,7 +40,6 @@ const OtherTeam = () => {
       if (data.cup_not_started) {
         setCupNotStarted(true);
         setTeamSnapshot(null);
-        setPlayers([]);
         setSelectedPlayers({});
         setTeamValue(0);
         setCurrentWeek(null);
@@ -46,8 +50,6 @@ const OtherTeam = () => {
       const teamSnapshotData = data;
 
       setTeamSnapshot(teamSnapshotData);
-      // Use players from team snapshot instead of separate API call
-      setPlayers(teamSnapshotData.players);
 
       setCurrentWeek(teamSnapshotData.game_week.week);
       setMaxWeek(teamSnapshotData.game_week.week);
@@ -62,7 +64,11 @@ const OtherTeam = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [teamId]);
+
+  useEffect(() => {
+    fetchMostRecentTeamSnapshot();
+  }, [fetchMostRecentTeamSnapshot]);
 
   const fetchTeamSnapshotForWeek = async (week) => {
     try {
@@ -85,8 +91,6 @@ const OtherTeam = () => {
 
       const teamSnapshotData = teamSnapshotDataArray[0];
       setTeamSnapshot(teamSnapshotData);
-      // Use players from team snapshot instead of separate API call
-      setPlayers(teamSnapshotData.players);
       setCurrentWeek(week);
 
       const selectedPlayers = mapPlayersToPositions(teamSnapshotData.players);
@@ -98,18 +102,6 @@ const OtherTeam = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapPlayersToPositions = (players) => {
-    const positionMapping = { Goalkeeper: [], Defender: [], Midfielder: [], Attacker: [] };
-
-    players.forEach(player => {
-      if (positionMapping[player.position]) {
-        positionMapping[player.position].push(player.id);
-      }
-    });
-
-    return positionMapping;
   };
 
   const handlePrevWeek = () => {
@@ -126,7 +118,6 @@ const OtherTeam = () => {
 
   const openPlayerStats = (player) => {
     setSelectedPlayer(player);
-    setShowPlayerStats(true);
   };
 
   const getPositionCount = (positionType) => {
@@ -250,12 +241,12 @@ const OtherTeam = () => {
         </div>
       </div>
 
-      {showPlayerStats && (
-        <PlayerStats
-          selectedPlayer={selectedPlayer}
-          closeStats={() => setShowPlayerStats(false)}
+      {selectedPlayer ? (
+        <PlayerDirectoryDetailModal
+          player={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
         />
-      )}
+      ) : null}
     </div>
     </div>
   );

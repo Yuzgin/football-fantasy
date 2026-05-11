@@ -252,12 +252,14 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
         players_data = []
         for player in obj.players.all():
             game_week_points = self._calculate_player_game_week_points(player, obj.game_week)
-            if obj.captain_id and player.id == obj.captain_id:
+            is_captain = bool(obj.captain_id and player.id == obj.captain_id)
+            if is_captain:
                 game_week_points *= 2
 
             player_data = {
                 'id': player.id,
                 'name': player.name,
+                'full_name': player.full_name,
                 'position': player.position,
                 'price': player.price,
                 'team': player.team,
@@ -270,7 +272,7 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
                 'red_cards': player.red_cards,
                 'MOTM': player.MOTM,
                 'Pen_Saves': player.Pen_Saves,
-                'game_stats': []  # Empty since we don't need all game stats
+                'game_stats': self._get_player_game_week_stats(player, obj.game_week, is_captain)
             }
             players_data.append(player_data)
         return players_data
@@ -281,6 +283,7 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
             return {
                 'id': obj.captain.id,
                 'name': obj.captain.name,
+                'full_name': obj.captain.full_name,
                 'position': obj.captain.position,
                 'price': obj.captain.price,
                 'team': obj.captain.team,
@@ -293,7 +296,7 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
                 'red_cards': obj.captain.red_cards,
                 'MOTM': obj.captain.MOTM,
                 'Pen_Saves': obj.captain.Pen_Saves,
-                'game_stats': []
+                'game_stats': self._get_player_game_week_stats(obj.captain, obj.game_week, True)
             }
         return None
 
@@ -323,6 +326,22 @@ class TeamSnapshotSerializer(serializers.ModelSerializer):
                 stat.match.game_week.id == game_week.id):
                 total_points += stat.points
         return total_points
+
+    def _get_player_game_week_stats(self, player, game_week, is_captain=False):
+        stats = []
+        for stat in player.game_stats.all():
+            if not (
+                stat.match and
+                stat.match.game_week and
+                stat.match.game_week.id == game_week.id
+            ):
+                continue
+
+            data = PlayerGameStatsSerializer(stat, context=self.context).data
+            if is_captain:
+                data['points'] = (data.get('points') or 0) * 2
+            stats.append(data)
+        return stats
 
     def update(self, instance, validated_data):
         # Use the new calculate_weekly_points method that accounts for captain double points
