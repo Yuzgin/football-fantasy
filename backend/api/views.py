@@ -17,7 +17,7 @@ from django.utils.timezone import now
 from django.core.management import call_command
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
-from django.db.models import Sum, Avg, Max
+from django.db.models import Sum, Avg, Max, Count
 from django.db import transaction
 from rest_framework.views import APIView
 from .permissions import IsStaffUser
@@ -72,7 +72,16 @@ class PlayerListView(generics.ListCreateAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Player.objects.all().prefetch_related('game_stats__match')
+        return (
+            Player.objects.all()
+            .annotate(_fantasy_teams_with_player=Count('team_players', distinct=True))
+            .prefetch_related('game_stats__match')
+        )
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['team_count'] = Team.objects.count()
+        return context
 
 
 class PlayerPointsListView(generics.ListAPIView):
@@ -767,5 +776,14 @@ class AdminCreateOrUpdateTeamSnapshots(APIView):
     def post(self, request):
         output = StringIO()
         call_command("create_or_update_team_snapshots", stdout=output)
+        return Response({"output": output.getvalue()}, status=200)
+
+
+class AdminFetchFixturesCup(APIView):
+    permission_classes = [IsStaffUser]
+
+    def post(self, request):
+        output = StringIO()
+        call_command("fetch_fixtures_cup", stdout=output)
         return Response({"output": output.getvalue()}, status=200)
 

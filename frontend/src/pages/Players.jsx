@@ -10,6 +10,8 @@ const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Attacker'];
 const SORT_ALPHABETICAL = 'alphabetical';
 const SORT_TEAM = 'team';
 const SORT_PRICE = 'price';
+const SORT_POINTS = 'points';
+const SORT_PICK_PERCENTAGE = 'pick_percentage';
 
 function alphabeticalCompare(a, b) {
   const fullA = (a.full_name || '').trim();
@@ -21,6 +23,20 @@ function alphabeticalCompare(a, b) {
   const primary = keyA.localeCompare(keyB, undefined, { sensitivity: 'base' });
   if (primary !== 0) return primary;
   return knownA.localeCompare(knownB, undefined, { sensitivity: 'base' });
+}
+
+function getPlayerPoints(player) {
+  const directPoints = Number(player?.points);
+  if (Number.isFinite(directPoints)) return directPoints;
+
+  const stats = player?.game_stats;
+  if (!Array.isArray(stats)) return 0;
+  return stats.reduce((sum, stat) => sum + (Number(stat.points) || 0), 0);
+}
+
+function getPickPercentage(player) {
+  const value = Number(player?.pick_percentage);
+  return Number.isFinite(value) ? value : 0;
 }
 
 /** Label for team filter only; values stay as stored (e.g. "1s") so filtering still matches. */
@@ -102,6 +118,16 @@ export default function Players() {
         if (pb !== pa) return pb - pa;
         return alphabeticalCompare(a, b);
       });
+    } else if (sortBy === SORT_POINTS) {
+      list.sort((a, b) => {
+        const diff = getPlayerPoints(b) - getPlayerPoints(a);
+        return diff || alphabeticalCompare(a, b);
+      });
+    } else if (sortBy === SORT_PICK_PERCENTAGE) {
+      list.sort((a, b) => {
+        const diff = getPickPercentage(b) - getPickPercentage(a);
+        return diff || alphabeticalCompare(a, b);
+      });
     } else {
       list.sort(alphabeticalCompare);
     }
@@ -171,6 +197,8 @@ export default function Players() {
             <option value={SORT_ALPHABETICAL}>Alphabetical (full name)</option>
             <option value={SORT_TEAM}>Team</option>
             <option value={SORT_PRICE}>Price (high to low)</option>
+            <option value={SORT_POINTS}>Points (high to low)</option>
+            <option value={SORT_PICK_PERCENTAGE}>% picked (high to low)</option>
           </select>
         </div>
       </div>
@@ -196,6 +224,8 @@ export default function Players() {
                     <th>Team</th>
                     <th className="players-col-position">Position</th>
                     <th className="players-col-price">Price</th>
+                    <th className="players-col-points">Points</th>
+                    <th className="players-col-picked">% Picked</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -216,6 +246,8 @@ export default function Players() {
                       <td>{p.team || '—'}</td>
                       <td className="players-col-position">{p.position || '—'}</td>
                       <td className="players-col-price">£{Number(p.price ?? 0).toFixed(1)}m</td>
+                      <td className="players-col-points">{getPlayerPoints(p)}</td>
+                      <td className="players-col-picked">{getPickPercentage(p).toFixed(1)}%</td>
                     </tr>
                   ))}
                 </tbody>

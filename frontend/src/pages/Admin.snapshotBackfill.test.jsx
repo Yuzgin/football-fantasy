@@ -189,4 +189,30 @@ describe('Admin snapshot backfill (header button)', () => {
     confirmSpy.mockRestore();
     alertSpy.mockRestore();
   });
+
+  it('runs the fetch cup fixtures command from the header button', async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    vi.mocked(api.post).mockResolvedValue({
+      data: { output: 'Fetched cup fixtures.' },
+    });
+
+    render(<Admin />);
+
+    const btn = await screen.findByRole('button', {
+      name: /fetch cup fixtures/i,
+    });
+    await user.click(btn);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/api/staff/fixtures/fetch-cup/');
+    });
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith('Fetched cup fixtures.');
+
+    confirmSpy.mockRestore();
+    alertSpy.mockRestore();
+  });
 });

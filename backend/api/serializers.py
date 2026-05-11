@@ -173,6 +173,8 @@ class PlayerGameStatsSerializer(serializers.ModelSerializer):
 
 class PlayerSerializer(serializers.ModelSerializer):
     points = serializers.SerializerMethodField()
+    pick_count = serializers.SerializerMethodField()
+    pick_percentage = serializers.SerializerMethodField()
     game_stats = PlayerGameStatsSerializer(many=True, read_only=True)
 
     class Meta:
@@ -180,7 +182,8 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "full_name", "position", "points", "price", "team",
             "game_stats", "goals", "assists", "clean_sheets", "games_played",
-            "points", "yellow_cards", "red_cards", "MOTM", "Pen_Saves"
+            "yellow_cards", "red_cards", "MOTM", "Pen_Saves", "pick_count",
+            "pick_percentage"
         ]
 
     def get_points(self, player):
@@ -192,7 +195,21 @@ class PlayerSerializer(serializers.ModelSerializer):
                 match__date__lte=game_week.end_date
             )
             return sum(stat.points for stat in stats)
-        return 0
+        return player.points or 0
+
+    def get_pick_count(self, player):
+        picked = getattr(player, '_fantasy_teams_with_player', None)
+        if picked is None and getattr(player, 'pk', None):
+            picked = player.team_players.count()
+        return picked or 0
+
+    def get_pick_percentage(self, player):
+        total = self.context.get('team_count')
+        if total is None:
+            total = Team.objects.count()
+        if total == 0:
+            return 0
+        return round((self.get_pick_count(player) * 100.0) / total, 1)
     
 class PlayerPointsSerializer(serializers.ModelSerializer):
     class Meta:

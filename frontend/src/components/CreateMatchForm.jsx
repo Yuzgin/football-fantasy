@@ -25,6 +25,7 @@ const CreateMatchForm = ({
   date,
   setDate,
   playersStats,
+  setPlayersStats,
   players,
   handlePlayerStatChange,
   addPlayerStat,
@@ -38,6 +39,42 @@ const CreateMatchForm = ({
   const applyScorePreset = (a, b) => {
     setTeam1_score(a);
     setTeam2_score(b);
+  };
+
+  const cleanSheetsEnabled =
+    playersStats.length > 0 && playersStats.every((stat) => Number(stat.clean_sheets) === 1);
+
+  const setAllCleanSheets = (enabled) => {
+    const value = enabled ? 1 : 0;
+
+    if (setPlayersStats) {
+      setPlayersStats(playersStats.map((stat) => ({ ...stat, clean_sheets: value })));
+      return;
+    }
+
+    playersStats.forEach((_, index) => handlePlayerStatChange(index, 'clean_sheets', value));
+  };
+
+  const addPlayerStatWithCleanSheetState = () => {
+    if (!setPlayersStats) {
+      addPlayerStat();
+      return;
+    }
+
+    setPlayersStats([
+      ...playersStats,
+      {
+        player: '',
+        goals: 0,
+        assists: 0,
+        yellow_cards: 0,
+        red_cards: 0,
+        clean_sheets: cleanSheetsEnabled ? 1 : 0,
+        points: 0,
+        MOTM: 0,
+        Pen_Saves: 0,
+      },
+    ]);
   };
 
   return (
@@ -159,6 +196,15 @@ const CreateMatchForm = ({
           <p className="create-match-form__stats-hint">
             {`Click the player field to open the list; type to filter. Player goals must add up to Langwith's score; set MOTM to 1 on exactly one player.`}
           </p>
+          {/* This toggle is necessary so admins can apply clean-sheet scoring to every player row at once. */}
+          <label className="create-match-form__clean-sheet-toggle">
+            <input
+              type="checkbox"
+              checked={cleanSheetsEnabled}
+              onChange={(e) => setAllCleanSheets(e.target.checked)}
+            />
+            <span>Set everyone&apos;s clean sheet to {cleanSheetsEnabled ? '1' : '0'}</span>
+          </label>
         </div>
 
         <div className="create-match-form__stat-rows">
@@ -176,7 +222,11 @@ const CreateMatchForm = ({
         </div>
 
         <div className="create-match-form__actions">
-          <button type="button" className="form-button form-button-secondary" onClick={addPlayerStat}>
+          <button
+            type="button"
+            className="form-button form-button-secondary"
+            onClick={addPlayerStatWithCleanSheetState}
+          >
             Add player row
           </button>
           <button type="submit" className="form-button">

@@ -15,6 +15,7 @@ const Admin = () => {
   const [playerGameStats, setPlayerGameStats] = useState([]);
   const [backfillBusy, setBackfillBusy] = useState(false);
   const [snapshotCommandBusy, setSnapshotCommandBusy] = useState(false);
+  const [fetchFixturesCupBusy, setFetchFixturesCupBusy] = useState(false);
   
   // Player form states
   const [playerForm, setPlayerForm] = useState({
@@ -89,6 +90,11 @@ const Admin = () => {
     return res.data;
   };
 
+  const fetchFixturesCup = async () => {
+    const res = await api.post('/api/staff/fixtures/fetch-cup/');
+    return res.data;
+  };
+
   const runCreateOrUpdateTeamSnapshots = async () => {
     if (snapshotCommandBusy) return;
 
@@ -108,6 +114,25 @@ const Admin = () => {
       alert(e?.response?.data?.detail || e?.message || 'Failed to run snapshot command.');
     } finally {
       setSnapshotCommandBusy(false);
+    }
+  };
+
+  const runFetchFixturesCup = async () => {
+    if (fetchFixturesCupBusy) return;
+
+    if (!window.confirm('Fetch upcoming cup fixtures from the Google Sheet and update fixtures?')) {
+      return;
+    }
+
+    setFetchFixturesCupBusy(true);
+    try {
+      const result = await fetchFixturesCup();
+      alert(result?.output || 'Cup fixtures fetched successfully.');
+      fetchAllData();
+    } catch (e) {
+      alert(e?.response?.data?.detail || e?.message || 'Failed to fetch cup fixtures.');
+    } finally {
+      setFetchFixturesCupBusy(false);
     }
   };
 
@@ -334,6 +359,15 @@ const Admin = () => {
               title="Run create_or_update_team_snapshots for the current gameweek"
             >
               {snapshotCommandBusy ? 'Processing snapshots…' : 'Create/update team snapshots'}
+            </button>
+            <button
+              type="button"
+              className="admin-tab admin-tab--active"
+              onClick={runFetchFixturesCup}
+              disabled={fetchFixturesCupBusy}
+              title="Run fetch_fixtures_cup to import upcoming cup fixtures"
+            >
+              {fetchFixturesCupBusy ? 'Fetching fixtures…' : 'Fetch cup fixtures'}
             </button>
           </div>
         </header>

@@ -108,6 +108,27 @@
   line-height: 1.45;
 }
 
+.create-match-form__clean-sheet-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(var(--app-accent-rgb), 0.26);
+  border-radius: 12px;
+  background: rgba(var(--app-accent-rgb), 0.08);
+  color: #252525;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.create-match-form__clean-sheet-toggle input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--app-accent-gold, #8a6405);
+}
+
 .create-match-form__stat-rows {
   margin-top: 1rem;
 }

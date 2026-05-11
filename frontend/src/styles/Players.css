@@ -26,14 +26,14 @@
 
 @media (min-width: 720px) {
   .players-toolbar {
-    grid-template-columns: 1.4fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr;
     align-items: end;
   }
 }
 
 @media (min-width: 1024px) {
   .players-toolbar {
-    grid-template-columns: 1.35fr 1fr 1fr 0.95fr;
+    grid-template-columns: 1.35fr 1fr 1fr 1fr;
   }
 }
 
@@ -107,7 +107,9 @@
   outline-offset: -2px;
 }
 
-.players-table .players-col-price {
+.players-table .players-col-price,
+.players-table .players-col-points,
+.players-table .players-col-picked {
   white-space: nowrap;
   text-align: right;
 }

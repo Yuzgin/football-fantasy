@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.test import override_settings
 from django.urls import resolve, reverse
@@ -126,6 +127,28 @@ class AdminMissingSnapshotsApiTests(APITestCase):
     def test_create_or_update_team_snapshots_forbidden_for_non_staff(self):
         self.client.force_authenticate(user=self.normal)
         url = reverse("staff-team-snapshots-create-or-update")
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    @patch("api.views.call_command")
+    def test_fetch_fixtures_cup_button_endpoint_runs_command(self, mock_call_command):
+        def fake_call_command(command_name, stdout=None):
+            self.assertEqual(command_name, "fetch_fixtures_cup")
+            stdout.write("Fetched cup fixtures.")
+
+        mock_call_command.side_effect = fake_call_command
+
+        self.client.force_authenticate(user=self.staff)
+        url = reverse("staff-fixtures-fetch-cup")
+        res = self.client.post(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data["output"], "Fetched cup fixtures.")
+        mock_call_command.assert_called_once()
+
+    def test_fetch_fixtures_cup_forbidden_for_non_staff(self):
+        self.client.force_authenticate(user=self.normal)
+        url = reverse("staff-fixtures-fetch-cup")
         res = self.client.post(url)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
