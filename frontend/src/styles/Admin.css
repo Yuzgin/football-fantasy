@@ -192,6 +192,244 @@
   outline-offset: 2px;
 }
 
+.admin-danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  box-shadow: none;
+}
+
+.admin-primary-button,
+.admin-secondary-button {
+  appearance: none;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.admin-primary-button {
+  border: 1px solid rgba(140, 105, 0, 0.45);
+  background: var(--app-accent-gold, #8a6405);
+  color: #141414;
+}
+
+.admin-secondary-button {
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: rgba(255, 255, 255, 0.78);
+  color: #1a1a1a;
+}
+
+.admin-primary-button:hover,
+.admin-secondary-button:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.admin-primary-button:disabled,
+.admin-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  box-shadow: none;
+}
+
+.admin-player-points {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) 1fr;
+  gap: 14px;
+}
+
+.admin-player-points__lookup {
+  min-width: 0;
+}
+
+.admin-player-points__main {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.admin-player-points__label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.admin-player-points__search {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #171717;
+  font: inherit;
+}
+
+.admin-player-points__results,
+.admin-player-points__games {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-player-points__result,
+.admin-player-points__game {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 10px 11px;
+  background: rgba(255, 255, 255, 0.68);
+  color: #171717;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-player-points__result span,
+.admin-player-points__game span {
+  display: block;
+  font-weight: 800;
+}
+
+.admin-player-points__result small,
+.admin-player-points__game small,
+.admin-player-points__meta,
+.admin-player-points__hint,
+.admin-player-points__empty {
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.admin-player-points__result--active,
+.admin-player-points__game--active {
+  border-color: rgba(140, 105, 0, 0.5);
+  background: rgba(159, 117, 6, 0.17);
+}
+
+.admin-player-points__player-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.admin-player-points__player-head h3,
+.admin-player-points__player-head p,
+.admin-player-points__fixture,
+.admin-player-points__meta {
+  margin: 0;
+}
+
+.admin-player-points__player-head h3 {
+  font-size: 1.2rem;
+  font-weight: 850;
+}
+
+.admin-player-points__player-head strong {
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(159, 117, 6, 0.2);
+  white-space: nowrap;
+}
+
+.admin-player-points__totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.admin-player-points__totals--compact {
+  grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+  margin: 12px 0;
+}
+
+.admin-player-points__totals div {
+  border-radius: 12px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.admin-player-points__totals span {
+  display: block;
+  color: rgba(0, 0, 0, 0.58);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-player-points__totals strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 1.05rem;
+}
+
+.admin-player-points__game-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, 1fr);
+  gap: 14px;
+}
+
+.admin-player-points__selected-game {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-player-points__fixture {
+  font-weight: 850;
+}
+
+.admin-player-points__edit {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-player-points__edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.admin-player-points__edit-grid label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.admin-player-points__match-field {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.admin-player-points__edit-grid input,
+.admin-player-points__match-field select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 10px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.84);
+  color: #171717;
+  font: inherit;
+}
+
+.admin-player-points__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 980px) {
   .admin-two-col {
     grid-template-columns: 1fr;
@@ -200,6 +438,11 @@
 
   .admin-panel__body {
     max-height: unset;
+  }
+
+  .admin-player-points,
+  .admin-player-points__game-grid {
+    grid-template-columns: 1fr;
   }
 }
 

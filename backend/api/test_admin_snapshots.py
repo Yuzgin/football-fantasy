@@ -111,6 +111,24 @@ class AdminMissingSnapshotsApiTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["created_count"], 0)
 
+    def test_create_or_update_team_snapshots_button_endpoint_runs_command(self):
+        self.client.force_authenticate(user=self.staff)
+        url = reverse("staff-team-snapshots-create-or-update")
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn("All team snapshots have been processed successfully", res.data["output"])
+        self.assertTrue(
+            TeamSnapshot.objects.filter(
+                team=self.team_missing_snapshot, game_week=self.gw
+            ).exists()
+        )
+
+    def test_create_or_update_team_snapshots_forbidden_for_non_staff(self):
+        self.client.force_authenticate(user=self.normal)
+        url = reverse("staff-team-snapshots-create-or-update")
+        res = self.client.post(url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_legacy_path_under_api_admin_hits_django_admin_not_snapshot_api(self):
         """Regression: /api/admin/ is django.contrib.admin — do not mount API routes there."""
         match = resolve("/api/admin/missing-snapshots/preview/")

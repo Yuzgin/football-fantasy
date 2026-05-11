@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '../api';
 import ViewPlayerList from '../components/ViewPlayerList';
 import CreatePlayerForm from '../components/CreatePlayerForm';
 import MatchList from '../components/MatchList';
 import CreateMatchForm from '../components/CreateMatchForm';
+import AdminPlayerPoints from '../components/AdminPlayerPoints';
 import { validateMatchBeforeCreate } from '../utils/matchLangwithValidation';
 import '../styles/Admin.css';
 
@@ -13,6 +14,7 @@ const Admin = () => {
   const [matches, setMatches] = useState([]);
   const [playerGameStats, setPlayerGameStats] = useState([]);
   const [backfillBusy, setBackfillBusy] = useState(false);
+  const [snapshotCommandBusy, setSnapshotCommandBusy] = useState(false);
   
   // Player form states
   const [playerForm, setPlayerForm] = useState({
@@ -44,15 +46,33 @@ const Admin = () => {
     return [...names];
   }, [matches]);
 
-  useEffect(() => {
-    fetchAllData();
+  const getPlayers = useCallback(() => {
+    api.get('/api/players/')
+      .then((res) => setPlayers(res.data))
+      .catch((err) => console.error('Error fetching players:', err));
   }, []);
 
-  const fetchAllData = () => {
+  const getMatches = useCallback(() => {
+    api.get('/api/matches/')
+      .then((res) => setMatches(res.data))
+      .catch((err) => console.error('Error fetching matches:', err));
+  }, []);
+
+  const getPlayerGameStats = useCallback(() => {
+    api.get('/api/player-game-stats/')
+      .then((res) => setPlayerGameStats(res.data))
+      .catch((err) => console.error('Error fetching player game stats:', err));
+  }, []);
+
+  const fetchAllData = useCallback(() => {
     getPlayers();
     getMatches();
     getPlayerGameStats();
-  };
+  }, [getMatches, getPlayerGameStats, getPlayers]);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
 
   const previewMissingSnapshots = async () => {
     const res = await api.get('/api/staff/missing-snapshots/preview/');
@@ -62,6 +82,33 @@ const Admin = () => {
   const backfillMissingSnapshots = async () => {
     const res = await api.post('/api/staff/missing-snapshots/backfill/');
     return res.data;
+  };
+
+  const createOrUpdateTeamSnapshots = async () => {
+    const res = await api.post('/api/staff/team-snapshots/create-or-update/');
+    return res.data;
+  };
+
+  const runCreateOrUpdateTeamSnapshots = async () => {
+    if (snapshotCommandBusy) return;
+
+    const confirmMsg =
+      'This will run the create_or_update_team_snapshots command for the current gameweek. ' +
+      'It can create missing snapshots and update team overall totals from existing snapshots.\n\n' +
+      'Proceed?';
+
+    if (!window.confirm(confirmMsg)) return;
+
+    setSnapshotCommandBusy(true);
+    try {
+      const result = await createOrUpdateTeamSnapshots();
+      alert(result?.output || 'Team snapshots processed successfully.');
+      fetchAllData();
+    } catch (e) {
+      alert(e?.response?.data?.detail || e?.message || 'Failed to run snapshot command.');
+    } finally {
+      setSnapshotCommandBusy(false);
+    }
   };
 
   const runSnapshotBackfillWithWarning = async () => {
@@ -103,24 +150,6 @@ const Admin = () => {
     } finally {
       setBackfillBusy(false);
     }
-  };
-
-  const getPlayers = () => {
-    api.get('/api/players/')
-      .then((res) => setPlayers(res.data))
-      .catch((err) => console.error('Error fetching players:', err));
-  };
-
-  const getMatches = () => {
-    api.get('/api/matches/')
-      .then((res) => setMatches(res.data))
-      .catch((err) => console.error('Error fetching matches:', err));
-  };
-
-  const getPlayerGameStats = () => {
-    api.get('/api/player-game-stats/')
-      .then((res) => setPlayerGameStats(res.data))
-      .catch((err) => console.error('Error fetching player game stats:', err));
   };
 
   // Player CRUD operations
@@ -207,26 +236,41 @@ const Admin = () => {
   };
 
   // Player Game Stats operations
-  const updatePlayerGameStat = (statId, updatedData) => {
-    api.put(`/api/player-game-stats/${statId}/`, updatedData)
-      .then(() => {
-        alert('Player game stat updated successfully!');
-        getPlayerGameStats();
-        getPlayers(); // Refresh players to update their totals
-      })
-      .catch((err) => alert(`Error updating player game stat: ${err.message}`));
+  const createPlayerGameStat = async (statData) => {
+    try {
+      await api.post('/api/player-game-stats/', statData);
+      alert('Player game stat created successfully!');
+      fetchAllData();
+    } catch (err) {
+      alert(`Error creating player game stat: ${err.message}`);
+      throw err;
+    }
   };
 
-  const deletePlayerGameStat = (statId) => {
-    if (window.confirm('Are you sure you want to delete this player game stat?')) {
-      api.delete(`/api/player-game-stats/${statId}/`)
-        .then(() => {
-          alert('Player game stat deleted successfully!');
-          getPlayerGameStats();
-          getPlayers(); // Refresh players to update their totals
-        })
-        .catch((err) => alert(`Error deleting player game stat: ${err.message}`));
+  const updatePlayerGameStat = async (statId, updatedData) => {
+    try {
+      await api.put(`/api/player-game-stats/${statId}/`, updatedData);
+      alert('Player game stat updated successfully!');
+      fetchAllData();
+    } catch (err) {
+      alert(`Error updating player game stat: ${err.message}`);
+      throw err;
     }
+  };
+
+  const deletePlayerGameStat = async (statId) => {
+    if (window.confirm('Are you sure you want to delete this player game stat?')) {
+      try {
+        await api.delete(`/api/player-game-stats/${statId}/`);
+        alert('Player game stat deleted successfully!');
+        fetchAllData();
+        return true;
+      } catch (err) {
+        alert(`Error deleting player game stat: ${err.message}`);
+        throw err;
+      }
+    }
+    return false;
   };
 
   // Helper functions
@@ -282,6 +326,15 @@ const Admin = () => {
             >
               {backfillBusy ? 'Backfilling…' : 'Backfill missing snapshots (current GW)'}
             </button>
+            <button
+              type="button"
+              className="admin-tab admin-tab--active"
+              onClick={runCreateOrUpdateTeamSnapshots}
+              disabled={snapshotCommandBusy}
+              title="Run create_or_update_team_snapshots for the current gameweek"
+            >
+              {snapshotCommandBusy ? 'Processing snapshots…' : 'Create/update team snapshots'}
+            </button>
           </div>
         </header>
 
@@ -306,6 +359,13 @@ const Admin = () => {
             onClick={() => setActiveTab('stats')}
           >
             Player stats
+          </button>
+          <button
+            type="button"
+            className={`admin-tab ${activeTab === 'playerPoints' ? 'admin-tab--active' : ''}`}
+            onClick={() => setActiveTab('playerPoints')}
+          >
+            Player points
           </button>
         </nav>
 
@@ -382,7 +442,10 @@ const Admin = () => {
               <div className="admin-stats-grid">
                 {playerGameStats.map((stat) => {
                   const playerName = players.find((p) => p.id === stat.player)?.name || 'Unknown Player';
-                  const match = matches.find((m) => m.id === stat.match);
+                  const matchId = typeof stat.match === 'object' ? stat.match?.id : stat.match;
+                  const match = typeof stat.match === 'object'
+                    ? stat.match
+                    : matches.find((m) => m.id === matchId);
                   const matchLabel = match ? `${match.team1} vs ${match.team2}` : 'Unknown match';
 
                   return (
@@ -418,6 +481,17 @@ const Admin = () => {
                 })}
               </div>
             </section>
+          )}
+
+          {activeTab === 'playerPoints' && (
+            <AdminPlayerPoints
+              players={players}
+              matches={matches}
+              playerGameStats={playerGameStats}
+              onCreateStat={createPlayerGameStat}
+              onUpdateStat={updatePlayerGameStat}
+              onDeleteStat={deletePlayerGameStat}
+            />
           )}
         </div>
       </div>

@@ -26,5 +26,6 @@ urlpatterns = [
     # Must not live under /api/admin/ — that path is owned by django.contrib.admin.
     path('staff/missing-snapshots/preview/', views.AdminMissingSnapshotsPreview.as_view(), name='staff-missing-snapshots-preview'),
     path('staff/missing-snapshots/backfill/', views.AdminBackfillMissingSnapshots.as_view(), name='staff-missing-snapshots-backfill'),
+    path('staff/team-snapshots/create-or-update/', views.AdminCreateOrUpdateTeamSnapshots.as_view(), name='staff-team-snapshots-create-or-update'),
     path('', include(router.urls)),  # Include the router for team snapshots
 ]

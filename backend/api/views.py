@@ -11,14 +11,49 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 import logging
+from io import StringIO
 from django.utils import timezone
 from django.utils.timezone import now
+from django.core.management import call_command
 from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .serializers import PlayerPointsSerializer, PlayerGoalsSerializer
 from django.db.models import Sum, Avg, Max
 from django.db import transaction
 from rest_framework.views import APIView
 from .permissions import IsStaffUser
+
+
+def _recalculate_snapshots_for_player_gameweeks(player_ids, game_week_ids):
+    """Recompute affected snapshots from source stats, then sync team totals."""
+    player_ids = {pid for pid in player_ids if pid}
+    game_week_ids = {gwid for gwid in game_week_ids if gwid}
+    if not player_ids or not game_week_ids:
+        return 0
+
+    snapshots = (
+        TeamSnapshot.objects.filter(players__id__in=player_ids, game_week_id__in=game_week_ids)
+        .distinct()
+        .select_related("team", "captain", "game_week")
+        .prefetch_related("players")
+    )
+
+    affected_team_ids = set()
+    recalculated_count = 0
+    for snapshot in snapshots:
+        weekly_points = snapshot.calculate_weekly_points()
+        if snapshot.weekly_points != weekly_points:
+            snapshot.weekly_points = weekly_points
+            snapshot.save(update_fields=["weekly_points"])
+        affected_team_ids.add(snapshot.team_id)
+        recalculated_count += 1
+
+    for team in Team.objects.filter(id__in=affected_team_ids).prefetch_related("snapshots"):
+        total_points = sum(snapshot.weekly_points for snapshot in team.snapshots.all())
+        if team.total_points != total_points:
+            team.total_points = total_points
+            team.save(update_fields=["total_points"])
+
+    return recalculated_count
 
 
 
@@ -330,6 +365,19 @@ class PlayerGameStatsListCreateView(generics.ListCreateAPIView):
         })
         return context
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            self.perform_create(serializer)
+            stat = serializer.instance
+            game_week_id = stat.match.game_week_id if stat.match else None
+            _recalculate_snapshots_for_player_gameweeks([stat.player_id], [game_week_id])
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = PlayerGameStats.objects.all()
@@ -343,6 +391,37 @@ class PlayerGameStatsDetailView(generics.RetrieveUpdateDestroyAPIView):
             'request': self.request
         })
         return context
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        old_player_id = instance.player_id
+        old_game_week_id = instance.match.game_week_id if instance.match else None
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        with transaction.atomic():
+            self.perform_update(serializer)
+            updated = serializer.instance
+            new_game_week_id = updated.match.game_week_id if updated.match else None
+            _recalculate_snapshots_for_player_gameweeks(
+                [old_player_id, updated.player_id],
+                [old_game_week_id, new_game_week_id],
+            )
+
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        player_id = instance.player_id
+        game_week_id = instance.match.game_week_id if instance.match else None
+
+        with transaction.atomic():
+            self.perform_destroy(instance)
+            _recalculate_snapshots_for_player_gameweeks([player_id], [game_week_id])
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TeamListView(generics.ListCreateAPIView):
@@ -680,4 +759,13 @@ class AdminBackfillMissingSnapshots(APIView):
             },
             status=201,
         )
+
+
+class AdminCreateOrUpdateTeamSnapshots(APIView):
+    permission_classes = [IsStaffUser]
+
+    def post(self, request):
+        output = StringIO()
+        call_command("create_or_update_team_snapshots", stdout=output)
+        return Response({"output": output.getvalue()}, status=200)
 

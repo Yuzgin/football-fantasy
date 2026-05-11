@@ -163,4 +163,30 @@ describe('Admin snapshot backfill (header button)', () => {
 
     alertSpy.mockRestore();
   });
+
+  it('runs the create/update team snapshots command from the header button', async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    vi.mocked(api.post).mockResolvedValue({
+      data: { output: 'All team snapshots have been processed successfully.' },
+    });
+
+    render(<Admin />);
+
+    const btn = await screen.findByRole('button', {
+      name: /create\/update team snapshots/i,
+    });
+    await user.click(btn);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/api/staff/team-snapshots/create-or-update/');
+    });
+    expect(confirmSpy).toHaveBeenCalled();
+    expect(alertSpy).toHaveBeenCalledWith('All team snapshots have been processed successfully.');
+
+    confirmSpy.mockRestore();
+    alertSpy.mockRestore();
+  });
 });
