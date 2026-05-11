@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api';
 import { Navigate } from 'react-router-dom';
 import TeamInfo from '../components/TeamInfo';
 import TransfersButton from '../components/TransfersButtton';
 import Header from '../components/Header';
 import PlayerView from '../components/PlayerView';
-import PlayerStats from '../components/PlayerStats';
+import PlayerDirectoryDetailModal from '../components/PlayerDirectoryDetailModal';
 
 const formations = {
   "4-4-2": ["Defender-1", "Defender-2", "Defender-3", "Defender-4", "Midfielder-1", "Midfielder-2", "Midfielder-3", "Midfielder-4", "Attacker-1", "Attacker-2"],
@@ -14,10 +14,7 @@ const formations = {
 const TeamPage = () => {
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState({});
-  const [budget, setBudget] = useState(100);
-  const [currentPosition, setCurrentPosition] = useState(null);
   const [teamValue, setTeamValue] = useState(100);
-  const [showPlayerStats, setShowPlayerStats] = useState(false);
   const[team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -46,7 +43,6 @@ const TeamPage = () => {
             return total + Number(player.price)}, 0);
             setTeamValue(totalValue);
 
-          let teamValue = 0;
           const positionMapping = {
               Goalkeeper: [],
               Defender: [],
@@ -58,7 +54,6 @@ const TeamPage = () => {
               if (positionMapping[player.position]) {
                   positionMapping[player.position].push(player.id);
               }
-              teamValue += Number(player.price);
           });
 
           // Ensure a goalkeeper is assigned if available
@@ -77,7 +72,7 @@ const TeamPage = () => {
           // Populate any remaining players that don't fit the selected formation
           Object.keys(positionMapping).forEach(positionType => {
               const remainingPositions = positionMapping[positionType];
-              remainingPositions.forEach((playerId, index) => {
+              remainingPositions.forEach((playerId) => {
                   // Find the next available position slot that hasn't been filled
                   const availablePosition = Object.keys(formations[selectedFormation])
                       .find(key => !initialSelectedPlayers[key] && key.startsWith(positionType));
@@ -93,7 +88,6 @@ const TeamPage = () => {
           });
 
           setSelectedPlayers(initialSelectedPlayers);
-          setBudget(100 - teamValue);
       } catch (error) {
           if (error.response && error.response.status === 404) {
             setTeam(null);
@@ -105,7 +99,6 @@ const TeamPage = () => {
 
   const openPlayerStats = (selectedPlayer) => {
     setSelectedPlayer(selectedPlayer);
-    setShowPlayerStats(true);
   };
 
   const getSelectedPlayerCount = () =>
@@ -210,12 +203,12 @@ const TeamPage = () => {
                 <TransfersButton />
               </div>
           </div>
-          {showPlayerStats && (
-            <PlayerStats
-                selectedPlayer={selectedPlayer}
-                closeStats={() => setShowPlayerStats(false)}
+          {selectedPlayer ? (
+            <PlayerDirectoryDetailModal
+              player={selectedPlayer}
+              onClose={() => setSelectedPlayer(null)}
             />
-            )}
+          ) : null}
       </div>
       </div>
   );
